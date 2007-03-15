@@ -105,6 +105,7 @@ public final class RubyDebugTarget extends RubyEntity {
         RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);
         getProxy().fireDebugEvent(ev);
         
+        //		try {
         getProcess().destroy();
         threads = new RubyThread[0];
         terminated = true;

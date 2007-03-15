@@ -13,7 +13,7 @@ import org.rubyforge.debugcommons.model.RubyThread;
 
 public abstract class DebuggerTestBase extends TestBase {
     
-    // XXX cannot be hardcoded. Use configuration files or propert or ...
+    // XXX cannot be hardcoded. Use configuration files or property or ...
     private static final String PATH_TO_CLASSIC_DEBUG_DIR =
             "/path/to/classic-debugger/dir";
     private static final String PATH_TO_REMOTE_DEBUG_DIR =
