@@ -1,0 +1,6 @@
+0.7.0 - 0.7.1
+-------------
+
+	* added possibility to specify timeout until ReadersSupport gives up
+	* RubyDebuggerProxy.checkConnection() fixed for ruby-debug
+
