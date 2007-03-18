@@ -96,7 +96,6 @@ public final class RubyDebuggerProxy {
         commandFactory = new ClassicDebuggerCommandFactory();
         readersSupport.startCommandLoop(getCommandSocket());
         setBreakpoints(initialBreakpoints);
-        connected = true;
     }
     
     private void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
@@ -138,6 +137,7 @@ public final class RubyDebuggerProxy {
                 default:
                     throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
             }
+            connected = true;
         }
         return controlWriter;
     }

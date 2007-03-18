@@ -156,13 +156,14 @@ public abstract class DebuggerTestBase extends TestBase {
     //    }
     
     protected void startDebugging(
-            final RubyDebuggerProxy proxy, 
+            final RubyDebuggerProxy proxy,
             final IRubyBreakpoint[] breakpoints,
             final int nOfEvents) throws InterruptedException {
         waitForEvents(proxy, nOfEvents, new Runnable() {
             public void run() {
                 try {
                     proxy.startDebugging(breakpoints);
+                    assertTrue(proxy.checkConnection());
                 } catch (RubyDebuggerException e) {
                     fail("Cannot start debugger: " + e);
                 }
