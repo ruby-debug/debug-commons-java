@@ -57,7 +57,8 @@ public final class RubyDebuggerProxy {
         return debugTarged;
     }
     
-    private ReadersSupport getReadersSupport() throws RubyDebuggerException {
+    /** <b>Package-private</b> for unit tests only. */
+    ReadersSupport getReadersSupport() throws RubyDebuggerException {
         return readersSupport;
     }
     
@@ -258,8 +259,7 @@ public final class RubyDebuggerProxy {
             sendCommand(commandFactory.createReadThreads());
             return getReadersSupport().readThreads();
         } catch (RubyDebuggerException e) {
-            Util.severe("Cannot obtain thread information", e);
-            return new RubyThreadInfo[0];
+            throw new RuntimeException("Cannot obtain thread information", e);
         }
     }
     
@@ -274,8 +274,7 @@ public final class RubyDebuggerProxy {
             }
             return frames;
         } catch (RubyDebuggerException e) {
-            Util.severe("Cannot obtain frames information", e);
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Cannot obtain frames information", e);
         }
     }
     
@@ -290,8 +289,7 @@ public final class RubyDebuggerProxy {
             }
             return variables;
         } catch (RubyDebuggerException e) {
-            Util.severe(e);
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Cannot obtain variables information", e);
         }
     }
     
@@ -306,8 +304,7 @@ public final class RubyDebuggerProxy {
             }
             return variables;
         } catch (RubyDebuggerException e) {
-            Util.severe(e);
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Cannot obtain instance variables information", e);
         }
     }
     
@@ -317,8 +314,7 @@ public final class RubyDebuggerProxy {
             RubyVariableInfo[] infos = getReadersSupport().readVariables();
             return infos.length == 0 ? null : new RubyVariable(frame, infos[0]);
         } catch (RubyDebuggerException e) {
-            Util.severe(e);
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Cannot inspect expression", e);
         }
     }
     

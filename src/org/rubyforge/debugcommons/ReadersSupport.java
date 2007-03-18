@@ -129,28 +129,29 @@ final class ReadersSupport {
         }
     }
     
-    private <T> T[] readInfo(BlockingQueue<T[]> queue) {
-        T[] result = null;
+    private <T> T[] readInfo(BlockingQueue<T[]> queue) throws RubyDebuggerException {
         try {
-            result = queue.poll(timeout, TimeUnit.SECONDS);
+            T[] result = queue.poll(timeout, TimeUnit.SECONDS);
             if (result == null) {
-                Util.severe("Unable to read information in the specified timeout");
+                throw new RubyDebuggerException("Unable to read information in the specified timeout [" + timeout + "s]");
+            } else {
+                return result;
             }
         } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading information " + queue.getClass(), ex);
+            Thread.currentThread().interrupt();
+            throw new RubyDebuggerException("Interruped during reading information " + queue.getClass(), ex);
         }
-        return result == null ? (T[]) new Object[0] : result;
     }
     
-    RubyThreadInfo[] readThreads() {
+    RubyThreadInfo[] readThreads() throws RubyDebuggerException {
         return readInfo(threads);
     }
     
-    RubyFrameInfo[] readFrames() {
+    RubyFrameInfo[] readFrames() throws RubyDebuggerException {
         return readInfo(frames);
     }
     
-    RubyVariableInfo[] readVariables() {
+    RubyVariableInfo[] readVariables() throws RubyDebuggerException {
         return readInfo(variables);
     }
     
