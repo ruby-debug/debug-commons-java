@@ -3,4 +3,5 @@
 
 	* added possibility to specify timeout until ReadersSupport gives up
 	* RubyDebuggerProxy.checkConnection() fixed for ruby-debug
+	* propagating RubyDebuggerException to the client (frontend)
 
