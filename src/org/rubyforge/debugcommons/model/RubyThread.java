@@ -1,6 +1,7 @@
 package org.rubyforge.debugcommons.model;
 
 import org.rubyforge.debugcommons.RubyDebugEvent;
+import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 
 public final class RubyThread extends RubyEntity {
@@ -19,7 +20,7 @@ public final class RubyThread extends RubyEntity {
         this.updateName();
     }
     
-    public RubyFrame[] getFrames() {
+    public RubyFrame[] getFrames() throws RubyDebuggerException {
         if (frames == null) {
             if (isSuspended()) {
                 frames = getProxy().readFrames(this);
@@ -39,7 +40,7 @@ public final class RubyThread extends RubyEntity {
     //		return isSuspended ; //TODO: change getFrames().length > 0;
     //	}
     
-    public RubyFrame getTopFrame() {
+    public RubyFrame getTopFrame() throws RubyDebuggerException {
         RubyFrame[] frames = getFrames();
         assert frames.length > 0;
         return frames[0];
@@ -114,17 +115,17 @@ public final class RubyThread extends RubyEntity {
     //		return isStepping;
     //	}
     
-    public void stepInto() {
+    public void stepInto() throws RubyDebuggerException {
         //        isStepping = true;
         this.updateName();
         getTopFrame().stepInto();
     }
     
-    public void stepOver() {
+    public void stepOver() throws RubyDebuggerException {
         getTopFrame().stepOver();
     }
     
-    public void stepReturn() {
+    public void stepReturn() throws RubyDebuggerException {
         RubyFrame[] frames = getFrames();
         assert frames.length > 0;
         frames[frames.length > 1 ? 1 : 0].stepReturn();

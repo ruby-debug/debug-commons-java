@@ -69,7 +69,11 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
         // there is a third variable 'x' for ruby 1.8.0
         waitForEvents(proxy, 1, new Runnable() {
             public void run() {
-                suspendedThread.stepOver();
+                try {
+                    suspendedThread.stepOver();
+                } catch (RubyDebuggerException e) {
+                    throw new RuntimeException("Cannot stepOver", e);
+                }
             }
         });
         frames = suspendedThread.getFrames();

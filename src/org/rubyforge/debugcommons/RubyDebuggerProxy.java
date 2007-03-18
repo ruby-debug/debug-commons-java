@@ -88,10 +88,10 @@ public final class RubyDebuggerProxy {
         }
         startRubyLoop();
     }
-
-	public boolean checkConnection() {
-		return connected;
-	}
+    
+    public boolean checkConnection() {
+        return connected;
+    }
     
     private void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         commandFactory = new ClassicDebuggerCommandFactory();
@@ -254,68 +254,48 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    public RubyThreadInfo[] readThreadInfo() {
-        try {
-            sendCommand(commandFactory.createReadThreads());
-            return getReadersSupport().readThreads();
-        } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot obtain thread information", e);
-        }
+    public RubyThreadInfo[] readThreadInfo() throws RubyDebuggerException {
+        sendCommand(commandFactory.createReadThreads());
+        return getReadersSupport().readThreads();
     }
     
-    public RubyFrame[] readFrames(RubyThread thread) {
-        try {
-            sendCommand(commandFactory.createReadFrames(thread));
-            RubyFrameInfo[] infos = getReadersSupport().readFrames();
-            RubyFrame[] frames = new RubyFrame[infos.length];
-            for (int i = 0; i < infos.length; i++) {
-                RubyFrameInfo info = infos[i];
-                frames[i] = new RubyFrame(thread, info);
-            }
-            return frames;
-        } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot obtain frames information", e);
+    public RubyFrame[] readFrames(RubyThread thread) throws RubyDebuggerException {
+        sendCommand(commandFactory.createReadFrames(thread));
+        RubyFrameInfo[] infos = getReadersSupport().readFrames();
+        RubyFrame[] frames = new RubyFrame[infos.length];
+        for (int i = 0; i < infos.length; i++) {
+            RubyFrameInfo info = infos[i];
+            frames[i] = new RubyFrame(thread, info);
         }
+        return frames;
     }
     
-    public RubyVariable[] readVariables(RubyFrame frame) {
-        try {
-            sendCommand(commandFactory.createReadLocalVariables(frame));
-            RubyVariableInfo[] infos = getReadersSupport().readVariables();
-            RubyVariable[] variables= new RubyVariable[infos.length];
-            for (int i = 0; i < infos.length; i++) {
-                RubyVariableInfo info = infos[i];
-                variables[i] = new RubyVariable(frame, info);
-            }
-            return variables;
-        } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot obtain variables information", e);
+    public RubyVariable[] readVariables(RubyFrame frame) throws RubyDebuggerException {
+        sendCommand(commandFactory.createReadLocalVariables(frame));
+        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariable[] variables= new RubyVariable[infos.length];
+        for (int i = 0; i < infos.length; i++) {
+            RubyVariableInfo info = infos[i];
+            variables[i] = new RubyVariable(frame, info);
         }
+        return variables;
     }
     
-    public RubyVariable[] readInstanceVariables(final RubyVariable variable) {
-        try {
-            sendCommand(commandFactory.createReadInstanceVariable(variable));
-            RubyVariableInfo[] infos = getReadersSupport().readVariables();
-            RubyVariable[] variables= new RubyVariable[infos.length];
-            for (int i = 0; i < infos.length; i++) {
-                RubyVariableInfo info = infos[i];
-                variables[i] = new RubyVariable(variable, info);
-            }
-            return variables;
-        } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot obtain instance variables information", e);
+    public RubyVariable[] readInstanceVariables(final RubyVariable variable) throws RubyDebuggerException {
+        sendCommand(commandFactory.createReadInstanceVariable(variable));
+        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariable[] variables= new RubyVariable[infos.length];
+        for (int i = 0; i < infos.length; i++) {
+            RubyVariableInfo info = infos[i];
+            variables[i] = new RubyVariable(variable, info);
         }
+        return variables;
     }
     
-    public RubyVariable inspectExpression(RubyFrame frame, String expression) {
-        try {
-            sendCommand(commandFactory.createInspect(frame, expression));
-            RubyVariableInfo[] infos = getReadersSupport().readVariables();
-            return infos.length == 0 ? null : new RubyVariable(frame, infos[0]);
-        } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot inspect expression", e);
-        }
+    public RubyVariable inspectExpression(RubyFrame frame, String expression) throws RubyDebuggerException {
+        sendCommand(commandFactory.createInspect(frame, expression));
+        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        return infos.length == 0 ? null : new RubyVariable(frame, infos[0]);
     }
     
     private void closeConnections() throws RubyDebuggerException, IOException {

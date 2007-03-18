@@ -2,6 +2,7 @@ package org.rubyforge.debugcommons.model;
 
 import java.io.File;
 import org.rubyforge.debugcommons.RubyDebugEvent;
+import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyEntity;
@@ -43,7 +44,7 @@ public final class RubyDebugTarget extends RubyEntity {
         return baseDir;
     }
     
-    public void updateThreads() {
+    public void updateThreads() throws RubyDebuggerException {
         // preconditions:
         // 1) both threadInfos and updatedThreads are sorted by their id attribute
         // 2) once a thread has died its id is never reused for new threads again.
@@ -68,7 +69,11 @@ public final class RubyDebugTarget extends RubyEntity {
     }
     
     public void suspensionOccurred(SuspensionPoint suspensionPoint) {
-        updateThreads();
+        try {
+            updateThreads();
+        } catch (RubyDebuggerException e) {
+            throw new RuntimeException("Cannot update threads", e);
+        }
         RubyThread thread = getThreadById(suspensionPoint.getThreadId());
         if (thread == null) {
             Util.warning("Thread with id " + suspensionPoint.getThreadId() + " was not found");

@@ -1,5 +1,7 @@
 package org.rubyforge.debugcommons.model;
 
+import org.rubyforge.debugcommons.RubyDebuggerException;
+
 public class RubyValue extends RubyEntity {
     
     private String value;
@@ -28,7 +30,7 @@ public class RubyValue extends RubyEntity {
         return false;
     }
     
-    public RubyVariable[] getVariables() {
+    public RubyVariable[] getVariables() throws RubyDebuggerException {
         if (!hasChildren) {
             return new RubyVariable[0];
         }

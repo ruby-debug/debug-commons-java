@@ -1,5 +1,7 @@
 package org.rubyforge.debugcommons.model;
 
+import org.rubyforge.debugcommons.RubyDebuggerException;
+
 public final class RubyFrame extends RubyEntity {
     
     private final RubyFrameInfo info;
@@ -29,18 +31,18 @@ public final class RubyFrame extends RubyEntity {
         return thread;
     }
     
-    public RubyVariable[] getVariables() {
+    public RubyVariable[] getVariables() throws RubyDebuggerException {
         if (variables == null) {
             variables = getProxy().readVariables(this);
         }
         return variables;
     }
     
-    public RubyVariable inspectExpression(final String expression) {
+    public RubyVariable inspectExpression(final String expression) throws RubyDebuggerException {
         return getProxy().inspectExpression(this, expression);
     }
     
-    public boolean hasVariables() {
+    public boolean hasVariables() throws RubyDebuggerException {
         return getVariables().length > 0;
     }
     
