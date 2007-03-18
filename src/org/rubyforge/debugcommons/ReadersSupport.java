@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
@@ -35,6 +36,12 @@ final class ReadersSupport {
     
     private static final String RUBY_DEBUG_PROMPT = "PROMPT";
     
+    /**
+     * Reading timeout until giving up when polling information from socket
+     * communication.
+     */
+    private final long timeout;
+    
     private final BlockingQueue<RubyThreadInfo[]> threads;
     private final BlockingQueue<RubyFrameInfo[]> frames;
     private final BlockingQueue<RubyVariableInfo[]> variables;
@@ -42,7 +49,12 @@ final class ReadersSupport {
     private final BlockingQueue<SuspensionPoint> suspensions;
     private final BlockingQueue<Integer> addedBreakpoints;
     
-    ReadersSupport() throws RubyDebuggerException {
+    /**
+     * @param timeout reading timeout until giving up when polling information
+     *        from socket communication.
+     */
+    ReadersSupport(final long timeout) throws RubyDebuggerException {
+        this.timeout = timeout;
         this.threads = new LinkedBlockingQueue<RubyThreadInfo[]>();
         this.frames = new LinkedBlockingQueue<RubyFrameInfo[]>();
         this.variables = new LinkedBlockingQueue<RubyVariableInfo[]>();
@@ -117,39 +129,37 @@ final class ReadersSupport {
         }
     }
     
-    int readBreakpointNo() {
+    private <T> T[] readInfo(BlockingQueue<T[]> queue) {
+        T[] result = null;
         try {
-            return addedBreakpoints.take();
+            result = queue.poll(timeout, TimeUnit.SECONDS);
+            if (result == null) {
+                Util.severe("Unable to read information in the specified timeout");
+            }
         } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading added breakpoint number", ex);
-            return -1;
+            Util.severe("Interruped during reading information " + queue.getClass(), ex);
         }
+        return result == null ? (T[]) new Object[0] : result;
     }
     
     RubyThreadInfo[] readThreads() {
-        try {
-            return threads.take();
-        } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading threads information", ex);
-            return new RubyThreadInfo[0];
-        }
+        return readInfo(threads);
     }
     
     RubyFrameInfo[] readFrames() {
-        try {
-            return frames.take();
-        } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading frames information", ex);
-            return new RubyFrameInfo[0];
-        }
+        return readInfo(frames);
     }
     
     RubyVariableInfo[] readVariables() {
+        return readInfo(variables);
+    }
+    
+    int readBreakpointNo() {
         try {
-            return variables.take();
+            return addedBreakpoints.poll(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading variables information", ex);
-            return new RubyVariableInfo[0];
+            Util.severe("Interruped during reading added breakpoint number", ex);
+            return -1;
         }
     }
     

@@ -50,7 +50,7 @@ public final class RubyDebuggerProxy {
     
     public void connect(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
         this.debugTarged = debugTarged;
-        this.readersSupport = new ReadersSupport();
+        this.readersSupport = new ReadersSupport(10); // default reading timeout 10s
     }
     
     public RubyDebugTarget getDebugTarged() {
