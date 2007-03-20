@@ -155,12 +155,17 @@ final class ReadersSupport {
         return readInfo(variables);
     }
     
-    int readBreakpointNo() {
+    int readBreakpointNo() throws RubyDebuggerException {
         try {
-            return addedBreakpoints.poll(timeout, TimeUnit.SECONDS);
+            Integer breakpointNo = addedBreakpoints.poll(timeout, TimeUnit.SECONDS);
+            if (breakpointNo == null) {
+                throw new RubyDebuggerException("Unable to read added breakpoint number in the specified timeout [" + timeout + "s]");
+            } else {
+                return breakpointNo;
+            }
         } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading added breakpoint number", ex);
-            return -1;
+            Thread.currentThread().interrupt();
+            throw new RubyDebuggerException("Interruped during reading added breakpoint number", ex);
         }
     }
     

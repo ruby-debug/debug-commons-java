@@ -27,4 +27,22 @@ public class ReadersSupportTest extends DebuggerTestBase {
         proxy.getDebugTarged().getThreadById(1).resume();
     }
     
+    public void testNPENotThrownWhenReadingAddedBreakpoints() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "b=10",  // 1
+                "b=11"); // 2
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            new TestBreakpoint("test.rb", 1),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        try {
+            proxy.getReadersSupport().readBreakpointNo();
+            fail("RubyDebuggerException expected");
+        } catch (RubyDebuggerException e) {
+            // OK - expected
+        }
+        proxy.getDebugTarged().getThreadById(1).resume();
+    }
+    
 }

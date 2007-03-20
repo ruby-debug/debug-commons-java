@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
-import org.rubyforge.debugcommons.ReadersSupport;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.RubyThread;
 
@@ -23,8 +22,8 @@ public abstract class DebuggerTestBase extends TestBase {
     
     //    private Socket socket;
     //    private PrintWriter socketWritter;
-    private File testFile;
-    private String testFilePath;
+    protected File testFile;
+    protected String testFilePath;
     private RubyDebugTarget debugTarget;
     private DebuggerType debuggerType;
     
@@ -65,7 +64,7 @@ public abstract class DebuggerTestBase extends TestBase {
     //        }
     //    }
     
-    protected File writeFile(String name, String[] content) throws FileNotFoundException {
+    protected File writeFile(String name, String... content) throws FileNotFoundException {
         File file = new File(getWorkDir(),  name);
         PrintWriter writer = new PrintWriter(file);
         try {
