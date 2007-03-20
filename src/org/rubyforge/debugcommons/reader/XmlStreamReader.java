@@ -1,7 +1,6 @@
 package org.rubyforge.debugcommons.reader;
 
 import java.io.IOException;
-import org.rubyforge.debugcommons.Util;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -21,10 +20,15 @@ public abstract class XmlStreamReader {
         }
     }
     
+    /**
+     * Works like {@link XmlPullParser#next} but skips all {@link
+     * XmlPullParser#TEXT} events.
+     */
     protected int nextEvent() throws XmlPullParserException, IOException {
         int eventType = -1;
         while ((eventType = xpp.next()) == XmlPullParser.TEXT) {
-            Util.fine("Skipping text event");
+            // skip
+            // Util.finest("Skipping text event");
         }
         return eventType;
     }
