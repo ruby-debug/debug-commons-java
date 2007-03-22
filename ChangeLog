@@ -5,4 +5,6 @@
 	* RubyDebuggerProxy.checkConnection() fixed for ruby-debug
 	* propagating RubyDebuggerException to the client (frontend)
 	* fixed NPE during reading a number of added breakpoint
+	* option to synchronize $stderr and $stdout
+	* option to pass additional debugger arguments
 
