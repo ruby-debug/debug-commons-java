@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -59,8 +60,11 @@ public final class RubyDebuggerFactory {
         }
         args.add("-r");
         args.add(descriptor.isVerbose() ? CLASSIC_VERBOSE_DEBUG_NAME : CLASSIC_DEBUG_NAME);
-        args.addAll(descriptor.getAdditionalArgs());
+        args.addAll(descriptor.getAddtionalOptions());
         args.add(descriptor.getScriptPath());
+        if (descriptor.getScriptArguments() != null) {
+            args.addAll(Arrays.asList(descriptor.getScriptArguments()));
+        }
         Util.fine("Running: \"" + args + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(descriptor.getBaseDirectory());
@@ -100,7 +104,11 @@ public final class RubyDebuggerFactory {
         }
         args.add("-f");
         args.add("xml");
+        args.add("--");
         args.add(descriptor.getScriptPath());
+        if (descriptor.getScriptArguments() != null) {
+            args.addAll(Arrays.asList(descriptor.getScriptArguments()));
+        }
         Util.fine("Running: \"" + args + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(descriptor.getBaseDirectory());
@@ -136,8 +144,9 @@ public final class RubyDebuggerFactory {
         private boolean verbose;
         private boolean useDefaultPort;
         private String scriptPath;
+        private String[] scriptArguments;
         private boolean synchronizedOutput;
-        private Collection<? extends String> additionalArgs;
+        private Collection<? extends String> additionalOptions;
         
         public boolean isVerbose() {
             return verbose;
@@ -166,6 +175,17 @@ public final class RubyDebuggerFactory {
             this.scriptPath = scriptPath;
         }
         
+        public String[] getScriptArguments() {
+            return scriptArguments;
+        }
+        
+        /**
+         * @param scriptArguments scriptArguments arguments for the debugged script.
+         */
+        public void setScriptArguments(String[] scriptArguments) {
+            this.scriptArguments = scriptArguments;
+        }
+        
         public boolean isSynchronizedOutput() {
             return synchronizedOutput;
         }
@@ -174,12 +194,12 @@ public final class RubyDebuggerFactory {
             this.synchronizedOutput = synchronizedOutput;
         }
         
-        public Collection<? extends String> getAdditionalArgs() {
-            return additionalArgs == null ? Collections.<String>emptySet() : additionalArgs;
+        public Collection<? extends String> getAddtionalOptions() {
+            return additionalOptions == null ? Collections.<String>emptySet() : additionalOptions;
         }
         
-        public void setAdditionalArgs(Collection<? extends String> additionalArgs) {
-            this.additionalArgs = additionalArgs;
+        public void setAdditionalOptions(Collection<? extends String> additionalOptions) {
+            this.additionalOptions = additionalOptions;
         }
         
         File getBaseDirectory() {

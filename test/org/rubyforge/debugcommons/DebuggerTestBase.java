@@ -78,21 +78,26 @@ public abstract class DebuggerTestBase extends TestBase {
     }
     
     protected RubyDebuggerProxy prepareProxy(String... lines) throws IOException, RubyDebuggerException {
+        return prepareProxyWithArguments(null, lines);
+    }
+    
+    protected RubyDebuggerProxy prepareProxyWithArguments(String[] arguments, String... lines) throws IOException, RubyDebuggerException {
         testFile = writeFile("test.rb", lines);
         testFilePath = testFile.getAbsolutePath();
-        RubyDebuggerProxy proxy = startDebugger();
-        //        socket = connect(debugTarget.getPort());
-        //        Thread.sleep(500);
-        //        socketWritter = new PrintWriter(socket.getOutputStream(), true);
-        return proxy;
+        return startDebugger(arguments);
     }
     
     public RubyDebuggerProxy startDebugger() throws IOException, RubyDebuggerException {
+        return startDebugger(null);
+    }
+    
+    public RubyDebuggerProxy startDebugger(final String[] scriptArguments) throws IOException, RubyDebuggerException {
         RubyDebuggerProxy proxy;
         RubyDebuggerFactory.Descriptor descriptor = new RubyDebuggerFactory.Descriptor();
         descriptor.useDefaultPort(false);
         descriptor.setVerbose(true);
         descriptor.setScriptPath(testFilePath);
+        descriptor.setScriptArguments(scriptArguments);
         switch(debuggerType) {
             case CLASSIC_DEBUGGER:
                 proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
