@@ -77,7 +77,7 @@ public abstract class DebuggerTestBase extends TestBase {
         return  file;
     }
     
-    protected RubyDebuggerProxy prepareProxy(String... lines) throws IOException, RubyDebuggerException, InterruptedException {
+    protected RubyDebuggerProxy prepareProxy(String... lines) throws IOException, RubyDebuggerException {
         testFile = writeFile("test.rb", lines);
         testFilePath = testFile.getAbsolutePath();
         RubyDebuggerProxy proxy = startDebugger();
