@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
@@ -27,7 +26,7 @@ public final class RubyDebuggerProxy {
     static final DebuggerType CLASSIC_DEBUGGER = DebuggerType.CLASSIC_DEBUGGER;
     static final DebuggerType RUBY_DEBUG = DebuggerType.RUBY_DEBUG;
     
-    public static final List<RubyDebuggerProxy> PROXIES = new ArrayList<RubyDebuggerProxy>();
+    public static final List<RubyDebuggerProxy> PROXIES = new CopyOnWriteArrayList<RubyDebuggerProxy>();
     
     private List<RubyDebugEventListener> listeners;
     
