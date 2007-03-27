@@ -8,4 +8,5 @@
 	* ability to synchronize $stderr and $stdout
 	* ability to pass additional debugger options
 	* ability to pass arguments to the debuggee
+	* fixed ConcurrentModificationException in RubyDebuggerProxy
 
