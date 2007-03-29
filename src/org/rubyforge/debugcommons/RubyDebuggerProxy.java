@@ -164,7 +164,7 @@ public final class RubyDebuggerProxy {
             if (breakpoint.isEnabled()) {
                 String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
                 sendControlCommand(command);
-                int index = getReadersSupport().readBreakpointNo();
+                int index = getReadersSupport().readAddedBreakpointNo();
                 breakpoint.setIndex(index);
             }
         } catch (RubyDebuggerException e) {
@@ -177,6 +177,7 @@ public final class RubyDebuggerProxy {
             if (breakpoint.getIndex() != -1) {
                 String command = commandFactory.createRemoveBreakpoint(breakpoint.getIndex());
                 sendControlCommand(command);
+                getReadersSupport().waitForRemovedBreakpoint(breakpoint.getIndex());
                 breakpoint.setIndex(-1);
             }
         } catch (RubyDebuggerException e) {

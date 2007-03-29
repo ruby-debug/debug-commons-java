@@ -9,4 +9,5 @@
 	* ability to pass additional debugger options
 	* ability to pass arguments to the debuggee
 	* fixed ConcurrentModificationException in RubyDebuggerProxy
+	* fixed breakpoint addition/removing
 

@@ -37,7 +37,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         };
         startDebugging(proxy, breakpoints, 1);
         try {
-            proxy.getReadersSupport().readBreakpointNo();
+            proxy.getReadersSupport().readAddedBreakpointNo();
             fail("RubyDebuggerException expected");
         } catch (RubyDebuggerException e) {
             // OK - expected
