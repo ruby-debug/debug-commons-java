@@ -9,5 +9,7 @@
 	* ability to pass additional debugger options
 	* ability to pass arguments to the debuggee
 	* fixed ConcurrentModificationException in RubyDebuggerProxy
-	* fixed breakpoint addition/removing
+	* change/fixed breakpoint addition/removing. Removed index from
+		IRubyBreakpoint interface. Frontend is not supposed to care about internal
+		communication details between the library and backend.
 

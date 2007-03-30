@@ -27,7 +27,6 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 3 -> 2
         
         IRubyBreakpoint second = breakpoints[1];
-        assertEquals("rigth breakpoint number for second breakpoint", second.getIndex(), 2);
         proxy.removeBreakpoint(second);
         
         // finish
@@ -53,7 +52,6 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 3 -> 2
         
         final IRubyBreakpoint first = breakpoints[0];
-        assertEquals("rigth breakpoint number for first breakpoint", first.getIndex(), 1);
         proxy.removeBreakpoint(first);
         
         // finish

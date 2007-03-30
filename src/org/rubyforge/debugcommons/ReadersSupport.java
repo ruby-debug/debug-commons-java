@@ -175,7 +175,8 @@ final class ReadersSupport {
         try {
             Integer removedID = removedBreakpoints.poll(timeout, TimeUnit.SECONDS);
             if (removedID == null) {
-                throw new RubyDebuggerException("Unable to read added breakpoint number in the specified timeout [" + timeout + "s]");
+                throw new RubyDebuggerException("Unable to read breakpoint number of the removed breakpoint ("
+                        + breakpointID + ") in the specified timeout [" + timeout + "s]");
             } else if (removedID != breakpointID) {
                 throw new RubyDebuggerException("Unexpected breakpoint removed. " +
                         "Received id: " + removedID + ", expected: " + breakpointID);

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
@@ -28,7 +31,8 @@ public final class RubyDebuggerProxy {
     
     public static final List<RubyDebuggerProxy> PROXIES = new CopyOnWriteArrayList<RubyDebuggerProxy>();
     
-    private List<RubyDebugEventListener> listeners;
+    private final List<RubyDebugEventListener> listeners;
+    private final Map<Integer, IRubyBreakpoint> breakpointsIDs;
     
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
@@ -45,6 +49,7 @@ public final class RubyDebuggerProxy {
     public RubyDebuggerProxy(DebuggerType debuggerType) {
         this.debuggerType = debuggerType;
         this.listeners = new CopyOnWriteArrayList<RubyDebugEventListener>();
+        this.breakpointsIDs = new HashMap<Integer, IRubyBreakpoint>();
     }
     
     public void connect(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
@@ -72,14 +77,14 @@ public final class RubyDebuggerProxy {
     public void startDebugging(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             switch(debuggerType) {
-                case CLASSIC_DEBUGGER:
-                    startClassicDebugger(initialBreakpoints);
-                    break;
-                case RUBY_DEBUG:
-                    startRubyDebug(initialBreakpoints);
-                    break;
-                default:
-                    throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+            case CLASSIC_DEBUGGER:
+                startClassicDebugger(initialBreakpoints);
+                break;
+            case RUBY_DEBUG:
+                startRubyDebug(initialBreakpoints);
+                break;
+            default:
+                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
             }
         } catch (RubyDebuggerException e) {
             PROXIES.remove(this);
@@ -123,19 +128,19 @@ public final class RubyDebuggerProxy {
     private PrintWriter getControlWriter() throws RubyDebuggerException {
         if (controlWriter == null) {
             switch(debuggerType) {
-                case CLASSIC_DEBUGGER:
-                    // same writer for commands and control in the case of Classic Debugger
-                    controlWriter = getCommandWriter();
-                    break;
-                case RUBY_DEBUG:
-                    try {
-                        controlWriter = new PrintWriter(getControlSocket().getOutputStream(), true);
-                    } catch (IOException e) {
-                        throw new RubyDebuggerException(e);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+            case CLASSIC_DEBUGGER:
+                // same writer for commands and control in the case of Classic Debugger
+                controlWriter = getCommandWriter();
+                break;
+            case RUBY_DEBUG:
+                try {
+                    controlWriter = new PrintWriter(getControlSocket().getOutputStream(), true);
+                } catch (IOException e) {
+                    throw new RubyDebuggerException(e);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
             }
             connected = true;
         }
@@ -164,25 +169,51 @@ public final class RubyDebuggerProxy {
             if (breakpoint.isEnabled()) {
                 String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
                 sendControlCommand(command);
-                int index = getReadersSupport().readAddedBreakpointNo();
-                breakpoint.setIndex(index);
+                Integer id = getReadersSupport().readAddedBreakpointNo();
+                breakpointsIDs.put(id, breakpoint);
             }
         } catch (RubyDebuggerException e) {
             Util.severe("Exception during adding breakpoint.", e);
         }
     }
     
+    /**
+     * Remove given breakpoint from the debugging session.
+     */
     public void removeBreakpoint(final IRubyBreakpoint breakpoint) {
-        try {
-            if (breakpoint.getIndex() != -1) {
-                String command = commandFactory.createRemoveBreakpoint(breakpoint.getIndex());
+        Integer id = findBreakpointId(breakpoint);
+        if (id != null) {
+            String command = commandFactory.createRemoveBreakpoint(id);
+            try {
                 sendControlCommand(command);
-                getReadersSupport().waitForRemovedBreakpoint(breakpoint.getIndex());
-                breakpoint.setIndex(-1);
+                getReadersSupport().waitForRemovedBreakpoint(id);
+                breakpointsIDs.remove(id);
+            } catch (RubyDebuggerException e) {
+                Util.severe("Exception during removing breakpoint.", e);
             }
-        } catch (RubyDebuggerException e) {
-            Util.severe("Exception during removing breakpoint.", e);
+        } else {
+            Util.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
+                    "its ID cannot be found. Might have been alread removed.");
         }
+    }
+    
+    /**
+     * Find ID under which the given breakpoint is known in the current
+     * debugging session.
+     *
+     * @return found ID; might be <tt>null</tt> if none is found
+     */
+    private Integer findBreakpointId(final IRubyBreakpoint wantedBP) {
+        for (Iterator<Map.Entry<Integer, IRubyBreakpoint>> it = breakpointsIDs.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Integer, IRubyBreakpoint> breakpointID = it.next();
+            IRubyBreakpoint bp = breakpointID.getValue();
+            int id = breakpointID.getKey();
+            if (wantedBP.getFilePath().equals(bp.getFilePath()) &&
+                    wantedBP.getLineNumber() == bp.getLineNumber()) {
+                return id;
+            }
+        }
+        return null;
     }
     
     private void startRubyLoop() {
