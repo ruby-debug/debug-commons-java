@@ -39,11 +39,10 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         RubyFrame frame = frames[0];
         assertEquals(3, frame.getLine());
         RubyVariable[] variables = frames[0].getVariables();
-        assertEquals("self, a, b, s", 4, variables.length);
-        assertEquals("self", variables[0].getName());
-        assertEquals("a", variables[1].getName());
-        assertEquals("b", variables[2].getName());
-        assertEquals("s", variables[3].getName());
+        assertEquals("a, b, s", 3, variables.length);
+        assertEquals("a", variables[0].getName());
+        assertEquals("b", variables[1].getName());
+        assertEquals("s", variables[2].getName());
         //        RubyVariable iv = frame.inspectExpression("a == b");
         waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
             public void run() {
@@ -60,10 +59,9 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         frame = frames[0];
         assertEquals(7, frame.getLine());
         variables = frame.getVariables();
-        assertEquals("self, b, s", 3, variables.length);
-        assertEquals("self", variables[0].getName());
-        assertEquals("b", variables[1].getName());
-        assertEquals("s", variables[2].getName());
+        assertEquals("b, s", 2, variables.length);
+        assertEquals("b", variables[0].getName());
+        assertEquals("s", variables[1].getName());
         // there is a third variable 'x' for ruby 1.8.0
         waitForEvents(proxy, 1, new Runnable() {
             public void run() {
@@ -78,10 +76,9 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals("one frames", 1, frames.length);
         frame = frames[0];
         variables = frame.getVariables();
-        assertEquals("self, b, s", 3, variables.length);
-        assertEquals("self", variables[0].getName());
-        assertEquals("b", variables[1].getName());
-        assertEquals("s", variables[2].getName());
+        assertEquals("b, s", 2, variables.length);
+        assertEquals("b", variables[0].getName());
+        assertEquals("s", variables[1].getName());
         waitForEvents(proxy, 1, new Runnable() { // finish main thread
             public void run() {
                 suspendedThread.resume();

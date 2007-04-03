@@ -1,3 +1,8 @@
+0.7.1 - 0.7.2
+-------------
+
+	* migrating to ruby-debug-ide
+
 0.7.0 - 0.7.1
 -------------
 
@@ -10,6 +15,6 @@
 	* ability to pass arguments to the debuggee
 	* fixed ConcurrentModificationException in RubyDebuggerProxy
 	* change/fixed breakpoint addition/removing. Removed index from
-		IRubyBreakpoint interface. Frontend is not supposed to care about internal
-		communication details between the library and backend.
+	  IRubyBreakpoint interface. Frontend is not supposed to care about internal
+	  communication details between the library and backend.
 

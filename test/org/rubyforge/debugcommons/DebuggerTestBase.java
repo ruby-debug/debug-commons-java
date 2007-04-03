@@ -104,8 +104,8 @@ public abstract class DebuggerTestBase extends TestBase {
                         PATH_TO_CLASSIC_DEBUG_DIR, "ruby");
                 break;
             case RUBY_DEBUG:
-                File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug");
-                assertTrue("rdebug file exists", rdebug.isFile());
+                File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
+                assertTrue("rdebug-ide file exists", rdebug.isFile());
                 proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath());
                 break;
             default:
@@ -172,7 +172,7 @@ public abstract class DebuggerTestBase extends TestBase {
             public void run() {
                 try {
                     proxy.startDebugging(breakpoints);
-                    assertTrue(proxy.checkConnection());
+                    assertTrue("proxy connected", proxy.checkConnection());
                 } catch (RubyDebuggerException e) {
                     fail("Cannot start debugger: " + e);
                 }

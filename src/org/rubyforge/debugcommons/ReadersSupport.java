@@ -64,10 +64,6 @@ final class ReadersSupport {
         this.removedBreakpoints = new LinkedBlockingQueue<Integer>();
     }
     
-    void startControlLoop(final Socket controlSocket) throws RubyDebuggerException {
-        startLoop(controlSocket, "control loop");
-    }
-    
     void startCommandLoop(final Socket commandSocket) throws RubyDebuggerException {
         startLoop(commandSocket, "command loop");
     }

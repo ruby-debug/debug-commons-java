@@ -80,7 +80,7 @@ public final class RubyDebuggerFactory {
      * waits on the first script's line.
      *
      * @param descriptor {@link Descriptor} to be used
-     * @param rdebugExecutable path to rdebug[.cmd]
+     * @param rdebugExecutable path to rdebug-javaide[.cmd]
      * @return {@link RubyDebugTarget} instance
      * @throws java.io.IOException
      * @throws org.rubyforge.debugcommons.RubyDebuggerException
@@ -91,19 +91,12 @@ public final class RubyDebuggerFactory {
             throws IOException, RubyDebuggerException {
         List<String> args = new ArrayList<String>();
         args.add(rdebugExecutable);
-        args.add("--server");
-        args.add("-w"); // wait for client to connect on command port
-        args.add("-n"); // do not halt when client connects
-        args.add("--port");
+        args.add("-p");
         int port = descriptor.defaultPortUsed() ? DEFAULT_PORT : Util.findFreePort();
         args.add(String.valueOf(port));
-        args.add("--cport");
-        args.add(String.valueOf(port + 1));
         if (descriptor.isVerbose()) {
             args.add("-d");
         }
-        args.add("-f");
-        args.add("xml");
         args.add("--");
         args.add(descriptor.getScriptPath());
         if (descriptor.getScriptArguments() != null) {

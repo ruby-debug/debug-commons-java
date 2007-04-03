@@ -37,11 +37,9 @@ public final class RubyDebuggerProxy {
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
     private Socket commandSocket;
-    private Socket controlSocket;
     private boolean connected;
     
     private PrintWriter commandWriter;
-    private PrintWriter controlWriter;
     private RubyLoop rubyLoop;
     private ICommandFactory commandFactory;
     private ReadersSupport readersSupport;
@@ -105,10 +103,9 @@ public final class RubyDebuggerProxy {
     
     private void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         commandFactory = new RubyDebugCommandFactory();
-        controlSocket = attach(debugTarged.getPort() + 1);
-        readersSupport.startControlLoop(controlSocket);
-        setBreakpoints(initialBreakpoints);
         readersSupport.startCommandLoop(getCommandSocket());
+        setBreakpoints(initialBreakpoints);
+        sendCommand("start");
     }
     
     public void fireDebugEvent(final RubyDebugEvent e) {
@@ -125,32 +122,11 @@ public final class RubyDebuggerProxy {
         listeners.remove(listener);
     }
     
-    private PrintWriter getControlWriter() throws RubyDebuggerException {
-        if (controlWriter == null) {
-            switch(debuggerType) {
-            case CLASSIC_DEBUGGER:
-                // same writer for commands and control in the case of Classic Debugger
-                controlWriter = getCommandWriter();
-                break;
-            case RUBY_DEBUG:
-                try {
-                    controlWriter = new PrintWriter(getControlSocket().getOutputStream(), true);
-                } catch (IOException e) {
-                    throw new RubyDebuggerException(e);
-                }
-                break;
-            default:
-                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
-            }
-            connected = true;
-        }
-        return controlWriter;
-    }
-    
     private PrintWriter getCommandWriter() throws RubyDebuggerException {
         if (commandWriter == null) {
             try {
                 commandWriter = new PrintWriter(getCommandSocket().getOutputStream(), true);
+                connected = true;
             } catch (IOException e) {
                 throw new RubyDebuggerException(e);
             }
@@ -168,7 +144,7 @@ public final class RubyDebuggerProxy {
         try {
             if (breakpoint.isEnabled()) {
                 String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
-                sendControlCommand(command);
+                sendCommand(command);
                 Integer id = getReadersSupport().readAddedBreakpointNo();
                 breakpointsIDs.put(id, breakpoint);
             }
@@ -185,7 +161,7 @@ public final class RubyDebuggerProxy {
         if (id != null) {
             String command = commandFactory.createRemoveBreakpoint(id);
             try {
-                sendControlCommand(command);
+                sendCommand(command);
                 getReadersSupport().waitForRemovedBreakpoint(id);
                 breakpointsIDs.remove(id);
             } catch (RubyDebuggerException e) {
@@ -228,28 +204,12 @@ public final class RubyDebuggerProxy {
         return commandSocket;
     }
     
-    public Socket getControlSocket() throws RubyDebuggerException {
-        assert debuggerType == DebuggerType.RUBY_DEBUG : "control is used only in ruby-debug";
-        if (controlSocket == null) {
-            controlSocket = attach(debugTarged.getPort() + 1);
-        }
-        return controlSocket;
-    }
-    
     public void resume(final RubyThread thread) {
         try {
             sendCommand(commandFactory.createResume(thread));
         } catch (RubyDebuggerException e) {
             Util.severe("resuming of " + thread.getId() + " failed", e);
         }
-    }
-    
-    private void sendControlCommand(final String s) throws RubyDebuggerException {
-        Util.fine("Sending control command debugger: " + s);
-        if (!debugTarged.isRunning()) {
-            throw new RubyDebuggerException("Trying to send a control command [" + s + "] to terminated process");
-        }
-        getControlWriter().println(s);
     }
     
     private void sendCommand(final String s) throws RubyDebuggerException {
@@ -333,12 +293,6 @@ public final class RubyDebuggerProxy {
         connected = false;
         if (commandSocket != null) {
             commandSocket.close();
-        }
-        if (controlSocket != null) {
-            if (debugTarged.isRunning()) {
-                sendControlCommand("exit");
-            }
-            controlSocket.close();
         }
     }
     
