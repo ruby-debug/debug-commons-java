@@ -69,7 +69,8 @@ public final class RubyDebuggerFactory {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(descriptor.getBaseDirectory());
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(RubyDebuggerProxy.CLASSIC_DEBUGGER);
-        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(), port, descriptor.getScriptPath());
+        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
+                port, descriptor.getScriptPath(), descriptor.getBaseDirectory());
         proxy.connect(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
         return proxy;
@@ -106,7 +107,8 @@ public final class RubyDebuggerFactory {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(descriptor.getBaseDirectory());
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(RubyDebuggerProxy.RUBY_DEBUG);
-        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(), port, descriptor.getScriptPath());
+        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(), port,
+                descriptor.getScriptPath(), descriptor.getBaseDirectory());
         proxy.connect(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
         return proxy;
@@ -137,6 +139,7 @@ public final class RubyDebuggerFactory {
         private boolean verbose;
         private boolean useDefaultPort;
         private String scriptPath;
+        private File baseDir;
         private String[] scriptArguments;
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
@@ -168,6 +171,20 @@ public final class RubyDebuggerFactory {
             this.scriptPath = scriptPath;
         }
         
+        /** @see #getBaseDirectory */
+        public void setBaseDirectory(File baseDir) {
+            this.baseDir = baseDir;
+        }
+        
+        /**
+         * Returns directory to be used as a base directory of the process. If
+         * it was not {@link #setBaseDirectory set} or is <code>null</code>,
+         * script's parent directory is used.
+         */
+        public File getBaseDirectory() {
+            return baseDir != null ? baseDir : new File(getScriptPath()).getParentFile();
+        }
+        
         public String[] getScriptArguments() {
             return scriptArguments;
         }
@@ -195,9 +212,6 @@ public final class RubyDebuggerFactory {
             this.additionalOptions = additionalOptions;
         }
         
-        File getBaseDirectory() {
-            return new File(getScriptPath()).getParentFile();
-        }
     }
     
 }

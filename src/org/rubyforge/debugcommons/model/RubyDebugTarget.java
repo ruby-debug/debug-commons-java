@@ -13,18 +13,18 @@ public final class RubyDebugTarget extends RubyEntity {
     private final Process process;
     private final int port;
     private final String debuggedFile;
-    private final String baseDir;
+    private final File baseDir;
     
     private boolean terminated;
     private RubyThread[] threads;
     
-    public RubyDebugTarget(RubyDebuggerProxy proxy, Process process, int port, String debuggedFile) {
+    public RubyDebugTarget(RubyDebuggerProxy proxy, Process process, int port,
+            String debuggedFile, File baseDir) {
         super(proxy);
         this.process = process;
         this.port = port;
-        File f = new File(debuggedFile);
-        this.debuggedFile = f.getName();
-        this.baseDir = f.getParent();
+        this.debuggedFile = new File(debuggedFile).getName();
+        this.baseDir = baseDir;
         this.threads = new RubyThread[0];
     }
     
@@ -40,7 +40,7 @@ public final class RubyDebugTarget extends RubyEntity {
         return debuggedFile;
     }
     
-    public String getBaseDir() {
+    public File getBaseDir() {
         return baseDir;
     }
     

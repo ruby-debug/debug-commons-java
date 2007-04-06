@@ -78,25 +78,35 @@ public abstract class DebuggerTestBase extends TestBase {
     }
     
     protected RubyDebuggerProxy prepareProxy(String... lines) throws IOException, RubyDebuggerException {
-        return prepareProxyWithArguments(null, lines);
+        return prepareProxy(null, null, lines);
     }
     
-    protected RubyDebuggerProxy prepareProxyWithArguments(String[] arguments, String... lines) throws IOException, RubyDebuggerException {
+    
+    protected RubyDebuggerProxy prepareProxy(String[] args, String... lines) throws IOException, RubyDebuggerException {
+        return prepareProxy(null, args, lines);
+    }
+    
+    protected RubyDebuggerProxy prepareProxy(File baseDir, String... lines) throws IOException, RubyDebuggerException {
+        return prepareProxy(baseDir, null, lines);
+    }
+    
+    protected RubyDebuggerProxy prepareProxy(File baseDir, String[] arguments, String... lines) throws IOException, RubyDebuggerException {
         testFile = writeFile("test.rb", lines);
         testFilePath = testFile.getAbsolutePath();
-        return startDebugger(arguments);
+        return startDebugger(baseDir, arguments);
     }
     
     public RubyDebuggerProxy startDebugger() throws IOException, RubyDebuggerException {
-        return startDebugger(null);
+        return startDebugger(null, null);
     }
     
-    public RubyDebuggerProxy startDebugger(final String[] scriptArguments) throws IOException, RubyDebuggerException {
+    public RubyDebuggerProxy startDebugger(final File baseDir, final String[] scriptArguments) throws IOException, RubyDebuggerException {
         RubyDebuggerProxy proxy;
         RubyDebuggerFactory.Descriptor descriptor = new RubyDebuggerFactory.Descriptor();
         descriptor.useDefaultPort(false);
         descriptor.setVerbose(true);
         descriptor.setScriptPath(testFilePath);
+        descriptor.setBaseDirectory(baseDir);
         descriptor.setScriptArguments(scriptArguments);
         switch(debuggerType) {
             case CLASSIC_DEBUGGER:
