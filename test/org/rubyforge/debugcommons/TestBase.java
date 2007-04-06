@@ -16,6 +16,7 @@ public class TestBase extends TestCase {
     
     @Override
     protected void setUp() throws Exception {
+        clearWorkDir();
         super.setUp();
         Util.LOGGER.setLevel(Level.ALL);
         Util.LOGGER.setUseParentHandlers(false);
