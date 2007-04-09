@@ -9,8 +9,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
+
+import static org.rubyforge.debugcommons.RubyDebuggerProxy.CLASSIC_DEBUGGER;
+import static org.rubyforge.debugcommons.RubyDebuggerProxy.RUBY_DEBUG;
 
 public final class RubyDebuggerFactory {
     
@@ -36,16 +40,15 @@ public final class RubyDebuggerFactory {
             final String pathToClassicDebugDir,
             final String interpreter)
             throws IOException, RubyDebuggerException {
+        descriptor.setType(CLASSIC_DEBUGGER);
         List<String> args = new ArrayList<String>();
         args.add(interpreter);
         args.add("-I");
         args.add(pathToClassicDebugDir);
-        int port = DEFAULT_PORT;
         if (!descriptor.defaultPortUsed()) {
-            port = Util.findFreePort();
-            if (port != -1) {
+            if (descriptor.getPort() != -1) {
                 try {
-                    String path = createRemoteDebugPortFile(port);
+                    String path = createRemoteDebugPortFile(descriptor.getPort());
                     args.add("-r");
                     args.add(path);
                 } catch (IOException e) {
@@ -65,15 +68,7 @@ public final class RubyDebuggerFactory {
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
-        Util.fine("Running: \"" + args + "\"");
-        ProcessBuilder pb = new ProcessBuilder(args);
-        pb.directory(descriptor.getBaseDirectory());
-        RubyDebuggerProxy proxy = new RubyDebuggerProxy(RubyDebuggerProxy.CLASSIC_DEBUGGER);
-        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
-                port, descriptor.getScriptPath(), descriptor.getBaseDirectory());
-        proxy.connect(target);
-        RubyDebuggerProxy.PROXIES.add(proxy);
-        return proxy;
+        return startDebugger(descriptor, args);
     }
     
     /**
@@ -81,20 +76,18 @@ public final class RubyDebuggerFactory {
      * waits on the first script's line.
      *
      * @param descriptor {@link Descriptor} to be used
-     * @param rdebugExecutable path to rdebug-javaide[.cmd]
+     * @param rdebugExecutable path to rdebug-ide
      * @return {@link RubyDebugTarget} instance
      * @throws java.io.IOException
      * @throws org.rubyforge.debugcommons.RubyDebuggerException
      */
-    public static RubyDebuggerProxy startRubyDebug(
-            final Descriptor descriptor,
-            final String rdebugExecutable)
-            throws IOException, RubyDebuggerException {
+    public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
+            final String rdebugExecutable) throws IOException, RubyDebuggerException {
+        descriptor.setType(RUBY_DEBUG);
         List<String> args = new ArrayList<String>();
         args.add(rdebugExecutable);
         args.add("-p");
-        int port = descriptor.defaultPortUsed() ? DEFAULT_PORT : Util.findFreePort();
-        args.add(String.valueOf(port));
+        args.add(String.valueOf(descriptor.getPort()));
         if (descriptor.isVerbose()) {
             args.add("-d");
         }
@@ -103,12 +96,17 @@ public final class RubyDebuggerFactory {
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
-        Util.fine("Running: \"" + args + "\"");
+        return startDebugger(descriptor, args);
+    }
+    
+    private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args)
+            throws IOException, RubyDebuggerException {
+        Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + args + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
-        pb.directory(descriptor.getBaseDirectory());
-        RubyDebuggerProxy proxy = new RubyDebuggerProxy(RubyDebuggerProxy.RUBY_DEBUG);
-        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(), port,
-                descriptor.getScriptPath(), descriptor.getBaseDirectory());
+        pb.directory(desc.getBaseDirectory());
+        RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType());
+        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
+                desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
         proxy.connect(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
         return proxy;
@@ -134,8 +132,12 @@ public final class RubyDebuggerFactory {
         return ioSynchronizer.getAbsolutePath();
     }
     
+    /** Describes a debugger session. */
     public static final class Descriptor {
         
+        private int coputedPort = -1;
+        
+        private DebuggerType type;
         private boolean verbose;
         private boolean useDefaultPort;
         private String scriptPath;
@@ -143,6 +145,14 @@ public final class RubyDebuggerFactory {
         private String[] scriptArguments;
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
+        
+        public DebuggerType getType() {
+            return type;
+        }
+        
+        public void setType(DebuggerType type) {
+            this.type = type;
+        }
         
         public boolean isVerbose() {
             return verbose;
@@ -210,6 +220,13 @@ public final class RubyDebuggerFactory {
         
         public void setAdditionalOptions(Collection<? extends String> additionalOptions) {
             this.additionalOptions = additionalOptions;
+        }
+        
+        int getPort() {
+            if (coputedPort == -1) {
+                coputedPort = defaultPortUsed() ? DEFAULT_PORT : Util.findFreePort();
+            }
+            return coputedPort;
         }
         
     }
