@@ -60,6 +60,42 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 3 -> finish
     }
     
+    public void testBreakpointsUpdating() throws Exception {
+        for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(type);
+            final RubyDebuggerProxy proxy = prepareProxy(
+                    "4.times do", // 1
+                    "  b=10",     // 2
+                    "  b=11",     // 3
+                    "end");       // 4
+            final TestBreakpoint[] breakpoints = new TestBreakpoint[] {
+                new TestBreakpoint("test.rb", 2),
+                new TestBreakpoint("test.rb", 3),
+            };
+            startDebugging(proxy, breakpoints, 1);
+            
+            // do one cycle
+            resumeSuspendedThread(proxy); // 2 -> 3
+            resumeSuspendedThread(proxy); // 3 -> 2
+            
+            // disable first breakpoint
+            final TestBreakpoint first = breakpoints[0];
+            first.setEnabled(false);
+            proxy.updateBreakpoint(first);
+            
+            resumeSuspendedThread(proxy); // 2 -> 3
+            resumeSuspendedThread(proxy); // 3 -> 3
+            
+            // reenable first breakpoint
+            first.setEnabled(true);
+            proxy.updateBreakpoint(first);
+            
+            resumeSuspendedThread(proxy); // 3 -> 2
+            resumeSuspendedThread(proxy); // 2 -> 3
+            resumeSuspendedThread(proxy); // 3 -> finish
+        }
+    }
+    
     private void resumeSuspendedThread(final RubyDebuggerProxy proxy) throws InterruptedException {
         waitForEvents(proxy, 1, new Runnable() {
             public void run() {

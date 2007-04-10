@@ -153,10 +153,18 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    /**
-     * Remove given breakpoint from the debugging session.
-     */
     public void removeBreakpoint(final IRubyBreakpoint breakpoint) {
+        removeBreakpoint(breakpoint, false);
+    }
+    
+    /**
+     * Remove the given breakpoint from this debugging session.
+     *
+     * @param breakpoint breakpoint to be removed
+     * @param silent whether info message should be ommited if the breakpoint
+     *        has not been set in this session
+     */
+    public void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
         Integer id = findBreakpointId(breakpoint);
         if (id != null) {
             String command = commandFactory.createRemoveBreakpoint(id);
@@ -167,10 +175,19 @@ public final class RubyDebuggerProxy {
             } catch (RubyDebuggerException e) {
                 Util.severe("Exception during removing breakpoint.", e);
             }
-        } else {
+        } else if(!silent) {
             Util.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
                     "its ID cannot be found. Might have been alread removed.");
         }
+    }
+    
+    /**
+     * Update the given breakpoint. Use when <em>enabled</em> property has
+     * changed.
+     */
+    public void updateBreakpoint(IRubyBreakpoint breakpoint) {
+        removeBreakpoint(breakpoint, true);
+        addBreakpoint(breakpoint);
     }
     
     /**

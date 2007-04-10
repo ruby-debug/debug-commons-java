@@ -212,14 +212,16 @@ public abstract class DebuggerTestBase extends TestBase {
         private String file;
         private int line;
         private int index;
+        private boolean enabled;
         
         TestBreakpoint(String file, int line) {
             this.file = file;
             this.line = line;
+            this.enabled = true;
         }
         
         public boolean isEnabled() {
-            return true;
+            return enabled;
         }
         
         public String getFilePath() {
@@ -228,6 +230,10 @@ public abstract class DebuggerTestBase extends TestBase {
         
         public int getLineNumber() {
             return line;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
         
         public void setIndex(int index) {
