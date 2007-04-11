@@ -102,6 +102,10 @@ public final class RubyDebugTarget extends RubyEntity {
         }
     }
     
+    /**
+     * Sends a termination event to the associated {@link RubyDebuggerProxy
+     * proxy} and kill the process.
+     */
     public void terminate() {
         if (terminated) {
             Util.warning("Trying to terminate same process more than once: " + this);
@@ -109,8 +113,6 @@ public final class RubyDebugTarget extends RubyEntity {
         }
         RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);
         getProxy().fireDebugEvent(ev);
-        
-        //		try {
         getProcess().destroy();
         threads = new RubyThread[0];
         terminated = true;
