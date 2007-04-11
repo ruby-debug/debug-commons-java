@@ -96,12 +96,4 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         }
     }
     
-    private void resumeSuspendedThread(final RubyDebuggerProxy proxy) throws InterruptedException {
-        waitForEvents(proxy, 1, new Runnable() {
-            public void run() {
-                suspendedThread.resume();
-            }
-        });
-    }
-    
 }

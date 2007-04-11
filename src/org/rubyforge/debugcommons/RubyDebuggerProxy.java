@@ -12,9 +12,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
-import org.rubyforge.debugcommons.ReadersSupport;
-import org.rubyforge.debugcommons.RubyDebugEventListener;
-import org.rubyforge.debugcommons.RubyDebugEvent;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
@@ -24,10 +21,10 @@ import org.rubyforge.debugcommons.model.RubyVariableInfo;
 
 public final class RubyDebuggerProxy {
     
-    static enum DebuggerType { CLASSIC_DEBUGGER, RUBY_DEBUG }
+    public static enum DebuggerType { CLASSIC_DEBUGGER, RUBY_DEBUG }
     
-    static final DebuggerType CLASSIC_DEBUGGER = DebuggerType.CLASSIC_DEBUGGER;
-    static final DebuggerType RUBY_DEBUG = DebuggerType.RUBY_DEBUG;
+    public static final DebuggerType CLASSIC_DEBUGGER = DebuggerType.CLASSIC_DEBUGGER;
+    public static final DebuggerType RUBY_DEBUG = DebuggerType.RUBY_DEBUG;
     
     public static final List<RubyDebuggerProxy> PROXIES = new CopyOnWriteArrayList<RubyDebuggerProxy>();
     

@@ -14,9 +14,9 @@ public abstract class DebuggerTestBase extends TestBase {
     
     // XXX cannot be hardcoded. Use configuration files or property or ...
     private static final String PATH_TO_CLASSIC_DEBUG_DIR =
-            "/path/to/classic-debugger/dir";
+            "/space/ruby/sources/rubyforge.org/debug-commons/trunk/lib";
     private static final String PATH_TO_REMOTE_DEBUG_DIR =
-            "/path/to/rdebug/dir";
+            "/space/ruby/gemrepo/bin";
     
     protected RubyThread suspendedThread;
     
@@ -47,7 +47,7 @@ public abstract class DebuggerTestBase extends TestBase {
         assertFalse("server process did not finish", debugTarget.isRunning());
     }
     
-    void setDebuggerType(final DebuggerType debuggerType) {
+    protected void setDebuggerType(final DebuggerType debuggerType) {
         this.debuggerType = debuggerType;
     }
     
@@ -190,6 +190,14 @@ public abstract class DebuggerTestBase extends TestBase {
         });
     }
     
+    protected void resumeSuspendedThread(final RubyDebuggerProxy proxy) throws InterruptedException {
+        waitForEvents(proxy, 1, new Runnable() {
+            public void run() {
+                suspendedThread.resume();
+            }
+        });
+    }
+    
     protected void waitForEvents(RubyDebuggerProxy proxy, int n, Runnable block) throws InterruptedException {
         final CountDownLatch events = new CountDownLatch(n);
         RubyDebugEventListener listener = new RubyDebugEventListener() {
@@ -214,7 +222,7 @@ public abstract class DebuggerTestBase extends TestBase {
         private int index;
         private boolean enabled;
         
-        TestBreakpoint(String file, int line) {
+        public TestBreakpoint(String file, int line) {
             this.file = file;
             this.line = line;
             this.enabled = true;
