@@ -96,4 +96,19 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         }
     }
     
+    public void testFinish() throws Exception {
+        for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(type);
+            final RubyDebuggerProxy proxy = prepareProxy(
+                    "b=1",  // 1
+                    "b=2",  // 2
+                    "b=3"); // 3
+            final TestBreakpoint[] breakpoints = new TestBreakpoint[] {
+                new TestBreakpoint("test.rb", 2),
+            };
+            startDebugging(proxy, breakpoints, 1);
+            proxy.finish();
+        }
+    }
+    
 }

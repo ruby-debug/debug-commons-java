@@ -1,7 +1,6 @@
 package org.rubyforge.debugcommons.model;
 
 import java.io.File;
-import org.rubyforge.debugcommons.RubyDebugEvent;
 import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.Util;
@@ -100,22 +99,6 @@ public final class RubyDebugTarget extends RubyEntity {
             // does not have a function like isRunning()?
             return true;
         }
-    }
-    
-    /**
-     * Sends a termination event to the associated {@link RubyDebuggerProxy
-     * proxy} and kill the process.
-     */
-    public void terminate() {
-        if (terminated) {
-            Util.warning("Trying to terminate same process more than once: " + this);
-            return;
-        }
-        RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);
-        getProxy().fireDebugEvent(ev);
-        getProcess().destroy();
-        threads = new RubyThread[0];
-        terminated = true;
     }
     
 }

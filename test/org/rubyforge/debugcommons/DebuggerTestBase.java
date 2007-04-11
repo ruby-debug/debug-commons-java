@@ -239,7 +239,7 @@ public abstract class DebuggerTestBase extends TestBase {
         public int getLineNumber() {
             return line;
         }
-
+        
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }

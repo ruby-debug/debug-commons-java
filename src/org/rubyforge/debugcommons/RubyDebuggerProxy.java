@@ -35,6 +35,7 @@ public final class RubyDebuggerProxy {
     private RubyDebugTarget debugTarged;
     private Socket commandSocket;
     private boolean connected;
+    private boolean finished;
     
     private PrintWriter commandWriter;
     private RubyLoop rubyLoop;
@@ -303,6 +304,28 @@ public final class RubyDebuggerProxy {
         return infos.length == 0 ? null : new RubyVariable(frame, infos[0]);
     }
     
+    public void finish() {
+        synchronized(this) {
+            if (finished) {
+                // possible if client call this explicitly and then second time from RubyLoop
+                Util.fine("Trying to finish the same proxy more than once: " + this);
+                return;
+            }
+            finished = true;
+        }
+        PROXIES.remove(RubyDebuggerProxy.this);
+        try {
+            closeConnections();
+        } catch (RubyDebuggerException e) {
+            Util.severe("Exception during closing connection", e);
+        } catch (IOException e) {
+            Util.severe("Exception during closing connection", e);
+        }
+        getDebugTarged().getProcess().destroy();
+        RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);
+        fireDebugEvent(ev);
+    }
+    
     private void closeConnections() throws RubyDebuggerException, IOException {
         connected = false;
         if (commandSocket != null) {
@@ -364,15 +387,7 @@ public final class RubyDebuggerProxy {
             } catch (RubyDebuggerException e) {
                 Util.severe("Exception in socket reader loop.", e);
             } finally {
-                PROXIES.remove(RubyDebuggerProxy.this);
-                debugTarged.terminate();
-                try {
-                    closeConnections();
-                } catch (RubyDebuggerException e) {
-                    Util.severe("Exception during closing connection", e);
-                } catch (IOException e) {
-                    Util.severe("Exception during closing connection", e);
-                }
+                finish();
                 Util.finest("Socket reader loop finished.");
             }
         }
