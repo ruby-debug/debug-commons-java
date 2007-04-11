@@ -14,6 +14,9 @@ public final class RubyThread extends RubyEntity {
     //    private boolean isTerminated;
     //    private boolean isStepping;
     
+    /** Used by {@link #runTo} method. */
+    private IRubyBreakpoint temporaryBreakpoint;
+    
     public RubyThread(RubyDebugTarget target, int id) {
         super(target.getProxy());
         this.id = id;
@@ -84,6 +87,10 @@ public final class RubyThread extends RubyEntity {
      * @param suspensionPoint point of suspension
      */
     public void suspend(final SuspensionPoint suspensionPoint) {
+        if (temporaryBreakpoint != null) {
+            getProxy().removeBreakpoint(temporaryBreakpoint);
+            temporaryBreakpoint = null;
+        }
         frames = null;
         isSuspended = true;
         //        isStepping = false;
@@ -129,6 +136,16 @@ public final class RubyThread extends RubyEntity {
         RubyFrame[] frames = getFrames();
         assert frames.length > 0;
         frames[frames.length > 1 ? 1 : 0].stepReturn();
+    }
+    
+    public void runTo(final String path, final int line) {
+        temporaryBreakpoint = new IRubyBreakpoint() {
+            public boolean isEnabled() { return true; }
+            public String getFilePath() { return path; }
+            public int getLineNumber() { return line; }
+        };
+        getProxy().addBreakpoint(temporaryBreakpoint);
+        resume();
     }
     
     //    public boolean canTerminate() {
