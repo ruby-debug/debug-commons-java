@@ -1,6 +1,5 @@
 package org.rubyforge.debugcommons;
 
-import java.net.SocketException;
 import org.rubyforge.debugcommons.reader.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -217,25 +216,20 @@ final class ReadersSupport {
                 Util.fine("Starting ReadersSupport readloop: " + getName());
                 startXPPLoop(xpp);
                 Util.fine("ReadersSupport readloop [" + getName() + "] successfully finished.");
-            } catch (SocketException e) {
-                // XXX: happens with ruby-debug since either:
+            } catch (IOException e) {
+                // Debugger is just killed. So this is currently more or less
+                // expected behaviour.
                 //  - no XmlPullParser.END_DOCUMENT is sent
-                //  - incorectly handling finishing of the session
-                Util.warning("SocketException. Loop [" + getName() + "]: " + e.getMessage());
+                //  - incorectly handling finishing of the session in the backends
+                Util.fine("SocketException. Loop [" + getName() + "]: " + e.getMessage());
             } catch (XmlPullParserException e) {
                 Util.severe("Exception during ReadersSupport loop [" + getName() + ']', e);
-                e.printStackTrace();
-            } catch (IOException e) {
-                // XXX: seems that classic-debugger does not close correctly
-                // connection. When it is fixed, uncomment below exception.
-                Util.severe("Exception during ReadersSupport loop [" + getName() + "]: ", e);
             } finally {
                 suspensions.add(SuspensionPoint.END);
                 try {
                     Thread.sleep(1000); // Avoid Commodification Exceptions
                 } catch (InterruptedException e) {
                     Util.severe("Readers loop interrupted", e);
-                    e.printStackTrace();
                 }
             }
         }
