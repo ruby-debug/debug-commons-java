@@ -5,6 +5,7 @@
 	* ability to pass base directory (needed e.g. for Rails debugging)
 	* ability to disable/enable a breakpoint
 	* addition of RubyThread.runTo(path, line) feature
+	* cleaner process termination control
 
 0.7.0 - 0.7.1
 -------------
