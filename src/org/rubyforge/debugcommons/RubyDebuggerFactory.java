@@ -91,6 +91,7 @@ public final class RubyDebuggerFactory {
         if (descriptor.isVerbose()) {
             args.add("-d");
         }
+        args.addAll(descriptor.getAddtionalOptions());
         args.add("--");
         args.add(descriptor.getScriptPath());
         if (descriptor.getScriptArguments() != null) {

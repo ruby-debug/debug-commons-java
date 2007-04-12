@@ -6,6 +6,7 @@
 	* ability to disable/enable a breakpoint
 	* addition of RubyThread.runTo(path, line) feature
 	* cleaner process termination control
+	* fast debugger also includes Descriptor.getAddtionalOptions()
 
 0.7.0 - 0.7.1
 -------------

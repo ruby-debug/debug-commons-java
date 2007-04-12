@@ -1,6 +1,8 @@
 package org.rubyforge.debugcommons;
 
 import java.io.File;
+import java.util.Collections;
+import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 
 public class RubyDebuggerFactoryTest extends DebuggerTestBase {
@@ -58,6 +60,33 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
                     "puts 'OK'");
             final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
                 new TestBreakpoint("test.rb", 2),
+            };
+            startDebugging(proxy, breakpoints, 1);
+            waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
+                public void run() {
+                    proxy.getDebugTarged().getThreadById(1).resume();
+                }
+            });
+        }
+    }
+    
+    public void testIncludingPath() throws Exception {
+        File baseDir = new File(getWorkDir(), "aaa");
+        assertTrue("base directory created", baseDir.mkdir());
+        File includeDir = new File(getWorkDir(), "bbb");
+        assertTrue("base directory created", includeDir.mkdir());
+        testFile = writeFile("bbb" + File.separator + "test.rb", "puts 'OK'");
+        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(debuggerType);
+            Descriptor descriptor = new Descriptor();
+            descriptor.useDefaultPort(false);
+            descriptor.setVerbose(true);
+            descriptor.setAdditionalOptions(Collections.singleton("-I" + includeDir.getAbsolutePath()));
+            descriptor.setBaseDirectory(baseDir);
+            descriptor.setScriptPath(testFile.getAbsolutePath());
+            final RubyDebuggerProxy proxy = startDebugger(descriptor);
+            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+                new TestBreakpoint("test.rb", 1),
             };
             startDebugging(proxy, breakpoints, 1);
             waitForEvents(proxy, 1, new Runnable() { // finish spawned thread

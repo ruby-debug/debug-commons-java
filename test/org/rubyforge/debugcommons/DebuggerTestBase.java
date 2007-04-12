@@ -5,9 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
+import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
+import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
-import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.RubyThread;
 
 public abstract class DebuggerTestBase extends TestBase {
@@ -101,13 +102,17 @@ public abstract class DebuggerTestBase extends TestBase {
     }
     
     public RubyDebuggerProxy startDebugger(final File baseDir, final String[] scriptArguments) throws IOException, RubyDebuggerException {
-        RubyDebuggerProxy proxy;
-        RubyDebuggerFactory.Descriptor descriptor = new RubyDebuggerFactory.Descriptor();
+        Descriptor descriptor = new Descriptor();
         descriptor.useDefaultPort(false);
         descriptor.setVerbose(true);
         descriptor.setScriptPath(testFilePath);
         descriptor.setBaseDirectory(baseDir);
         descriptor.setScriptArguments(scriptArguments);
+        return startDebugger(descriptor);
+    }
+    
+    public RubyDebuggerProxy startDebugger(final Descriptor descriptor) throws IOException, RubyDebuggerException {
+        RubyDebuggerProxy proxy;
         switch(debuggerType) {
             case CLASSIC_DEBUGGER:
                 proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
