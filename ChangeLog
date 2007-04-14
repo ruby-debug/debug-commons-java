@@ -7,6 +7,8 @@
 	* addition of RubyThread.runTo(path, line) feature
 	* cleaner process termination control
 	* fast debugger also includes Descriptor.getAddtionalOptions()
+	* do not throw exception when sending command to finished process. Just emit
+		warning, until the terminating mechanism is polished.
 
 0.7.0 - 0.7.1
 -------------

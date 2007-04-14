@@ -230,7 +230,8 @@ public final class RubyDebuggerProxy {
     private void sendCommand(final String s) throws RubyDebuggerException {
         Util.fine("Sending command debugger: " + s);
         if (!debugTarged.isRunning()) {
-            throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process");
+            Util.warning("Trying to send a command [" + s + "] to terminated process");
+            return;
         }
         getCommandWriter().println(s);
     }
