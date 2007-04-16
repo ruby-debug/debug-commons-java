@@ -44,11 +44,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals("b", variables[1].getName());
         assertEquals("s", variables[2].getName());
         //        RubyVariable iv = frame.inspectExpression("a == b");
-        waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-            public void run() {
-                suspendedThread.resume();
-            }
-        });
+        resumeSuspendedThread(proxy); // finish spawned thread
         
         // main thread suspended
         ti = proxy.readThreadInfo();
@@ -79,11 +75,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals("b, s", 2, variables.length);
         assertEquals("b", variables[0].getName());
         assertEquals("s", variables[1].getName());
-        waitForEvents(proxy, 1, new Runnable() { // finish main thread
-            public void run() {
-                suspendedThread.resume();
-            }
-        });
+        resumeSuspendedThread(proxy); // finish main thread
     }
     
 }

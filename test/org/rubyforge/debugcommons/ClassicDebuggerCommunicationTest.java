@@ -48,11 +48,7 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
         assertEquals("false", inspected.getValue().getValueString());
         assertEquals("FalseClass", inspected.getValue().getReferenceTypeName());
         RubyVariable unknown = frame.inspectExpression("unknown_in_context");
-        waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-            public void run() {
-                suspendedThread.resume();
-            }
-        });
+        resumeSuspendedThread(proxy); // finish spawned thread
         
         // main thread suspended
         ti = proxy.readThreadInfo();
@@ -83,11 +79,7 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
         assertEquals("b, s", 2, variables.length);
         assertEquals("b", variables[0].getName());
         assertEquals("s", variables[1].getName());
-        waitForEvents(proxy, 1, new Runnable() { // finish main thread
-            public void run() {
-                suspendedThread.resume();
-            }
-        });
+        resumeSuspendedThread(proxy); // finish main thread
     }
     
 }
