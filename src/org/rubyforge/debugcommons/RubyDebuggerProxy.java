@@ -138,16 +138,12 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    public void addBreakpoint(final IRubyBreakpoint breakpoint) {
-        try {
-            if (breakpoint.isEnabled()) {
-                String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
-                sendCommand(command);
-                Integer id = getReadersSupport().readAddedBreakpointNo();
-                breakpointsIDs.put(id, breakpoint);
-            }
-        } catch (RubyDebuggerException e) {
-            Util.severe("Exception during adding breakpoint.", e);
+    public void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
+        if (breakpoint.isEnabled()) {
+            String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
+            sendCommand(command);
+            Integer id = getReadersSupport().readAddedBreakpointNo();
+            breakpointsIDs.put(id, breakpoint);
         }
     }
     
@@ -183,7 +179,7 @@ public final class RubyDebuggerProxy {
      * Update the given breakpoint. Use when <em>enabled</em> property has
      * changed.
      */
-    public void updateBreakpoint(IRubyBreakpoint breakpoint) {
+    public void updateBreakpoint(IRubyBreakpoint breakpoint) throws RubyDebuggerException {
         removeBreakpoint(breakpoint, true);
         addBreakpoint(breakpoint);
     }
@@ -230,8 +226,7 @@ public final class RubyDebuggerProxy {
     private void sendCommand(final String s) throws RubyDebuggerException {
         Util.fine("Sending command debugger: " + s);
         if (!debugTarged.isRunning()) {
-            Util.warning("Trying to send a command [" + s + "] to terminated process");
-            return;
+            throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process");
         }
         getCommandWriter().println(s);
     }
@@ -321,6 +316,13 @@ public final class RubyDebuggerProxy {
             Util.severe("Exception during closing connection", e);
         } catch (IOException e) {
             Util.severe("Exception during closing connection", e);
+        }
+        try {
+            // Needed to let the IO readers to read the last pieces of input and
+            // output streams.
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         getDebugTarged().getProcess().destroy();
         RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);

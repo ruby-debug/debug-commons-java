@@ -138,7 +138,7 @@ public final class RubyThread extends RubyEntity {
         frames[frames.length > 1 ? 1 : 0].stepReturn();
     }
     
-    public void runTo(final String path, final int line) {
+    public void runTo(final String path, final int line) throws RubyDebuggerException {
         temporaryBreakpoint = new IRubyBreakpoint() {
             public boolean isEnabled() { return true; }
             public String getFilePath() { return path; }
