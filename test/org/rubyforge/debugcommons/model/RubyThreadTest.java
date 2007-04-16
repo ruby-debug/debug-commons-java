@@ -1,6 +1,7 @@
 package org.rubyforge.debugcommons.model;
 
 import org.rubyforge.debugcommons.DebuggerTestBase;
+import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.RubyDebuggerProxy;
 
 public final class RubyThreadTest extends DebuggerTestBase {
@@ -24,7 +25,11 @@ public final class RubyThreadTest extends DebuggerTestBase {
             
             waitForEvents(proxy, 1, new Runnable() {
                 public void run() {
-                    suspendedThread.runTo(testFilePath, 3);
+                    try {
+                        suspendedThread.runTo(testFilePath, 3);
+                    } catch (RubyDebuggerException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
             
