@@ -9,6 +9,7 @@
 	* fast debugger also includes Descriptor.getAddtionalOptions()
 	* timeout before killing process to give the IO readers better chance to
 		finish last pieces of IOs
+	* send 'exit' to rdebug-ide when process termination is forced
 
 0.7.0 - 0.7.1
 -------------

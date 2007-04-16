@@ -90,7 +90,7 @@ public final class RubyDebuggerProxy {
         startRubyLoop();
     }
     
-    public boolean checkConnection() {
+    public synchronized boolean checkConnection() {
         return connected;
     }
     
@@ -121,7 +121,7 @@ public final class RubyDebuggerProxy {
         listeners.remove(listener);
     }
     
-    private PrintWriter getCommandWriter() throws RubyDebuggerException {
+    private synchronized PrintWriter getCommandWriter() throws RubyDebuggerException {
         if (commandWriter == null) {
             try {
                 commandWriter = new PrintWriter(getCommandSocket().getOutputStream(), true);
@@ -309,30 +309,32 @@ public final class RubyDebuggerProxy {
                 return;
             }
             finished = true;
+            PROXIES.remove(RubyDebuggerProxy.this);
+            try {
+                closeConnections();
+            } catch (RubyDebuggerException e) {
+                Util.severe("Exception during closing connection", e);
+            } catch (IOException e) {
+                Util.severe("Exception during closing connection", e);
+            }
+            try {
+                // Needed to let the IO readers to read the last pieces of input and
+                // output streams.
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Util.LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
+            }
+            getDebugTarged().getProcess().destroy();
         }
-        PROXIES.remove(RubyDebuggerProxy.this);
-        try {
-            closeConnections();
-        } catch (RubyDebuggerException e) {
-            Util.severe("Exception during closing connection", e);
-        } catch (IOException e) {
-            Util.severe("Exception during closing connection", e);
-        }
-        try {
-            // Needed to let the IO readers to read the last pieces of input and
-            // output streams.
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        getDebugTarged().getProcess().destroy();
-        RubyDebugEvent ev = new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE);
-        fireDebugEvent(ev);
+        fireDebugEvent(new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE));
     }
     
-    private void closeConnections() throws RubyDebuggerException, IOException {
+    private synchronized void closeConnections() throws RubyDebuggerException, IOException {
         connected = false;
         if (commandSocket != null) {
+            if (debuggerType == RUBY_DEBUG && debugTarged.isRunning()) {
+                sendCommand("exit");
+            }
             commandSocket.close();
         }
     }
