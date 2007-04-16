@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -73,14 +74,14 @@ public final class RubyDebuggerProxy {
     public void startDebugging(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             switch(debuggerType) {
-            case CLASSIC_DEBUGGER:
-                startClassicDebugger(initialBreakpoints);
-                break;
-            case RUBY_DEBUG:
-                startRubyDebug(initialBreakpoints);
-                break;
-            default:
-                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+                case CLASSIC_DEBUGGER:
+                    startClassicDebugger(initialBreakpoints);
+                    break;
+                case RUBY_DEBUG:
+                    startRubyDebug(initialBreakpoints);
+                    break;
+                default:
+                    throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
             }
         } catch (RubyDebuggerException e) {
             PROXIES.remove(this);
@@ -376,7 +377,14 @@ public final class RubyDebuggerProxy {
         public void run() {
             try {
                 if (debuggerType == CLASSIC_DEBUGGER) {
-                    sendCommand("cont");
+                    try {
+                        sendCommand("cont");
+                    } catch (RubyDebuggerException e) {
+                        Util.LOGGER.log(Level.INFO, "Unable to set initial 'cont'" +
+                                " command to Classic Debugger: " + e.getMessage(), e);
+                        finish();
+                        return;
+                    }
                 }
                 Util.finest("Waiting for breakpoints.");
                 while (true) {
