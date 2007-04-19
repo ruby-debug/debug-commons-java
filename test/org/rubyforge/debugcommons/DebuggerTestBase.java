@@ -198,7 +198,10 @@ public abstract class DebuggerTestBase extends TestBase {
     protected void resumeSuspendedThread(final RubyDebuggerProxy proxy) throws InterruptedException {
         waitForEvents(proxy, 1, new Runnable() {
             public void run() {
-                suspendedThread.resume();
+                synchronized(DebuggerTestBase.this) {
+                    suspendedThread.resume();
+                    suspendedThread = null;
+                }
             }
         });
     }
@@ -208,7 +211,9 @@ public abstract class DebuggerTestBase extends TestBase {
         RubyDebugEventListener listener = new RubyDebugEventListener() {
             public void onDebugEvent(RubyDebugEvent e) {
                 if (e.isSuspensionType()) {
-                    DebuggerTestBase.this.suspendedThread = e.getRubyThread();
+                    synchronized(DebuggerTestBase.this) {
+                        DebuggerTestBase.this.suspendedThread = e.getRubyThread();
+                    }
                 }
                 Util.finest("Received event: " + e);
                 events.countDown();
