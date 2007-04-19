@@ -2,6 +2,7 @@ package org.rubyforge.debugcommons.model;
 
 import org.rubyforge.debugcommons.RubyDebugEvent;
 import org.rubyforge.debugcommons.RubyDebuggerException;
+import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 
 public final class RubyThread extends RubyEntity {
@@ -28,7 +29,7 @@ public final class RubyThread extends RubyEntity {
             if (isSuspended()) {
                 frames = getProxy().readFrames(this);
             } else {
-                frames = new RubyFrame[] {} ;
+                frames = new RubyFrame[] {};
             }
         }
         return frames;
@@ -42,11 +43,14 @@ public final class RubyThread extends RubyEntity {
     //	public boolean hasFrames() {
     //		return isSuspended ; //TODO: change getFrames().length > 0;
     //	}
-    
+
+    /**
+     * Returns top stack frame for this thread. Might be <code>null</code> if
+     * thread is not {@link #isSuspended() suspended}.
+     */
     public RubyFrame getTopFrame() throws RubyDebuggerException {
         RubyFrame[] frames = getFrames();
-        assert frames.length > 0;
-        return frames[0];
+        return frames.length == 0 ? null : frames[0];
     }
     
     //	public boolean canResume() {
@@ -71,8 +75,8 @@ public final class RubyThread extends RubyEntity {
     protected void resume(boolean isStep) {
         //        isStepping = isStep;
         isSuspended = false;
-        this.updateName();
-        //        this.frames = new RubyFrame[] {};
+        frames = null;
+        updateName();
     }
     
     public void resume() {
@@ -125,17 +129,30 @@ public final class RubyThread extends RubyEntity {
     public void stepInto() throws RubyDebuggerException {
         //        isStepping = true;
         this.updateName();
-        getTopFrame().stepInto();
+        RubyFrame frame = getTopFrame();
+        if (frame == null) {
+            Util.fine("stepInto failed, not top stack frame (thread is not suspended?)");
+        } else {
+            frame.stepInto();
+        }
     }
     
     public void stepOver() throws RubyDebuggerException {
-        getTopFrame().stepOver();
+        RubyFrame frame = getTopFrame();
+        if (frame == null) {
+            Util.fine("stepOver failed, not top stack frame (thread is not suspended?)");
+        } else {
+            frame.stepOver();
+        }
     }
     
     public void stepReturn() throws RubyDebuggerException {
         RubyFrame[] frames = getFrames();
-        assert frames.length > 0;
-        frames[frames.length > 1 ? 1 : 0].stepReturn();
+        if (frames.length == 0) {
+            Util.fine("stepReturn failed, empty frame stack (thread is not suspended?)");
+        } else {
+            frames[frames.length > 1 ? 1 : 0].stepReturn();
+        }
     }
     
     public void runTo(final String path, final int line) throws RubyDebuggerException {

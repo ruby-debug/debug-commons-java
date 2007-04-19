@@ -10,6 +10,7 @@
 	* timeout before killing process to give the IO readers better chance to
 		finish last pieces of IOs
 	* send 'exit' to rdebug-ide when process termination is forced
+	* cleaned up behavior of suspended threads
 
 0.7.0 - 0.7.1
 -------------

@@ -43,4 +43,37 @@ public final class RubyThreadTest extends DebuggerTestBase {
         }
     }
     
+    public void testSuspendedThread() throws Exception {
+        for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(type);
+            final RubyDebuggerProxy proxy = prepareProxy(
+                    "loop do",
+                    "  a = 2",
+                    "  sleep 1",
+                    "  puts a",
+                    "end");
+            TestBreakpoint bp2 = new TestBreakpoint("test.rb", 2);
+            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+                bp2,
+            };
+            startDebugging(proxy, breakpoints, 1);
+            resumeSuspendedThread(proxy);
+            assertSuspensionLine(2);
+            
+            bp2.setEnabled(false);
+            proxy.updateBreakpoint(bp2);
+            
+            suspendedThread.resume();
+
+            assertNull("not top stack frame", suspendedThread.getTopFrame());
+            proxy.finish();
+        }
+    }
+    
+    private void assertSuspensionLine(int line) throws RubyDebuggerException {
+        RubyFrame[] frames = suspendedThread.getFrames();
+        RubyFrame frame = frames[0];
+        assertEquals(line, frame.getLine());
+    }
+    
 }
