@@ -102,7 +102,7 @@ public final class RubyDebuggerFactory {
     
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args)
             throws IOException, RubyDebuggerException {
-        Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + args + "\"");
+        Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(desc.getBaseDirectory());
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType());
@@ -230,6 +230,15 @@ public final class RubyDebuggerFactory {
             return coputedPort;
         }
         
+    }
+    
+    /** Just helper method for logging. */
+    private static String getProcessAsString(List<String> process) {
+        StringBuilder sb = new StringBuilder();
+        for (String arg : process) {
+            sb.append(arg).append(' ');
+        }
+        return sb.toString();
     }
     
 }
