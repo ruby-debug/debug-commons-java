@@ -81,6 +81,12 @@ public final class RubyDebugTarget extends RubyEntity {
         thread.suspend(suspensionPoint);
     }
     
+    /**
+     * Look up Ruby thread corresponding to the given id.
+     *
+     * @return {@link RubyThread} instance or <code>null</code> if no thread if
+     *          found.
+     */
     public RubyThread getThreadById(int id) {
         for (RubyThread thread : threads) {
             if (thread.getId() == id) {
