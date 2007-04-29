@@ -23,7 +23,7 @@ public class RubyDebugCommandFactory implements ICommandFactory {
     }
     
     public String createStepReturn(RubyFrame frame) {
-        return  "frame " + frame.getIndex() + "; next 1 " + (frame.getIndex() + 1);
+        return  "frame " + frame.getIndex() + "; finish";
     }
     
     public String createStepInto(RubyFrame frame) {
