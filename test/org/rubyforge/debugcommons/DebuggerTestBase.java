@@ -114,17 +114,17 @@ public abstract class DebuggerTestBase extends TestBase {
     public RubyDebuggerProxy startDebugger(final Descriptor descriptor) throws IOException, RubyDebuggerException {
         RubyDebuggerProxy proxy;
         switch(debuggerType) {
-            case CLASSIC_DEBUGGER:
-                proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
-                        PATH_TO_CLASSIC_DEBUG_DIR, "ruby");
-                break;
-            case RUBY_DEBUG:
-                File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
-                assertTrue("rdebug-ide file exists", rdebug.isFile());
-                proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath());
-                break;
-            default:
-                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+        case CLASSIC_DEBUGGER:
+            proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
+                    PATH_TO_CLASSIC_DEBUG_DIR, "ruby");
+            break;
+        case RUBY_DEBUG:
+            File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
+            assertTrue("rdebug-ide file exists", rdebug.isFile());
+            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath());
+            break;
+        default:
+            throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
         }
         debugTarget = proxy.getDebugTarged();
         rubyStderrRedirectorThread = new OutputRedirectorThread(debugTarget.getProcess().getErrorStream());
@@ -201,6 +201,21 @@ public abstract class DebuggerTestBase extends TestBase {
                 synchronized(DebuggerTestBase.this) {
                     suspendedThread.resume();
                     suspendedThread = null;
+                }
+            }
+        });
+    }
+    
+    protected void doStepOver(final RubyDebuggerProxy proxy, final boolean forceNewLine) throws InterruptedException {
+        waitForEvents(proxy, 1,new Runnable() {
+            public void run() {
+                synchronized(DebuggerTestBase.this) {
+                    try {
+                        suspendedThread.stepOver(forceNewLine);
+                        suspendedThread = null;
+                    } catch (RubyDebuggerException e) {
+                        fail("Unable do step: " + e);
+                    }
                 }
             }
         });

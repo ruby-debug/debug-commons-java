@@ -22,12 +22,22 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
         return "th " + frame.getThread().getId() + "; next";
     }
     
+    public String createForcedStepOver(RubyFrame frame) {
+        // not supported by Classic Debugger
+        return createStepOver(frame);
+    }
+    
     public String createStepReturn(RubyFrame frame) {
         return "th " + frame.getThread().getId() + "; next " + (frame.getLine() + 1);
     }
     
     public String createStepInto(RubyFrame frame) {
         return "th " + frame.getThread().getId() + "; step";
+    }
+    
+    public String createForcedStepInto(RubyFrame frame) {
+        // not supported by Classic Debugger
+        return createStepInto(frame);
     }
     
     public String createReadThreads() {

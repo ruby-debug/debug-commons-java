@@ -14,9 +14,13 @@ public interface ICommandFactory {
     
     String createStepOver(RubyFrame frame);
     
+    String createForcedStepOver(RubyFrame frame);
+    
     String createStepReturn(RubyFrame frame);
     
     String createStepInto(RubyFrame frame);
+    
+    String createForcedStepInto(RubyFrame frame);
     
     String createReadThreads();
     

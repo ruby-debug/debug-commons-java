@@ -2,6 +2,7 @@ package org.rubyforge.debugcommons;
 
 import org.rubyforge.debugcommons.DebuggerTestBase.TestBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.RubyFrame;
 
 public final class RubyDebuggerProxyTest extends DebuggerTestBase {
     
@@ -109,6 +110,58 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
             startDebugging(proxy, breakpoints, 1);
             proxy.finish();
         }
+    }
+    
+    public void testStepOver() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "10.times do",  // 1
+                "  sleep 0.1",  // 2
+                "end");         // 3
+        final TestBreakpoint[] breakpoints = new TestBreakpoint[] {
+            new TestBreakpoint("test.rb", 2),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
+        proxy.removeBreakpoint(breakpoints[0]);
+        doStepOver(proxy, false);
+        doStepOver(proxy, false);
+        doStepOver(proxy, false);
+        doStepOver(proxy, true);
+    }
+    
+    public void testStepReturn() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "def a",      // 1
+                "  sleep 0.1",// 2
+                "end",        // 3
+                "def b",      // 4
+                "  a",        // 5
+                "  sleep 0.1",// 6
+                "end",        // 7
+                "def c",      // 8
+                "  b",        // 9
+                "  sleep 0.1",// 10
+                "end",        // 11
+                "c",          // 12
+                "sleep 0.1"); // 13
+        final TestBreakpoint[] breakpoints = new TestBreakpoint[] {
+            new TestBreakpoint("test.rb", 2),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        RubyFrame[] frames = suspendedThread.getFrames();
+        assertEquals("four frames", 4, frames.length);
+        final RubyFrame frame = frames[2];
+        assertEquals("line 9", 9, frame.getLine());
+        waitForEvents(proxy, 1,new Runnable() {
+            public void run() {
+                frame.stepReturn();
+                suspendedThread = null;
+            }
+        });
+        assertEquals("two frames", 2, suspendedThread.getFrames().length);
+        resumeSuspendedThread(proxy);
     }
     
 }

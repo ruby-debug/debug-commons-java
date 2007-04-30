@@ -74,14 +74,14 @@ public final class RubyDebuggerProxy {
     public void startDebugging(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             switch(debuggerType) {
-                case CLASSIC_DEBUGGER:
-                    startClassicDebugger(initialBreakpoints);
-                    break;
-                case RUBY_DEBUG:
-                    startRubyDebug(initialBreakpoints);
-                    break;
-                default:
-                    throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+            case CLASSIC_DEBUGGER:
+                startClassicDebugger(initialBreakpoints);
+                break;
+            case RUBY_DEBUG:
+                startRubyDebug(initialBreakpoints);
+                break;
+            default:
+                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
             }
         } catch (RubyDebuggerException e) {
             PROXIES.remove(this);
@@ -233,9 +233,13 @@ public final class RubyDebuggerProxy {
     }
     
     
-    public void sendStepOverEnd(RubyFrame frame) {
+    public void sendStepOverEnd(RubyFrame frame, boolean forceNewLine) {
         try {
-            sendCommand(commandFactory.createStepOver(frame));
+            if (forceNewLine) {
+                sendCommand(commandFactory.createForcedStepOver(frame));
+            } else {
+                sendCommand(commandFactory.createStepOver(frame));
+            }
         } catch (RubyDebuggerException e) {
             Util.severe("Stepping failed", e);
         }
@@ -249,9 +253,13 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    public void sendStepIntoEnd(RubyFrame frame) {
+    public void sendStepIntoEnd(RubyFrame frame, boolean forceNewLine) {
         try {
-            sendCommand(commandFactory.createStepInto(frame));
+            if (forceNewLine) {
+                sendCommand(commandFactory.createForcedStepInto(frame));
+            } else {
+                sendCommand(commandFactory.createStepInto(frame));
+            }
         } catch (RubyDebuggerException e) {
             Util.severe("Stepping failed", e);
         }

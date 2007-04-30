@@ -66,14 +66,22 @@ public final class RubyFrame extends RubyEntity {
         return false;
     }
     
-    public void stepInto() {
+    public void stepInto(boolean forceNewLine) {
         thread.resume(true /*isstep*/);
-        getProxy().sendStepIntoEnd(this) ;
+        getProxy().sendStepIntoEnd(this, forceNewLine);
+    }
+    
+    public void stepInto() {
+        stepInto(false);
+    }
+    
+    public void stepOver(boolean forceNewLine) {
+        thread.resume(true /*isstep*/);
+        getProxy().sendStepOverEnd(this, forceNewLine);
     }
     
     public void stepOver() {
-        thread.resume(true /*isstep*/);
-        getProxy().sendStepOverEnd(this);
+        stepOver(false);
     }
     
     public void stepReturn() {

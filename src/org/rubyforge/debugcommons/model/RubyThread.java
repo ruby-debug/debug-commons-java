@@ -43,7 +43,7 @@ public final class RubyThread extends RubyEntity {
     //	public boolean hasFrames() {
     //		return isSuspended ; //TODO: change getFrames().length > 0;
     //	}
-
+    
     /**
      * Returns top stack frame for this thread. Might be <code>null</code> if
      * thread is not {@link #isSuspended() suspended}.
@@ -109,16 +109,16 @@ public final class RubyThread extends RubyEntity {
     //		isSuspended = true;
     //		// TODO: send suspension command to ruby debugger
     //	}
-    //
-    //	public boolean canStepInto() {
-    //		return isSuspended && this.hasFrames();
-    //	}
-    //
-    //	public boolean canStepOver() {
-    //		return isSuspended && this.hasFrames();
-    //	}
-    //
-    //	public boolean canStepReturn() {
+    
+    public boolean canStepInto() {
+        return isSuspended && frames.length > 0;
+    }
+    
+    public boolean canStepOver() {
+        return isSuspended && frames.length > 0;
+    }
+    
+    //    public boolean canStepReturn() {
     //		return false;
     //	}
     //
@@ -126,24 +126,32 @@ public final class RubyThread extends RubyEntity {
     //		return isStepping;
     //	}
     
-    public void stepInto() throws RubyDebuggerException {
+    public void stepInto(boolean forceNewLine) throws RubyDebuggerException {
         //        isStepping = true;
         this.updateName();
         RubyFrame frame = getTopFrame();
         if (frame == null) {
             Util.fine("stepInto failed, not top stack frame (thread is not suspended?)");
         } else {
-            frame.stepInto();
+            frame.stepInto(forceNewLine);
         }
     }
     
-    public void stepOver() throws RubyDebuggerException {
+    public void stepInto() throws RubyDebuggerException {
+        stepInto(false);
+    }
+    
+    public void stepOver(boolean forceNewLine) throws RubyDebuggerException {
         RubyFrame frame = getTopFrame();
         if (frame == null) {
             Util.fine("stepOver failed, not top stack frame (thread is not suspended?)");
         } else {
-            frame.stepOver();
+            frame.stepOver(forceNewLine);
         }
+    }
+    
+    public void stepOver() throws RubyDebuggerException {
+        stepOver(false);
     }
     
     public void stepReturn() throws RubyDebuggerException {
