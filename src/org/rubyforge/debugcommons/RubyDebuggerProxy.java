@@ -233,7 +233,7 @@ public final class RubyDebuggerProxy {
     }
     
     
-    public void sendStepOverEnd(RubyFrame frame, boolean forceNewLine) {
+    public void sendStepOver(RubyFrame frame, boolean forceNewLine) {
         try {
             if (forceNewLine) {
                 sendCommand(commandFactory.createForcedStepOver(frame));

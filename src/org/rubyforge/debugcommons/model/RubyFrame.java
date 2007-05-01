@@ -77,7 +77,7 @@ public final class RubyFrame extends RubyEntity {
     
     public void stepOver(boolean forceNewLine) {
         thread.resume(true /*isstep*/);
-        getProxy().sendStepOverEnd(this, forceNewLine);
+        getProxy().sendStepOver(this, forceNewLine);
     }
     
     public void stepOver() {
