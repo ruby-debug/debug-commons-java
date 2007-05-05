@@ -2,6 +2,7 @@
 -------------
 
 	* minor refactoring in RubyDebuggerProxy: s/sendStepOverEnd/sendStepOver
+	* ability to customize interpreter to be used by the rdebug-ide executable
 
 0.7.1 - 0.7.2
 -------------

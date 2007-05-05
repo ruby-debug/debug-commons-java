@@ -72,19 +72,35 @@ public final class RubyDebuggerFactory {
     }
     
     /**
+     * Delegates to {@link #startRubyDebug(Descriptor, String, String)} with
+     * <code>null</code> for <code>interpreter</code> parameter.
+     */
+    public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
+            final String rdebugExecutable) throws IOException, RubyDebuggerException {
+        return startRubyDebug(descriptor, rdebugExecutable, null);
+    }
+    
+    /**
      * Starts Kent Sibilev's ruby-debug session for the given script. Debugger
      * waits on the first script's line.
      *
      * @param descriptor {@link Descriptor} to be used
      * @param rdebugExecutable path to rdebug-ide
+     * @param interpreter interpreter to be used for running
+     *        <code>rdebugExecutable</code>. If <code>null</code>
+     *        <code>rdebugExecutable</code> will be run directly using default
+     *        system interpreter.
      * @return {@link RubyDebugTarget} instance
      * @throws java.io.IOException
      * @throws org.rubyforge.debugcommons.RubyDebuggerException
      */
     public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
-            final String rdebugExecutable) throws IOException, RubyDebuggerException {
+            final String rdebugExecutable, final String interpreter) throws IOException, RubyDebuggerException {
         descriptor.setType(RUBY_DEBUG);
         List<String> args = new ArrayList<String>();
+        if (interpreter != null) {
+            args.add(interpreter);
+        }
         args.add(rdebugExecutable);
         args.add("-p");
         args.add(String.valueOf(descriptor.getPort()));
