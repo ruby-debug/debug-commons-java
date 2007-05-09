@@ -254,7 +254,7 @@ public final class RubyDebuggerFactory {
         for (String arg : process) {
             sb.append(arg).append(' ');
         }
-        return sb.toString();
+        return sb.toString().trim();
     }
     
 }
