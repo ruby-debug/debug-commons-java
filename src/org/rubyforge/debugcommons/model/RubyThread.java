@@ -110,12 +110,12 @@ public final class RubyThread extends RubyEntity {
     //		// TODO: send suspension command to ruby debugger
     //	}
     
-    public boolean canStepInto() {
-        return isSuspended && frames.length > 0;
+    public boolean canStepInto() throws RubyDebuggerException {
+        return isSuspended && getFrames().length > 0;
     }
     
-    public boolean canStepOver() {
-        return isSuspended && frames.length > 0;
+    public boolean canStepOver() throws RubyDebuggerException {
+        return isSuspended && getFrames().length > 0;
     }
     
     //    public boolean canStepReturn() {

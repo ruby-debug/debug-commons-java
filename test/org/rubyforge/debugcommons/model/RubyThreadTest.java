@@ -64,10 +64,39 @@ public final class RubyThreadTest extends DebuggerTestBase {
             proxy.updateBreakpoint(bp2);
             
             suspendedThread.resume();
-
+            
             assertNull("not top stack frame", suspendedThread.getTopFrame());
             proxy.finish();
         }
+    }
+    
+    public void testThreadsSwitching() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.CLASSIC_DEBUGGER);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "a = Thread.new do",
+                "  sleep 0.1",
+                "  sleep 0.1",
+                "end",
+                "b = Thread.new do",
+                "  sleep 0.1",
+                "  sleep 0.1",
+                "end",
+                "a.join",
+                "b.join");
+        TestBreakpoint bp2 = new TestBreakpoint("test.rb", 2);
+        TestBreakpoint bp6 = new TestBreakpoint("test.rb", 6);
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            bp2, bp6
+        };
+        startDebugging(proxy, breakpoints, 2);
+        RubyThread t2 = proxy.getDebugTarged().getThreadById(2);
+        RubyThread t3 = proxy.getDebugTarged().getThreadById(3);
+        assertNotNull("thread 2 is not null", t2);
+        assertNotNull("thread 3 is not null", t3);
+        assertTrue(t2.canStepOver());
+        assertTrue(t3.canStepOver());
+        t2.resume();
+        t3.resume();
     }
     
     private void assertSuspensionLine(int line) throws RubyDebuggerException {
