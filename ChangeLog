@@ -3,6 +3,8 @@
 
 	* minor refactoring in RubyDebuggerProxy: s/sendStepOverEnd/sendStepOver
 	* ability to customize interpreter to be used by the rdebug-ide executable
+	* fixed NPE from RubyThread.canStep(Into|Over) methods. The methods also
+	  throws RubyDebuggerException now
 
 0.7.1 - 0.7.2
 -------------
