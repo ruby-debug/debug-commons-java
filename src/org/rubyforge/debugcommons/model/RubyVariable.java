@@ -1,5 +1,7 @@
 package org.rubyforge.debugcommons.model;
 
+import org.rubyforge.debugcommons.RubyDebuggerProxy;
+
 public final class RubyVariable extends RubyEntity {
     
     private final RubyVariableInfo info;
@@ -9,35 +11,50 @@ public final class RubyVariable extends RubyEntity {
     private final boolean isLocal;
     private final boolean isInstance;
     private final boolean isConstant;
+    private final boolean isGlobal;
     private final RubyValue value;
     private final RubyVariable parent;
     
-    public RubyVariable(RubyFrame frame, RubyVariableInfo info) {
-        this(frame, info, null);
-    }
-    
-    public RubyVariable(RubyVariable parent, RubyVariableInfo info) {
-        this(parent.getFrame(), info, parent);
-    }
-    
-    private RubyVariable(RubyFrame frame, RubyVariableInfo info, RubyVariable parent) {
-        super(frame.getProxy());
-        this.frame = frame;
-        this.parent = parent;
+    private RubyVariable(RubyDebuggerProxy proxy, RubyVariableInfo info, RubyFrame frame, RubyVariable parent) {
+        super(proxy);
         this.info = info;
         if (info != RubyVariableInfo.UNKNOWN_IN_CONTEXT) {
             this.isStatic = info.getKind().equals("class");
             this.isLocal = info.getKind().equals("local");
             this.isInstance = info.getKind().equals("instance");
             this.isConstant = info.getKind().equals("constant");
+            this.isGlobal = info.getKind().equals("global");
             this.value = new RubyValue(this, info.getValue(), info.getType(), info.hasChildren());
         } else {
             this.isStatic = false;
             this.isLocal = false;
             this.isInstance = false;
             this.isConstant = false;
+            this.isGlobal = false;
             this.value = null;
         }
+        this.frame = frame;
+        this.parent = parent;
+    }
+    
+    /**
+     * Helper constructor for global variables which have neither frame nor
+     * parent.
+     */
+    public RubyVariable(RubyDebuggerProxy proxy, RubyVariableInfo info) {
+        this(proxy, info, null, null);
+    }
+    
+    public RubyVariable(RubyVariableInfo info, RubyFrame frame) {
+        this(info, frame, null);
+    }
+    
+    public RubyVariable(RubyVariableInfo info, RubyVariable parent) {
+        this(parent.getProxy(), info, parent.getFrame(), parent);
+    }
+    
+    private RubyVariable(RubyVariableInfo info, RubyFrame frame, RubyVariable parent) {
+        this(frame.getProxy(), info, frame, parent);
     }
     
     public String getName() {
@@ -129,6 +146,10 @@ public final class RubyVariable extends RubyEntity {
     
     public boolean isConstant() {
         return isConstant;
+    }
+    
+    public boolean isGlobal() {
+        return isGlobal;
     }
     
     public boolean isHashValue() {

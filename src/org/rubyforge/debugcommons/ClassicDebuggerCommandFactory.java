@@ -14,8 +14,20 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
         return "th " + frame.getThread().getId() + "; frame " + frame.getIndex() + "; v l";
     }
     
+    public String createReadGlobalVariables() {
+        return "v g";
+    }
+    
     public String createReadInstanceVariable(RubyVariable variable) {
-        return "th " + variable.getFrame().getThread().getId() + "; v i " + variable.getFrame().getIndex() + " " + variable.getObjectId();
+        StringBuilder command = new StringBuilder();
+        if (!variable.isGlobal()) {
+            command.append("th " + variable.getFrame().getThread().getId() + "; ");
+        }
+        command.append("v i ");
+        if (!variable.isGlobal()) {
+            command.append(variable.getFrame().getIndex() + " ");
+        }
+        return command.append(variable.getObjectId()).toString();
     }
     
     public String createStepOver(RubyFrame frame) {

@@ -287,7 +287,7 @@ public final class RubyDebuggerProxy {
         RubyVariable[] variables= new RubyVariable[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyVariableInfo info = infos[i];
-            variables[i] = new RubyVariable(frame, info);
+            variables[i] = new RubyVariable(info, frame);
         }
         return variables;
     }
@@ -298,7 +298,18 @@ public final class RubyDebuggerProxy {
         RubyVariable[] variables= new RubyVariable[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyVariableInfo info = infos[i];
-            variables[i] = new RubyVariable(variable, info);
+            variables[i] = new RubyVariable(info, variable);
+        }
+        return variables;
+    }
+    
+    public RubyVariable[] readGlobalVariables() throws RubyDebuggerException {
+        sendCommand(commandFactory.createReadGlobalVariables());
+        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariable[] variables= new RubyVariable[infos.length];
+        for (int i = 0; i < infos.length; i++) {
+            RubyVariableInfo info = infos[i];
+            variables[i] = new RubyVariable(this, info);
         }
         return variables;
     }
@@ -306,7 +317,7 @@ public final class RubyDebuggerProxy {
     public RubyVariable inspectExpression(RubyFrame frame, String expression) throws RubyDebuggerException {
         sendCommand(commandFactory.createInspect(frame, expression));
         RubyVariableInfo[] infos = getReadersSupport().readVariables();
-        return infos.length == 0 ? null : new RubyVariable(frame, infos[0]);
+        return infos.length == 0 ? null : new RubyVariable(infos[0], frame);
     }
     
     public void finish() {

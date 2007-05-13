@@ -5,6 +5,7 @@
 	* ability to customize interpreter to be used by the rdebug-ide executable
 	* fixed NPE from RubyThread.canStep(Into|Over) methods. The methods also
 	  throws RubyDebuggerException now
+	* Support for reading of global variable
 
 0.7.1 - 0.7.2
 -------------

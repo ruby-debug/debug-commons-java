@@ -11,11 +11,19 @@ public class RubyDebugCommandFactory implements ICommandFactory {
     }
     
     public String createReadLocalVariables(RubyFrame frame) {
-        return "frame " + frame.getIndex() + "; v l ";
+        return "frame " + frame.getIndex() + "; v l";
+    }
+    
+    public String createReadGlobalVariables() {
+        return "v g";
     }
     
     public String createReadInstanceVariable(RubyVariable variable) {
-        return "frame " + variable.getFrame().getIndex() + "; v i " + variable.getObjectId();
+        StringBuilder command = new StringBuilder();
+        if (!variable.isGlobal()) {
+            command.append("frame " + variable.getFrame().getIndex() + "; ");
+        }
+        return command.append("v i " + variable.getObjectId()).toString();
     }
     
     public String createStepOver(RubyFrame frame) {

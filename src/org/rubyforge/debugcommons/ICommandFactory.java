@@ -10,6 +10,8 @@ public interface ICommandFactory {
     
     String createReadLocalVariables(RubyFrame frame);
     
+    String createReadGlobalVariables();
+    
     String createReadInstanceVariable(RubyVariable variable);
     
     String createStepOver(RubyFrame frame);
@@ -35,4 +37,5 @@ public interface ICommandFactory {
     String createCatchOff();
     
     String createLoad(String filename);
+    
 }
