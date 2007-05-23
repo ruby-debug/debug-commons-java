@@ -105,8 +105,8 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals(7, frame.getLine());
         RubyVariable[] variables = frames[0].getVariables();
         assertEquals("a", 1, variables.length);
-        resumeSuspendedThread(proxy); // finish main thread
         variables[0].getValue().getVariables();
+        resumeSuspendedThread(proxy); // finish main thread
     }
     
 }
