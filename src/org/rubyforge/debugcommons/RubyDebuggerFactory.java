@@ -43,6 +43,7 @@ public final class RubyDebuggerFactory {
         descriptor.setType(CLASSIC_DEBUGGER);
         List<String> args = new ArrayList<String>();
         args.add(interpreter);
+        args.addAll(descriptor.getAddtionalOptions());
         args.add("-I");
         args.add(pathToClassicDebugDir);
         if (!descriptor.defaultPortUsed()) {
@@ -63,7 +64,6 @@ public final class RubyDebuggerFactory {
         }
         args.add("-r");
         args.add(descriptor.isVerbose() ? CLASSIC_VERBOSE_DEBUG_NAME : CLASSIC_DEBUG_NAME);
-        args.addAll(descriptor.getAddtionalOptions());
         args.add(descriptor.getScriptPath());
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
