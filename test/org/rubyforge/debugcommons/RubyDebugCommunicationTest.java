@@ -82,4 +82,31 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         resumeSuspendedThread(proxy); // finish main thread
     }
     
+    /**
+     * This test failed with ruby-debug-ide version &lt; 0.5. The debugger
+     * backend just died.
+     */
+    public void testInspectionWithEqualityNotCountingOnNilParameter() throws Exception {
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "class A",
+                "  def ==(obj)",
+                "    obj.non_existent",
+                "  end",
+                "end",
+                "a = A.new",
+                "puts a");
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            new TestBreakpoint("test.rb", 7)
+        };
+        startDebugging(proxy, breakpoints, 1);
+        RubyFrame[] frames = suspendedThread.getFrames();
+        assertEquals("one frames", 1, frames.length);
+        RubyFrame frame = frames[0];
+        assertEquals(7, frame.getLine());
+        RubyVariable[] variables = frames[0].getVariables();
+        assertEquals("a", 1, variables.length);
+        resumeSuspendedThread(proxy); // finish main thread
+        variables[0].getValue().getVariables();
+    }
+    
 }
