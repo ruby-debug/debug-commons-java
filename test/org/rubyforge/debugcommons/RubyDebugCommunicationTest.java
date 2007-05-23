@@ -43,7 +43,11 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals("a", variables[0].getName());
         assertEquals("b", variables[1].getName());
         assertEquals("s", variables[2].getName());
-        //        RubyVariable iv = frame.inspectExpression("a == b");
+        RubyVariable inspected = frame.inspectExpression("a == b");
+        assertEquals("eval_result", inspected.getName());
+        assertEquals("false", inspected.getValue().getValueString());
+        assertEquals("FalseClass", inspected.getValue().getReferenceTypeName());
+        RubyVariable unknown = frame.inspectExpression("unknown_in_context");
         resumeSuspendedThread(proxy); // finish spawned thread
         
         // main thread suspended
