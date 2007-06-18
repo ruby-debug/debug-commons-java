@@ -135,7 +135,7 @@ public final class RubyDebuggerFactory {
         FileWriter fWriter = new FileWriter(debugParameterFile);
         new PrintWriter(fWriter).println("$RemoteDebugPort=" + port);
         fWriter.close();
-        return debugParameterFile.getAbsolutePath();
+        return debugParameterFile.getCanonicalPath();
     }
     
     private static String createIOSynchronizer() throws IOException {
@@ -146,7 +146,7 @@ public final class RubyDebuggerFactory {
         pwWriter.println("$stdout.sync=true");
         pwWriter.println("$stderr.sync=true");
         fWriter.close();
-        return ioSynchronizer.getAbsolutePath();
+        return ioSynchronizer.getCanonicalPath();
     }
     
     /** Describes a debugger session. */
