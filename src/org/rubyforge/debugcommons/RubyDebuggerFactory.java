@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
-import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
 
 import static org.rubyforge.debugcommons.RubyDebuggerProxy.CLASSIC_DEBUGGER;
@@ -57,11 +56,7 @@ public final class RubyDebuggerFactory {
                 }
             }
         }
-        if (descriptor.isSynchronizedOutput()) {
-            String path = createIOSynchronizer();
-            args.add("-r");
-            args.add(path);
-        }
+        appendIOSynchronizer(args, descriptor);
         args.add("-r");
         args.add(descriptor.isVerbose() ? CLASSIC_VERBOSE_DEBUG_NAME : CLASSIC_DEBUG_NAME);
         args.add(descriptor.getScriptPath());
@@ -100,6 +95,7 @@ public final class RubyDebuggerFactory {
         List<String> args = new ArrayList<String>();
         if (interpreter != null) {
             args.add(interpreter);
+            appendIOSynchronizer(args, descriptor);
         }
         args.add(rdebugExecutable);
         args.add("-p");
@@ -115,7 +111,7 @@ public final class RubyDebuggerFactory {
         }
         return startDebugger(descriptor, args);
     }
-    
+
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args)
             throws IOException, RubyDebuggerException {
         Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
@@ -148,7 +144,15 @@ public final class RubyDebuggerFactory {
         fWriter.close();
         return ioSynchronizer.getCanonicalPath();
     }
-    
+
+    private static void appendIOSynchronizer(final List<? super String> args, final Descriptor descriptor) throws IOException {
+        if (descriptor.isSynchronizedOutput()) {
+            String path = createIOSynchronizer();
+            args.add("-r");
+            args.add(path);
+        }
+    }
+
     /** Describes a debugger session. */
     public static final class Descriptor {
         
@@ -249,7 +253,7 @@ public final class RubyDebuggerFactory {
     }
     
     /** Just helper method for logging. */
-    private static String getProcessAsString(List<String> process) {
+    private static String getProcessAsString(List<? extends String> process) {
         StringBuilder sb = new StringBuilder();
         for (String arg : process) {
             sb.append(arg).append(' ');

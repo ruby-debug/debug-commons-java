@@ -8,6 +8,7 @@
 	* Support for reading of global variables
 	* use cannonical files to prevent errors mainly on Windows with long paths
 	* adjusted connection timeout message
+	* append IO synchronizers also to the fast debugger
 
 0.7.1 - 0.7.2
 -------------
