@@ -365,7 +365,7 @@ public final class RubyDebuggerProxy {
                 socket = new Socket("localhost", port);
             } catch (ConnectException e) {
                 if (i == tryCount - 1) {
-                    throw new RubyDebuggerException("Ruby process finished prematurely", e);
+                    throw new RubyDebuggerException("Cannot connect to the debugged process in 10s", e);
                 }
                 try {
                     Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
