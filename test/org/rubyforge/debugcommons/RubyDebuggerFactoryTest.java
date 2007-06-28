@@ -24,11 +24,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
                 new TestBreakpoint(testFilePath, 1),
             };
             startDebugging(proxy, breakpoints, 1);
-            waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-                public void run() {
-                    proxy.getDebugTarged().getThreadById(1).resume();
-                }
-            });
+            resumeSuspendedThread(proxy);
         }
     }
     
@@ -43,11 +39,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
                 new TestBreakpoint("test.rb", 2),
             };
             startDebugging(proxy, breakpoints, 1);
-            waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-                public void run() {
-                    proxy.getDebugTarged().getThreadById(1).resume();
-                }
-            });
+            resumeSuspendedThread(proxy);
         }
     }
     
@@ -63,11 +55,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
                 new TestBreakpoint("test.rb", 2),
             };
             startDebugging(proxy, breakpoints, 1);
-            waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-                public void run() {
-                    proxy.getDebugTarged().getThreadById(1).resume();
-                }
-            });
+            resumeSuspendedThread(proxy);
         }
     }
     
@@ -90,11 +78,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
                 new TestBreakpoint("test.rb", 1),
             };
             startDebugging(proxy, breakpoints, 1);
-            waitForEvents(proxy, 1, new Runnable() { // finish spawned thread
-                public void run() {
-                    proxy.getDebugTarged().getThreadById(1).resume();
-                }
-            });
+            resumeSuspendedThread(proxy);
         }
     }
 
