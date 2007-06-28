@@ -2,6 +2,7 @@ package org.rubyforge.debugcommons;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Collections;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 
@@ -96,5 +97,23 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
             });
         }
     }
-    
+
+    public void testEnvironment() throws Exception {
+        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(debuggerType);
+            Descriptor descriptor = new Descriptor();
+            descriptor.useDefaultPort(false);
+            descriptor.setVerbose(true);
+            descriptor.setEnvironment(Collections.singletonMap("MY_ENV_123_X", "test_123"));
+            testFile = writeFile("test.rb", "exit 1 if ENV['MY_ENV_123_X'] != 'test_123'", "puts 'OK'");
+            descriptor.setScriptPath(testFile.getAbsolutePath());
+            final RubyDebuggerProxy proxy = startDebugger(descriptor);
+            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+                new TestBreakpoint("test.rb", 2),
+            };
+            startDebugging(proxy, breakpoints, 1);
+            resumeSuspendedThread(proxy);
+        }
+    }
+
 }

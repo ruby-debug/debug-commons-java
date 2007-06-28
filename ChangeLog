@@ -6,9 +6,10 @@
 	* fixed NPE from RubyThread.canStep(Into|Over) methods. The methods also
 	  throws RubyDebuggerException now
 	* Support for reading of global variables
-	* use cannonical files to prevent errors mainly on Windows with long paths
+	* use canonical files to prevent errors mainly on Windows with long paths
 	* adjusted connection timeout message
 	* append IO synchronizers also to the fast debugger
+	* ability to adjust environment of debugged process
 
 0.7.1 - 0.7.2
 -------------

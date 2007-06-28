@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
 
@@ -117,6 +118,9 @@ public final class RubyDebuggerFactory {
         Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(desc.getBaseDirectory());
+        if (desc.getEnvironment() != null) {
+            pb.environment().putAll(desc.getEnvironment());
+        }
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType());
         RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
                 desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
@@ -164,13 +168,14 @@ public final class RubyDebuggerFactory {
         private String scriptPath;
         private File baseDir;
         private String[] scriptArguments;
+        private Map<String, String> environment;
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
         
         public DebuggerType getType() {
             return type;
         }
-        
+
         public void setType(DebuggerType type) {
             this.type = type;
         }
@@ -225,6 +230,14 @@ public final class RubyDebuggerFactory {
          */
         public void setScriptArguments(String[] scriptArguments) {
             this.scriptArguments = scriptArguments;
+        }
+        
+        public Map<String, String> getEnvironment() {
+            return environment;
+        }
+
+        public void setEnvironment(final Map<String, String> environment) {
+            this.environment = environment;
         }
         
         public boolean isSynchronizedOutput() {
