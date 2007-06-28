@@ -8,8 +8,6 @@ import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import org.rubyforge.debugcommons.RubyDebuggerException;
-import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -211,6 +209,7 @@ final class ReadersSupport {
             this.xpp = xpp;
         }
         
+        @Override
         public void run() {
             try {
                 Util.fine("Starting ReadersSupport readloop: " + getName());

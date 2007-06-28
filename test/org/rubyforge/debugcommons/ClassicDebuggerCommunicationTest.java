@@ -1,6 +1,5 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;

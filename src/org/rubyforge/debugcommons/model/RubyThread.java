@@ -3,7 +3,6 @@ package org.rubyforge.debugcommons.model;
 import org.rubyforge.debugcommons.RubyDebugEvent;
 import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.Util;
-import org.rubyforge.debugcommons.model.SuspensionPoint;
 
 public final class RubyThread extends RubyEntity {
     

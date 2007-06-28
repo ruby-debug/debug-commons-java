@@ -4,8 +4,6 @@ import java.io.File;
 import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.Util;
-import org.rubyforge.debugcommons.model.RubyEntity;
-import org.rubyforge.debugcommons.model.RubyThread;
 
 public final class RubyDebugTarget extends RubyEntity {
     
@@ -14,7 +12,6 @@ public final class RubyDebugTarget extends RubyEntity {
     private final String debuggedFile;
     private final File baseDir;
     
-    private boolean terminated;
     private RubyThread[] threads;
     
     public RubyDebugTarget(RubyDebuggerProxy proxy, Process process, int port,
