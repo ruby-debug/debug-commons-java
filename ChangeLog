@@ -10,6 +10,7 @@
 	* adjusted connection timeout message
 	* append IO synchronizers also to the fast debugger
 	* ability to adjust environment of debugged process
+	* Rubyish renaming RubyVariable.isStatic() to isClass()
 
 0.7.1 - 0.7.2
 -------------
