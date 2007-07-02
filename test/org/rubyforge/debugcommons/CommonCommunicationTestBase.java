@@ -1,6 +1,8 @@
 package org.rubyforge.debugcommons;
 
+import java.util.Arrays;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyVariable;
 
 public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
@@ -29,6 +31,34 @@ public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
         assertNotNull("$: found", loadPath);
         assertTrue("$: is global", loadPath.isGlobal());
         assertTrue("$: has children", loadPath.getValue().getVariables().length > 0);
+        resumeSuspendedThread(proxy); // finish spawned thread
+    }
+    
+    public void testClassVariables() throws Exception {
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "class A",
+                "  @x=1",
+                "  @@y=2",
+                "  def initialize",
+                "    @z=3",
+                "  end",
+                "end",
+                "a = A.new",
+                "sleep 0.1");
+
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            new TestBreakpoint("test.rb", 9),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        assertNotNull(suspendedThread);
+        RubyFrame[] frames = suspendedThread.getFrames();
+        assertEquals("one frames", 1, frames.length);
+        RubyVariable[] variables = frames[0].getVariables();
+        assertEquals("a", 1, variables.length);
+        RubyVariable aVar = variables[0];
+        assertEquals("a", aVar.getName());
+        RubyVariable[] vars = aVar.getValue().getVariables();
+        assertEquals("two vars: @@y, @z (was: " + Arrays.asList(vars) + ")", 2, vars.length);
         resumeSuspendedThread(proxy); // finish spawned thread
     }
     
