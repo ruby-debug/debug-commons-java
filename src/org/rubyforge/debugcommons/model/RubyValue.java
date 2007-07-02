@@ -30,6 +30,13 @@ public class RubyValue extends RubyEntity {
         return false;
     }
     
+    /**
+     * Returns <em>instance</em> variables of the object represented by this
+     * value plus <em>class</em> variables of the class of the object.
+     *
+     * @see RubyVariable#isClass
+     * @see RubyVariable#isInstance
+     */
     public RubyVariable[] getVariables() throws RubyDebuggerException {
         if (!hasChildren) {
             return new RubyVariable[0];
