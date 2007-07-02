@@ -7,7 +7,7 @@ public final class RubyVariable extends RubyEntity {
     private final RubyVariableInfo info;
     private final RubyFrame frame;
     
-    private final boolean isStatic;
+    private final boolean isClass;
     private final boolean isLocal;
     private final boolean isInstance;
     private final boolean isConstant;
@@ -19,14 +19,14 @@ public final class RubyVariable extends RubyEntity {
         super(proxy);
         this.info = info;
         if (info != RubyVariableInfo.UNKNOWN_IN_CONTEXT) {
-            this.isStatic = info.getKind().equals("class");
+            this.isClass = info.getKind().equals("class");
             this.isLocal = info.getKind().equals("local");
             this.isInstance = info.getKind().equals("instance");
             this.isConstant = info.getKind().equals("constant");
             this.isGlobal = info.getKind().equals("global");
             this.value = new RubyValue(this, info.getValue(), info.getType(), info.hasChildren());
         } else {
-            this.isStatic = false;
+            this.isClass = false;
             this.isLocal = false;
             this.isInstance = false;
             this.isConstant = false;
@@ -140,8 +140,8 @@ public final class RubyVariable extends RubyEntity {
         return isLocal;
     }
     
-    public boolean isStatic() {
-        return isStatic;
+    public boolean isClass() {
+        return isClass;
     }
     
     public boolean isConstant() {
