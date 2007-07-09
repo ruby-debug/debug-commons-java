@@ -157,11 +157,8 @@ public final class RubyVariable extends RubyEntity {
     }
     
     public String toString() {
-        if (this.isHashValue()) {
-            return this.getName() + " => " + this.getValue();
-        }
-        return this.getName() + " = " + this.getValue();
-        
+        String sep = this.isHashValue() ? " => " : " = ";
+        return getName() + sep + getValue() + ", INFO: (" + info + ')';
     }
     
 }

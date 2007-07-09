@@ -6,7 +6,7 @@ public final class RubyVariableInfo {
      * Used for cases when expression cannot be evaluated in the current
      * context.
      */
-    public static final RubyVariableInfo UNKNOWN_IN_CONTEXT = new RubyVariableInfo(null, null);
+    public static final RubyVariableInfo UNKNOWN_IN_CONTEXT = new RubyVariableInfo("<UNKNOWN_IN_CONTEXT>", "<UNKNOWN_IN_CONTEXT>");
     
     private final String name;
     private final String kind;
@@ -50,6 +50,17 @@ public final class RubyVariableInfo {
     
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + getClass().getName() + '@' + System.identityHashCode(this) + 
+                "] kind = " + kind + 
+                ", value = " + value + 
+                ", type = " + type + 
+                ", hasChildren = " + hasChildren + 
+                ", objectId = " + objectId + 
+                "), UNKNOWN_IN_CONTEXT == " + (kind == "<UNKNOWN>");
     }
     
 }
