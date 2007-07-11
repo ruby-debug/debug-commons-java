@@ -18,21 +18,12 @@ public final class RubyVariable extends RubyEntity {
     private RubyVariable(RubyDebuggerProxy proxy, RubyVariableInfo info, RubyFrame frame, RubyVariable parent) {
         super(proxy);
         this.info = info;
-        if (info != RubyVariableInfo.UNKNOWN_IN_CONTEXT) {
-            this.isClass = info.getKind().equals("class");
-            this.isLocal = info.getKind().equals("local");
-            this.isInstance = info.getKind().equals("instance");
-            this.isConstant = info.getKind().equals("constant");
-            this.isGlobal = info.getKind().equals("global");
-            this.value = new RubyValue(this, info.getValue(), info.getType(), info.hasChildren());
-        } else {
-            this.isClass = false;
-            this.isLocal = false;
-            this.isInstance = false;
-            this.isConstant = false;
-            this.isGlobal = false;
-            this.value = null;
-        }
+        this.isClass = info.getKind().equals("class");
+        this.isLocal = info.getKind().equals("local");
+        this.isInstance = info.getKind().equals("instance");
+        this.isConstant = info.getKind().equals("constant");
+        this.isGlobal = info.getKind().equals("global");
+        this.value = new RubyValue(this, info.getValue(), info.getType(), info.hasChildren());
         this.frame = frame;
         this.parent = parent;
     }

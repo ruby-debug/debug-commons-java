@@ -51,11 +51,9 @@ public final class VariablesReader extends XmlStreamReader {
     }
     
     private void parseProcessingException() throws XmlPullParserException, IOException {
-        Util.fine("Processing exception occured." +
+        Util.severe("Processing exception occured." +
                 " exceptionMessage: " + getAttributeValue("message") +
                 ", exceptionType: " + getAttributeValue("type"));
-        variables = new RubyVariableInfo[1];
-        variables[0] = RubyVariableInfo.UNKNOWN_IN_CONTEXT;
         ensureEndTag("processingException");
     }
     
@@ -66,11 +64,10 @@ public final class VariablesReader extends XmlStreamReader {
         return reader.variables;
     }
     
-    public static RubyVariableInfo[] readProcessingException(final XmlPullParser xpp)
+    public static void logProcessingException(final XmlPullParser xpp)
             throws IOException, XmlPullParserException {
         VariablesReader reader = new VariablesReader(xpp);
         reader.parse();
-        return reader.variables;
     }
     
 }

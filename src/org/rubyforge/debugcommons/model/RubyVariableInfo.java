@@ -2,12 +2,6 @@ package org.rubyforge.debugcommons.model;
 
 public final class RubyVariableInfo {
     
-    /**
-     * Used for cases when expression cannot be evaluated in the current
-     * context.
-     */
-    public static final RubyVariableInfo UNKNOWN_IN_CONTEXT = new RubyVariableInfo("<UNKNOWN_IN_CONTEXT>", "<UNKNOWN_IN_CONTEXT>");
-    
     private final String name;
     private final String kind;
     private final String value;
@@ -59,8 +53,7 @@ public final class RubyVariableInfo {
                 ", value = " + value + 
                 ", type = " + type + 
                 ", hasChildren = " + hasChildren + 
-                ", objectId = " + objectId + 
-                "), UNKNOWN_IN_CONTEXT == " + (kind == "<UNKNOWN>");
+                ", objectId = " + objectId; 
     }
     
 }

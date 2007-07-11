@@ -118,7 +118,8 @@ final class ReadersSupport {
         } else if (VARIABLES_ELEMENT.equals(element)) {
             variables.add(VariablesReader.readVariables(xpp));
         } else if (PROCESSING_EXCEPTION_ELEMENT.equals(element)) {
-            variables.add(VariablesReader.readProcessingException(xpp));
+            VariablesReader.logProcessingException(xpp);
+            variables.add(new RubyVariableInfo[0]);
         } else {
             assert false : "Unexpected element: " + element;
         }
