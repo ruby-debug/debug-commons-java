@@ -1,6 +1,7 @@
 package org.rubyforge.debugcommons;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -21,7 +22,7 @@ import org.rubyforge.debugcommons.model.RubyVariable;
 import org.rubyforge.debugcommons.model.RubyVariableInfo;
 
 public final class RubyDebuggerProxy {
-    
+
     public static enum DebuggerType { CLASSIC_DEBUGGER, RUBY_DEBUG }
     
     public static final DebuggerType CLASSIC_DEBUGGER = DebuggerType.CLASSIC_DEBUGGER;
@@ -211,7 +212,7 @@ public final class RubyDebuggerProxy {
     
     public Socket getCommandSocket() throws RubyDebuggerException {
         if (commandSocket == null) {
-            commandSocket = attach(debugTarged.getPort());
+            commandSocket = attach(debugTarged);
         }
         return commandSocket;
     }
@@ -358,14 +359,16 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    private static Socket attach(int port) throws RubyDebuggerException {
+    private static Socket attach(final RubyDebugTarget target) throws RubyDebuggerException {
+        int port = target.getPort();
         Socket socket = null;
         for (int tryCount = 20, i = 0; i < tryCount && socket == null; i++) {
             try {
                 socket = new Socket("localhost", port);
             } catch (ConnectException e) {
                 if (i == tryCount - 1) {
-                    throw new RubyDebuggerException("Cannot connect to the debugged process in 10s", e);
+                    String info = dumpProcess(target.getProcess());
+                    throw new RubyDebuggerException("Cannot connect to the debugged process in 10s:\n\n" + info, e);
                 }
                 try {
                     Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
@@ -380,7 +383,33 @@ public final class RubyDebuggerProxy {
         }
         return socket;
     }
-    
+
+    private static String dumpProcess(final Process process) {
+        StringBuilder info = new StringBuilder();
+        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: "));
+        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: "));
+        return info.toString();
+    }
+
+    private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix) {
+        try {
+            int c;
+            StringBuilder output = new StringBuilder();
+            while ((c = stream.read()) != -1) {
+                output.append((char) c);
+            }
+            if (output.length() > 0) {
+                Util.LOGGER.log(level, msgPrefix);
+                String outputS = output.toString();
+                Util.LOGGER.log(level, outputS);
+                return msgPrefix + '\n' + outputS;
+            }
+        } catch (IOException e) {
+            Util.severe(e);
+        }
+        return "";
+    }
+
     private class RubyLoop extends Thread {
         
         RubyLoop() {

@@ -11,6 +11,7 @@
 	* append IO synchronizers also to the fast debugger
 	* ability to adjust environment of debugged process
 	* Rubyish renaming RubyVariable.isStatic() to isClass()
+	* log and provide more info within the exception when debugger start fails
 
 0.7.1 - 0.7.2
 -------------
