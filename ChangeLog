@@ -14,6 +14,8 @@
 	* log and provide more info within the exception when debugger start fails
 	* Get rid of non-sense RubyVariableInfo.UNKNOWN_IN_CONTEXT. Log(severe)
 	  processing exception instead. To be tuned.
+	* Send 'exit' command to classic debugger as well (supported since classic
+	  debugger backend 0.9.5)
 
 0.7.1 - 0.7.2
 -------------
