@@ -352,7 +352,7 @@ public final class RubyDebuggerProxy {
     private synchronized void closeConnections() throws RubyDebuggerException, IOException {
         connected = false;
         if (commandSocket != null) {
-            if (debuggerType == RUBY_DEBUG && debugTarged.isRunning()) {
+            if (debugTarged.isRunning()) {
                 sendCommand("exit");
             }
             commandSocket.close();
