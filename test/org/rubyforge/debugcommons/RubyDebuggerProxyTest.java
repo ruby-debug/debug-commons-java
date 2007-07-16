@@ -160,7 +160,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
                 suspendedThread = null;
             }
         });
-        assertEquals("two frames", 2, suspendedThread.getFrames().length);
+        assertEquals("one frame", 1, suspendedThread.getFrames().length);
         resumeSuspendedThread(proxy);
     }
     
