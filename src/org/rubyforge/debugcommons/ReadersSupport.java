@@ -109,7 +109,9 @@ final class ReadersSupport {
         } else if (SUSPENDED_ELEMENT.equals(element)) {
             SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
             suspensions.add(sp);
-        } else if (ERROR_ELEMENT.equals(element) || MESSAGE_ELEMENT.equals(element)) {
+        } else if (ERROR_ELEMENT.equals(element)) {
+            Util.warning(ErrorReader.readMessage(xpp));
+        } else if (MESSAGE_ELEMENT.equals(element)) {
             Util.info(ErrorReader.readMessage(xpp));
         } else if (THREADS_ELEMENT.equals(element)) {
             threads.add(ThreadInfoReader.readThreads(xpp));
