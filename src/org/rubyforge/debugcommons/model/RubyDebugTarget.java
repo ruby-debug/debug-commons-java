@@ -68,7 +68,12 @@ public final class RubyDebugTarget extends RubyEntity {
         try {
             updateThreads();
         } catch (RubyDebuggerException e) {
-            throw new RuntimeException("Cannot update threads", e);
+            if (getProxy().checkConnection()) {
+                throw new RuntimeException("Cannot update threads", e);
+            } else {
+                Util.fine("Session has finished. Ignoring unsuccessful thread update.");
+                return;
+            }
         }
         RubyThread thread = getThreadById(suspensionPoint.getThreadId());
         if (thread == null) {

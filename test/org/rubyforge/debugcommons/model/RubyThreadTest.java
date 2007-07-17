@@ -66,7 +66,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
             suspendedThread.resume();
             
             assertNull("not top stack frame", suspendedThread.getTopFrame());
-            proxy.finish();
+            proxy.finish(true);
         }
     }
     

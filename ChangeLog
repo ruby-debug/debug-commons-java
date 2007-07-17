@@ -16,6 +16,7 @@
 	  processing exception instead. To be tuned.
 	* Send 'exit' command to classic debugger as well (supported since classic
 	  debugger backend 0.9.5)
+	* Better utilization of 'exit' and session ending/finishing
 
 0.7.1 - 0.7.2
 -------------

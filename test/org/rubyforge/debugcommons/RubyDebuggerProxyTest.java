@@ -108,7 +108,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
                 new TestBreakpoint("test.rb", 2),
             };
             startDebugging(proxy, breakpoints, 1);
-            proxy.finish();
+            proxy.finish(true);
         }
     }
     

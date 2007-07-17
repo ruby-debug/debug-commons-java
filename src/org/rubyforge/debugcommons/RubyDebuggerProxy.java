@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -92,20 +93,28 @@ public final class RubyDebuggerProxy {
     }
     
     public synchronized boolean checkConnection() {
-        return connected;
+        return !finished && connected;
     }
     
     private void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
-        commandFactory = new ClassicDebuggerCommandFactory();
-        readersSupport.startCommandLoop(getCommandSocket());
-        setBreakpoints(initialBreakpoints);
+        try {
+            commandFactory = new ClassicDebuggerCommandFactory();
+            readersSupport.startCommandLoop(getCommandSocket().getInputStream());
+            setBreakpoints(initialBreakpoints);
+        } catch (IOException ex) {
+            throw new RubyDebuggerException(ex);
+        }
     }
-    
+
     private void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
-        commandFactory = new RubyDebugCommandFactory();
-        readersSupport.startCommandLoop(getCommandSocket());
-        setBreakpoints(initialBreakpoints);
-        sendCommand("start");
+        try {
+            commandFactory = new RubyDebugCommandFactory();
+            readersSupport.startCommandLoop(getCommandSocket().getInputStream());
+            setBreakpoints(initialBreakpoints);
+            sendCommand("start");
+        } catch (IOException ex) {
+            throw new RubyDebuggerException(ex);
+        }
     }
     
     public void fireDebugEvent(final RubyDebugEvent e) {
@@ -272,8 +281,16 @@ public final class RubyDebuggerProxy {
     }
     
     public RubyFrame[] readFrames(RubyThread thread) throws RubyDebuggerException {
-        sendCommand(commandFactory.createReadFrames(thread));
-        RubyFrameInfo[] infos = getReadersSupport().readFrames();
+        RubyFrameInfo[] infos;
+        try {
+            sendCommand(commandFactory.createReadFrames(thread));
+            infos = getReadersSupport().readFrames();
+        } catch (RubyDebuggerException e) {
+            if (checkConnection()) {
+                throw e;
+            }
+            infos = new RubyFrameInfo[0];
+        }
         RubyFrame[] frames = new RubyFrame[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyFrameInfo info = infos[i];
@@ -321,7 +338,7 @@ public final class RubyDebuggerProxy {
         return infos.length == 0 ? null : new RubyVariable(infos[0], frame);
     }
     
-    public void finish() {
+    public void finish(final boolean forced) {
         synchronized(this) {
             if (finished) {
                 // possible if client call this explicitly and then second time from RubyLoop
@@ -330,32 +347,28 @@ public final class RubyDebuggerProxy {
             }
             finished = true;
             PROXIES.remove(RubyDebuggerProxy.this);
-            try {
-                closeConnections();
-            } catch (RubyDebuggerException e) {
-                Util.severe("Exception during closing connection", e);
-            } catch (IOException e) {
-                Util.severe("Exception during closing connection", e);
+            if (forced) {
+                sendExit();
+                try {
+                    // Needed to let the IO readers to read the last pieces of input and
+                    // output streams.
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Util.LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
+                }
+                getDebugTarged().getProcess().destroy();
             }
-            try {
-                // Needed to let the IO readers to read the last pieces of input and
-                // output streams.
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Util.LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
-            }
-            getDebugTarged().getProcess().destroy();
         }
         fireDebugEvent(new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE));
     }
     
-    private synchronized void closeConnections() throws RubyDebuggerException, IOException {
-        connected = false;
-        if (commandSocket != null) {
-            if (debugTarged.isRunning()) {
+    private synchronized void sendExit() {
+        if (commandSocket != null && debugTarged.isRunning()) {
+            try {
                 sendCommand("exit");
+            } catch (RubyDebuggerException ex) {
+                Util.fine("'exit' command failed. Process died? " + debugTarged.isRunning());
             }
-            commandSocket.close();
         }
     }
     
@@ -432,7 +445,7 @@ public final class RubyDebuggerProxy {
                     } catch (RubyDebuggerException e) {
                         Util.LOGGER.log(Level.INFO, "Unable to set initial 'cont'" +
                                 " command to Classic Debugger: " + e.getMessage(), e);
-                        finish();
+                        finish(true);
                         return;
                     }
                 }
@@ -448,9 +461,9 @@ public final class RubyDebuggerProxy {
             } catch (RubyDebuggerException e) {
                 Util.severe("Exception in socket reader loop.", e);
             } finally {
-                finish();
-                Util.finest("Socket reader loop finished.");
+                finish(false);
             }
+            Util.finest("Socket reader loop finished.");
         }
     }
     

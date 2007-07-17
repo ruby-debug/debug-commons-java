@@ -3,8 +3,8 @@ package org.rubyforge.debugcommons;
 import org.rubyforge.debugcommons.reader.*;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +33,9 @@ final class ReadersSupport {
     
     private static final String RUBY_DEBUG_PROMPT = "PROMPT";
     
+    /** Message sent by debugger backend when debugger has finished. */
+    private static final String FINISHED = "finished";
+    
     /**
      * Reading timeout until giving up when polling information from socket
      * communication.
@@ -46,6 +49,8 @@ final class ReadersSupport {
     private final BlockingQueue<SuspensionPoint> suspensions;
     private final BlockingQueue<Integer> addedBreakpoints;
     private final BlockingQueue<Integer> removedBreakpoints;
+    
+    private boolean finished;
     
     /**
      * @param timeout reading timeout until giving up when polling information
@@ -61,13 +66,9 @@ final class ReadersSupport {
         this.removedBreakpoints = new LinkedBlockingQueue<Integer>();
     }
     
-    void startCommandLoop(final Socket commandSocket) throws RubyDebuggerException {
-        startLoop(commandSocket, "command loop");
-    }
-    
-    private void startLoop(final Socket socket, final String name) throws RubyDebuggerException {
+    void startCommandLoop(final InputStream is) throws RubyDebuggerException {
         try {
-            new XPPLoop(getXpp(socket), ReadersSupport.class + " " + name).start();
+            new XPPLoop(is, ReadersSupport.class + " command loop").start();
         } catch (IOException e) {
             throw new RubyDebuggerException(e);
         } catch (XmlPullParserException e) {
@@ -93,6 +94,9 @@ final class ReadersSupport {
             } else {
                 assert false : "Unexpected state: " + eventType;
             }
+            if (finished) {
+                break;
+            }
             eventType = xpp.next();
         } while (eventType != XmlPullParser.END_DOCUMENT);
     }
@@ -112,7 +116,12 @@ final class ReadersSupport {
         } else if (ERROR_ELEMENT.equals(element)) {
             Util.warning(ErrorReader.readMessage(xpp));
         } else if (MESSAGE_ELEMENT.equals(element)) {
-            Util.info(ErrorReader.readMessage(xpp));
+            String text = ErrorReader.readMessage(xpp);
+            Util.info(text);
+            if (text.equals(FINISHED)) {
+                Util.fine("Got <message>, text == finished");
+                finished = true;
+            }
         } else if (THREADS_ELEMENT.equals(element)) {
             threads.add(ThreadInfoReader.readThreads(xpp));
         } else if (FRAMES_ELEMENT.equals(element)) {
@@ -195,21 +204,23 @@ final class ReadersSupport {
         }
     }
     
-    private static XmlPullParser getXpp(Socket socket)  throws XmlPullParserException, IOException {
+    private static XmlPullParser getXpp(final InputStream is)  throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance(
                 "org.kxml2.io.KXmlParser,org.kxml2.io.KXmlSerializer", null);
         XmlPullParser xpp = factory.newPullParser();
-        xpp.setInput(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+        xpp.setInput(new BufferedReader(new InputStreamReader(is)));
         return xpp;
     }
     
     private class XPPLoop extends Thread {
         
-        final XmlPullParser xpp;
+        private final XmlPullParser xpp;
+        private final InputStream is;
         
-        XPPLoop(final XmlPullParser xpp, final String loopName) {
+        XPPLoop(final InputStream is, final String loopName) throws XmlPullParserException, IOException {
             super(loopName);
-            this.xpp = xpp;
+            this.is = is;
+            this.xpp = getXpp(is);
         }
         
         @Override
@@ -229,7 +240,10 @@ final class ReadersSupport {
             } finally {
                 suspensions.add(SuspensionPoint.END);
                 try {
+                    is.close();
                     Thread.sleep(1000); // Avoid Commodification Exceptions
+                } catch (IOException e) {
+                    Util.severe("Cannot close socket's input stream", e);
                 } catch (InterruptedException e) {
                     Util.severe("Readers loop interrupted", e);
                 }
