@@ -125,5 +125,19 @@ public final class RubyFrame extends RubyEntity {
     public String toString() {
         return getName();
     }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RubyFrame)) {
+            return false;
+        }
+        final RubyFrame other = (RubyFrame) obj;
+        return info == null ? other.info == null : info.equals(other.info);
+    }
+
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + (this.info != null ? this.info.hashCode() : 0);
+        return hash;
+    }
     
 }

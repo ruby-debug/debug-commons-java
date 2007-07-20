@@ -23,5 +23,23 @@ public final class RubyFrameInfo {
     public String getFile() {
         return file;
     }
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RubyFrameInfo)) {
+            return false;
+        }
+        final RubyFrameInfo other = (RubyFrameInfo) obj;
+        return (file == null ? other.file == null : file.equals(other.file))
+                && (line == other.line) && (index == other.index);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (file != null ? file.hashCode() : 0);
+        hash = 59 * hash + line;
+        hash = 59 * hash + index;
+        return hash;
+    }
 }
