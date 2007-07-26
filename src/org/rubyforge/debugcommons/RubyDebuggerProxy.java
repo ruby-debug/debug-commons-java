@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -33,6 +32,7 @@ public final class RubyDebuggerProxy {
     
     private final List<RubyDebugEventListener> listeners;
     private final Map<Integer, IRubyBreakpoint> breakpointsIDs;
+    private final int timeout;
     
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
@@ -45,15 +45,20 @@ public final class RubyDebuggerProxy {
     private ICommandFactory commandFactory;
     private ReadersSupport readersSupport;
     
-    public RubyDebuggerProxy(DebuggerType debuggerType) {
+    public RubyDebuggerProxy(final DebuggerType debuggerType) {
+        this(debuggerType, 10); // default reading timeout 10s
+    }
+    
+    public RubyDebuggerProxy(final DebuggerType debuggerType, final int timeout) {
         this.debuggerType = debuggerType;
         this.listeners = new CopyOnWriteArrayList<RubyDebugEventListener>();
         this.breakpointsIDs = new HashMap<Integer, IRubyBreakpoint>();
+        this.timeout = timeout;
     }
     
     public void connect(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
         this.debugTarged = debugTarged;
-        this.readersSupport = new ReadersSupport(10); // default reading timeout 10s
+        this.readersSupport = new ReadersSupport(timeout);
     }
     
     public RubyDebugTarget getDebugTarged() {
@@ -221,7 +226,7 @@ public final class RubyDebuggerProxy {
     
     public Socket getCommandSocket() throws RubyDebuggerException {
         if (commandSocket == null) {
-            commandSocket = attach(debugTarged);
+            commandSocket = RubyDebuggerProxy.attach(debugTarged, timeout);
         }
         return commandSocket;
     }
@@ -372,16 +377,22 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    private static Socket attach(final RubyDebugTarget target) throws RubyDebuggerException {
+    /**
+     * Tries to attach to the <code>targed</code>'s process and gives up in
+     * <code>timeout</code> seconds.
+     * 
+     * @timeout timeout in <em>seconds</em>
+     */
+    private static Socket attach(final RubyDebugTarget target, final int timeout) throws RubyDebuggerException {
         int port = target.getPort();
         Socket socket = null;
-        for (int tryCount = 20, i = 0; i < tryCount && socket == null; i++) {
+        for (int tryCount = (timeout*2), i = 0; i < tryCount && socket == null; i++) {
             try {
                 socket = new Socket("localhost", port);
             } catch (ConnectException e) {
                 if (i == tryCount - 1) {
                     String info = dumpProcess(target.getProcess());
-                    throw new RubyDebuggerException("Cannot connect to the debugged process in 10s:\n\n" + info, e);
+                    throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
                 }
                 try {
                     Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');

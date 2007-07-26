@@ -18,6 +18,7 @@
 	  debugger backend 0.9.5)
 	* Better utilization of 'exit' and session ending/finishing
 	* RubyFrame and RubyFrameInfo override equal and hashcode
+	* ability to customize ReadersSupport and connecting-to-server timeouts
 
 0.7.1 - 0.7.2
 -------------

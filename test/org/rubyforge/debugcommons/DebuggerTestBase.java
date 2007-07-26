@@ -121,7 +121,7 @@ public abstract class DebuggerTestBase extends TestBase {
         case RUBY_DEBUG:
             File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
             assertTrue("rdebug-ide file exists", rdebug.isFile());
-            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath());
+            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), 10);
             break;
         default:
             throw new IllegalStateException("Unhandled debugger type: " + debuggerType);

@@ -38,7 +38,8 @@ public final class RubyDebuggerFactory {
     public static RubyDebuggerProxy startClassicDebugger(
             final Descriptor descriptor,
             final String pathToClassicDebugDir,
-            final String interpreter)
+            final String interpreter,
+            final int timeout)
             throws IOException, RubyDebuggerException {
         descriptor.setType(CLASSIC_DEBUGGER);
         List<String> args = new ArrayList<String>();
@@ -64,16 +65,26 @@ public final class RubyDebuggerFactory {
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
-        return startDebugger(descriptor, args);
+        return startDebugger(descriptor, args, timeout);
     }
-    
+
+    /**
+     * The same as {@link #startClassicDebugger(Descriptor, String, String, int)}.
+     */
+    public static RubyDebuggerProxy startClassicDebugger(
+            final Descriptor descriptor,
+            final String pathToClassicDebugDir,
+            final String interpreter) throws IOException, RubyDebuggerException {
+        return startClassicDebugger(descriptor, pathToClassicDebugDir, interpreter, 10);
+    }
+
     /**
      * Delegates to {@link #startRubyDebug(Descriptor, String, String)} with
      * <code>null</code> for <code>interpreter</code> parameter.
      */
     public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
-            final String rdebugExecutable) throws IOException, RubyDebuggerException {
-        return startRubyDebug(descriptor, rdebugExecutable, null);
+            final String rdebugExecutable, final int timeout) throws IOException, RubyDebuggerException {
+        return startRubyDebug(descriptor, rdebugExecutable, null, timeout);
     }
     
     /**
@@ -90,8 +101,11 @@ public final class RubyDebuggerFactory {
      * @throws java.io.IOException
      * @throws org.rubyforge.debugcommons.RubyDebuggerException
      */
-    public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
-            final String rdebugExecutable, final String interpreter) throws IOException, RubyDebuggerException {
+    public static RubyDebuggerProxy startRubyDebug(
+            final Descriptor descriptor,
+            final String rdebugExecutable,
+            final String interpreter,
+            final int timeout) throws IOException, RubyDebuggerException {
         descriptor.setType(RUBY_DEBUG);
         List<String> args = new ArrayList<String>();
         if (interpreter != null) {
@@ -110,10 +124,10 @@ public final class RubyDebuggerFactory {
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
-        return startDebugger(descriptor, args);
+        return startDebugger(descriptor, args, timeout);
     }
 
-    private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args)
+    private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args, final int timeout)
             throws IOException, RubyDebuggerException {
         Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
@@ -121,7 +135,7 @@ public final class RubyDebuggerFactory {
         if (desc.getEnvironment() != null) {
             pb.environment().putAll(desc.getEnvironment());
         }
-        RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType());
+        RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType(), timeout);
         RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
                 desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
         proxy.connect(target);
