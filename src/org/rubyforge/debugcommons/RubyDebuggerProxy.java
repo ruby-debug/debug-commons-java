@@ -2,6 +2,7 @@ package org.rubyforge.debugcommons;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -411,52 +412,55 @@ public final class RubyDebuggerProxy {
 
     private static String dumpProcess(final Process process) {
         final StringBuilder info = new StringBuilder();
-        if (Util.isRunning(process)) {
-            info.append("But server process is running. You might try to increase the timeout. Killing...");
+        boolean running = Util.isRunning(process);
+        if (running) {
+            info.append("But server process is running. You might try to increase the timeout. Killing...\n\n");
+        }
+        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
+        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
+        if (running) {
+            process.destroy();
+        }
+        return info.toString();
+    }
+
+    private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix, final boolean asynch) {
+        final StringBuilder output = new StringBuilder();
+        if (asynch) {
             Thread collector = new Thread(new Runnable() {
                 public void run() {
-                    info.append(collectStreamsOutput(process));
+                    collect(stream, output);
                 }
             });
             collector.start();
-            // give one second to the thread to collect current stderr and stdout
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Util.severe(ex);
             }
             collector.interrupt();
-            process.destroy();
         } else {
-            info.append(collectStreamsOutput(process));
+            collect(stream, output);
         }
-        return info.toString();
-    }
-
-    private static String collectStreamsOutput(final Process process) {
-        final StringBuilder info = new StringBuilder();
-        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: "));
-        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: "));
-        return info.toString();
+        if (output.length() > 0) {
+            Util.LOGGER.log(level, msgPrefix);
+            String outputS = output.toString();
+            Util.LOGGER.log(level, outputS);
+            return msgPrefix + '\n' + outputS;
+        } else {
+            return "";
+        }
     }
     
-    private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix) {
+    private static void collect(final InputStream stream, final StringBuilder output) {
         try {
             int c;
-            StringBuilder output = new StringBuilder();
             while ((c = stream.read()) != -1) {
                 output.append((char) c);
-            }
-            if (output.length() > 0) {
-                Util.LOGGER.log(level, msgPrefix);
-                String outputS = output.toString();
-                Util.LOGGER.log(level, outputS);
-                return msgPrefix + '\n' + outputS;
             }
         } catch (IOException e) {
             Util.LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
         }
-        return "";
     }
 
     private class RubyLoop extends Thread {
