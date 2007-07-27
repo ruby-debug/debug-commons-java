@@ -65,5 +65,15 @@ public final class Util {
         }
         return -1;
     }
-    
+
+    public static boolean isRunning(final Process process) {
+        try {
+            process.exitValue();
+            return false;
+        } catch (IllegalThreadStateException ex) {
+            // not yet finished, normal behaviour why does java.lang.Process
+            // does not have a function like isRunning()?
+            return true;
+        }
+    }
 }

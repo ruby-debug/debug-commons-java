@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -409,12 +410,36 @@ public final class RubyDebuggerProxy {
     }
 
     private static String dumpProcess(final Process process) {
-        StringBuilder info = new StringBuilder();
+        final StringBuilder info = new StringBuilder();
+        if (Util.isRunning(process)) {
+            info.append("But server process is running. You might try to increase the timeout. Killing...");
+            Thread collector = new Thread(new Runnable() {
+                public void run() {
+                    info.append(collectStreamsOutput(process));
+                }
+            });
+            collector.start();
+            // give one second to the thread to collect current stderr and stdout
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Util.severe(ex);
+            }
+            collector.interrupt();
+            process.destroy();
+        } else {
+            info.append(collectStreamsOutput(process));
+        }
+        return info.toString();
+    }
+
+    private static String collectStreamsOutput(final Process process) {
+        final StringBuilder info = new StringBuilder();
         info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: "));
         info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: "));
         return info.toString();
     }
-
+    
     private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix) {
         try {
             int c;
@@ -429,7 +454,7 @@ public final class RubyDebuggerProxy {
                 return msgPrefix + '\n' + outputS;
             }
         } catch (IOException e) {
-            Util.severe(e);
+            Util.LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
         }
         return "";
     }

@@ -99,14 +99,7 @@ public final class RubyDebugTarget extends RubyEntity {
     }
     
     public boolean isRunning() {
-        try {
-            process.exitValue();
-            return false;
-        } catch (IllegalThreadStateException ex) {
-            // not yet finished, normal behaviour why does java.lang.Process
-            // does not have a function like isRunning()?
-            return true;
-        }
+        return Util.isRunning(process);
     }
     
 }
