@@ -98,7 +98,7 @@ public final class RubyThread extends RubyEntity {
         isSuspended = true;
         //        isStepping = false;
         this.updateName(suspensionPoint);
-        RubyDebugEvent ev = new RubyDebugEvent(this, suspensionPoint.getFile(), suspensionPoint.getLine());
+        RubyDebugEvent ev = new RubyDebugEvent(this, suspensionPoint);
         getProxy().fireDebugEvent(ev);
     }
     

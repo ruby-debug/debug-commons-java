@@ -21,6 +21,7 @@
 	* ability to customize ReadersSupport and connecting-to-server timeouts
 	* fixing threading problems when collecting stderr and stdout after server
 	  startup timeout (also see NetBeans issue 110961)
+	* adding RubyDebugEvent.isStepping()
 
 0.7.1 - 0.7.2
 -------------
