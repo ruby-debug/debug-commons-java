@@ -108,6 +108,7 @@ public final class RubyDebuggerProxy {
             commandFactory = new ClassicDebuggerCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
             setBreakpoints(initialBreakpoints);
+            sendCommand("cont");
         } catch (IOException ex) {
             throw new RubyDebuggerException(ex);
         }
@@ -479,16 +480,6 @@ public final class RubyDebuggerProxy {
         
         public void run() {
             try {
-                if (debuggerType == CLASSIC_DEBUGGER) {
-                    try {
-                        sendCommand("cont");
-                    } catch (RubyDebuggerException e) {
-                        Util.LOGGER.log(Level.INFO, "Unable to set initial 'cont'" +
-                                " command to Classic Debugger: " + e.getMessage(), e);
-                        finish(true);
-                        return;
-                    }
-                }
                 Util.finest("Waiting for breakpoints.");
                 while (true) {
                     SuspensionPoint hit = getReadersSupport().readSuspension();
