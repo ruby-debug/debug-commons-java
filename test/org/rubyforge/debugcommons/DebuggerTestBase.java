@@ -37,6 +37,15 @@ public abstract class DebuggerTestBase extends TestBase {
     public DebuggerTestBase(String name) {
         super(name);
     }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        assertTrue("Correctly set DebuggerTestBase.PATH_TO_CLASSIC_DEBUG_DIR",
+                new File(PATH_TO_CLASSIC_DEBUG_DIR, "classic-debug.rb").exists());
+        assertTrue("Correctly set DebuggerTestBase.PATH_TO_REMOTE_DEBUG_DIR",
+                new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide").exists());
+    }
     
     @Override
     protected void tearDown() throws Exception {
