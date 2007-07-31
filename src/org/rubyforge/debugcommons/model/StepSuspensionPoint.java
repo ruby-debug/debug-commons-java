@@ -28,7 +28,7 @@ public class StepSuspensionPoint extends SuspensionPoint {
     }
     
     public String toString() {
-        return "Step end at " + this.getPosition();
+        return "Step end at " + this.getPosition() + ", threadId: " + this.getThreadId();
     }
     
 }

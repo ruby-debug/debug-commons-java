@@ -18,7 +18,7 @@ public class BreakpointSuspensionPoint extends SuspensionPoint {
     }
     
     public String toString() {
-        return "Breakpoint at " + getPosition();
+        return "Breakpoint at " + getPosition() + ", threadId: " + this.getThreadId();
     }
     
 }
