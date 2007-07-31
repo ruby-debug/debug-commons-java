@@ -6,7 +6,7 @@ public abstract class SuspensionPoint {
     
     private String file;
     private int line;
-    private int threadId;
+    private int threadId = -1;
     
     public SuspensionPoint() {}
     
@@ -15,7 +15,8 @@ public abstract class SuspensionPoint {
         this.line = line;
     }
     
-    public abstract String toString();
+    public abstract @Override String toString();
+    
     public abstract boolean isException();
     public abstract boolean isStep();
     public abstract boolean isBreakpoint();
@@ -50,19 +51,19 @@ public abstract class SuspensionPoint {
     
     private static final class EndSuspensionPoint extends SuspensionPoint {
         
-        public String toString() {
+        public @Override String toString() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
-        public boolean isException() {
+        public @Override boolean isException() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
-        public boolean isStep() {
+        public @Override boolean isStep() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
-        public boolean isBreakpoint() {
+        public @Override boolean isBreakpoint() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
