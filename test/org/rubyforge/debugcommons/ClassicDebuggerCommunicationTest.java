@@ -81,4 +81,40 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
         resumeSuspendedThread(proxy); // finish main thread
     }
     
+    // TODO: failing test due to backend wrong synchronization
+//    public void testSynchronization() throws Exception {
+//        setTimeout(30);
+//        final RubyDebuggerProxy proxy = prepareProxy(
+//                "require 'thread'",
+//                "m = Mutex.new",
+//                "i = 0",
+//                "(1..2).each do",
+//                "  Thread.new do",
+//                "    (1..5).each do",
+//                "      Thread.new do",
+//                "        (1..20).each do",
+//                "          Thread.new do",
+//                "            sleep 0.01",
+//                "            m.synchronize do",
+//                "              i += 1",
+//                "            end",
+//                "          end",
+//                "        end",
+//                "      end",
+//                "    end",
+//                "  end",
+//                "end",
+//                "while i != 200",
+//                "  puts \"i: #{i}\"",
+//                "  sleep 1",
+//                "end",
+//                "puts 'main thread'");
+//        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+//            new TestBreakpoint("test.rb", 10),
+//        };
+//        startDebugging(proxy, breakpoints, 200);
+//        System.out.println("MK> OK");
+//        proxy.finish(true);
+//    }
+
 }

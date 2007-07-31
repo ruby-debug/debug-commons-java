@@ -27,6 +27,7 @@ public abstract class DebuggerTestBase extends TestBase {
     protected String testFilePath;
     private RubyDebugTarget debugTarget;
     private DebuggerType debuggerType;
+    private int timeout = 10; // 10s by default
     
     protected ReadersSupport readersSupport;
     
@@ -50,6 +51,10 @@ public abstract class DebuggerTestBase extends TestBase {
     
     protected void setDebuggerType(final DebuggerType debuggerType) {
         this.debuggerType = debuggerType;
+    }
+    
+    protected void setTimeout(final int timeout) {
+        this.timeout = timeout;
     }
     
     //    public void sendCont() {
@@ -116,12 +121,12 @@ public abstract class DebuggerTestBase extends TestBase {
         switch(debuggerType) {
         case CLASSIC_DEBUGGER:
             proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
-                    PATH_TO_CLASSIC_DEBUG_DIR, "ruby");
+                    PATH_TO_CLASSIC_DEBUG_DIR, "ruby", timeout);
             break;
         case RUBY_DEBUG:
             File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
             assertTrue("rdebug-ide file exists", rdebug.isFile());
-            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), 10);
+            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), timeout);
             break;
         default:
             throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
@@ -232,6 +237,7 @@ public abstract class DebuggerTestBase extends TestBase {
                 }
                 Util.finest("Received event: " + e);
                 events.countDown();
+                Util.finest("Current events count: " + events.getCount());
             }
         };
         proxy.addRubyDebugEventListener(listener);
