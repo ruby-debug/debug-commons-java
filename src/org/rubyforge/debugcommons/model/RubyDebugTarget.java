@@ -40,7 +40,7 @@ public final class RubyDebugTarget extends RubyEntity {
         return baseDir;
     }
     
-    public void updateThreads() throws RubyDebuggerException {
+    public synchronized void updateThreads() throws RubyDebuggerException {
         // preconditions:
         // 1) both threadInfos and updatedThreads are sorted by their id attribute
         // 2) once a thread has died its id is never reused for new threads again.
@@ -64,7 +64,7 @@ public final class RubyDebugTarget extends RubyEntity {
         threads = updatedThreads;
     }
     
-    public void suspensionOccurred(SuspensionPoint suspensionPoint) {
+    public synchronized void suspensionOccurred(SuspensionPoint suspensionPoint) {
         try {
             updateThreads();
         } catch (RubyDebuggerException e) {
@@ -89,7 +89,7 @@ public final class RubyDebugTarget extends RubyEntity {
      * @return {@link RubyThread} instance or <code>null</code> if no thread if
      *          found.
      */
-    public RubyThread getThreadById(int id) {
+    public synchronized RubyThread getThreadById(int id) {
         for (RubyThread thread : threads) {
             if (thread.getId() == id) {
                 return thread;

@@ -22,6 +22,7 @@
 	* fixing threading problems when collecting stderr and stdout after server
 	  startup timeout (also see NetBeans issue 110961)
 	* adding RubyDebugEvent.isStepping()
+	* synchronization fixes
 
 0.7.1 - 0.7.2
 -------------
