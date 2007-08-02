@@ -40,31 +40,33 @@ public final class RubyDebugTarget extends RubyEntity {
         return baseDir;
     }
     
-    public synchronized void updateThreads() throws RubyDebuggerException {
+    private void updateThreads() throws RubyDebuggerException {
         // preconditions:
         // 1) both threadInfos and updatedThreads are sorted by their id attribute
         // 2) once a thread has died its id is never reused for new threads again.
         //    Instead each new thread gets an id which is the currently highest id + 1.
-        
         Util.fine("udpating threads");
         RubyThreadInfo[] threadInfos = getProxy().readThreadInfo();
         RubyThread[] updatedThreads = new RubyThread[threadInfos.length];
         int threadIndex = 0;
-        for (int i = 0; i < threadInfos.length; i++) {
-            while (threadIndex < threads.length && threadInfos[i].getId() != threads[threadIndex].getId()) {
-                // step over dead threads, which do not occur in threadInfos anymore
-                threadIndex += 1;
+        synchronized (this) {
+            for (int i = 0; i < threadInfos.length; i++) {
+                while (threadIndex < threads.length && threadInfos[i].getId() != threads[threadIndex].getId()) {
+                    // step over dead threads, which do not occur in threadInfos anymore
+                    threadIndex += 1;
+                }
+                if (threadIndex == threads.length) {
+                    updatedThreads[i] = new RubyThread(this, threadInfos[i].getId());
+                } else {
+                    updatedThreads[i] = threads[threadIndex];
+                }
             }
-            if (threadIndex == threads.length) {
-                updatedThreads[i] = new RubyThread(this, threadInfos[i].getId());
-            } else {
-                updatedThreads[i] = threads[threadIndex];
-            }
+            threads = updatedThreads;
         }
-        threads = updatedThreads;
     }
     
-    public synchronized void suspensionOccurred(SuspensionPoint suspensionPoint) {
+    public void suspensionOccurred(SuspensionPoint suspensionPoint) {
+        RubyThread thread = null;
         try {
             updateThreads();
         } catch (RubyDebuggerException e) {
@@ -75,7 +77,7 @@ public final class RubyDebugTarget extends RubyEntity {
                 return;
             }
         }
-        RubyThread thread = getThreadById(suspensionPoint.getThreadId());
+        thread = getThreadById(suspensionPoint.getThreadId());
         if (thread == null) {
             Util.warning("Thread with id " + suspensionPoint.getThreadId() + " was not found");
             return;
