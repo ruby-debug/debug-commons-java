@@ -17,5 +17,9 @@ public final class RubyThreadInfo {
     public String getStatus() {
         return status;
     }
+
+    public @Override String toString() {
+        return "RubyThreadInfo[Id: " + id + ", " + status + ']';
+    }
     
 }
