@@ -130,7 +130,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         doStepOver(proxy, true);
     }
     
-    public void testStepReturn() throws Exception {
+    public void testStepReturnOnFrame() throws Exception {
         setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
                 "def a",      // 1
@@ -164,4 +164,42 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy);
     }
     
+    public void testStepReturnOnThread() throws Exception {
+        for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
+            setDebuggerType(type);
+            final RubyDebuggerProxy proxy = prepareProxy(
+                    "def a",      // 1
+                    "  sleep 0.1",// 2
+                    "end",        // 3
+                    "def b",      // 4
+                    "  a",        // 5
+                    "  sleep 0.1",// 6
+                    "end",        // 7
+                    "def c",      // 8
+                    "  b",        // 9
+                    "  sleep 0.1",// 10
+                    "end",        // 11
+                    "c",          // 12
+                    "sleep 0.1"); // 13
+            final TestBreakpoint[] breakpoints = new TestBreakpoint[] {
+                new TestBreakpoint("test.rb", 2),
+            };
+            startDebugging(proxy, breakpoints, 1);
+            RubyFrame[] frames = suspendedThread.getFrames();
+            assertEquals("four frames", 4, frames.length);
+            waitForEvents(proxy, 1,new Runnable() {
+                public void run() {
+                    try {
+                        suspendedThread.stepReturn();
+                        suspendedThread = null;
+                    } catch (RubyDebuggerException e) {
+                        Util.severe(e);
+                    }
+                }
+            });
+            assertEquals("three frames", 3, suspendedThread.getFrames().length);
+            resumeSuspendedThread(proxy);
+        }
+    }
+
 }

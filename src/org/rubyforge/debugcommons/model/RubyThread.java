@@ -154,11 +154,11 @@ public final class RubyThread extends RubyEntity {
     }
     
     public void stepReturn() throws RubyDebuggerException {
-        RubyFrame[] frames = getFrames();
-        if (frames.length == 0) {
+        RubyFrame frame = getTopFrame();
+        if (frame == null) {
             Util.fine("stepReturn failed, empty frame stack (thread is not suspended?)");
         } else {
-            frames[frames.length > 1 ? 1 : 0].stepReturn();
+            frame.stepReturn();
         }
     }
     

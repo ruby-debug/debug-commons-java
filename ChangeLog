@@ -23,6 +23,7 @@
 	  startup timeout (also see NetBeans issue 110961)
 	* adding RubyDebugEvent.isStepping()
 	* synchronization fixes
+	* Fixed RubyThread.stepReturn()
 
 0.7.1 - 0.7.2
 -------------
