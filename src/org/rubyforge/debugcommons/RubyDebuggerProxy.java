@@ -227,7 +227,7 @@ public final class RubyDebuggerProxy {
     
     public Socket getCommandSocket() throws RubyDebuggerException {
         if (commandSocket == null) {
-            commandSocket = RubyDebuggerProxy.attach(debugTarged, timeout);
+            commandSocket = attach();
         }
         return commandSocket;
     }
@@ -381,25 +381,30 @@ public final class RubyDebuggerProxy {
     /**
      * Tries to attach to the <code>targed</code>'s process and gives up in
      * <code>timeout</code> seconds.
-     * 
-     * @timeout timeout in <em>seconds</em>
      */
-    private static Socket attach(final RubyDebugTarget target, final int timeout) throws RubyDebuggerException {
-        int port = target.getPort();
+    private Socket attach() throws RubyDebuggerException {
+        int port = debugTarged.getPort();
         Socket socket = null;
         for (int tryCount = (timeout*2), i = 0; i < tryCount && socket == null; i++) {
             try {
                 socket = new Socket("localhost", port);
             } catch (ConnectException e) {
-                if (i == tryCount - 1) {
-                    String info = dumpProcess(target.getProcess());
-                    throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
+                synchronized (this) {
+                    Util.finest("MK> " + new Exception().getStackTrace()[0] + " called...." + ", " + System.currentTimeMillis());
+                    Util.finest("MK>   finished: \"" + finished + '"');
+                    if (finished) { // terminated by frontend before process started
+                        throw new RubyDebuggerException("Process was terminated before debugger connection was established.");
+                    }
+                    if (i == tryCount - 1) {
+                        String info = dumpProcess(debugTarged.getProcess());
+                        throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
+                    }
                 }
                 try {
                     Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {
-                    Util.severe("Interrupted during attaching.", e);
+                    Util.severe("Interrupted during attaching.", e1);
                     Thread.currentThread().interrupt();
                 }
             } catch (IOException e) {
