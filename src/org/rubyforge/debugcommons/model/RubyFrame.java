@@ -50,18 +50,6 @@ public final class RubyFrame extends RubyEntity {
         return getFile() + ':' + getLine();
     }
     
-    //    public boolean canStepInto() {
-    //        return canResume();
-    //    }
-    //
-    //    public boolean canStepOver() {
-    //        return canResume();
-    //    }
-    //
-    //    public boolean canStepReturn() {
-    //        return canResume();
-    //    }
-    
     public boolean isStepping() {
         return false;
     }
@@ -89,18 +77,6 @@ public final class RubyFrame extends RubyEntity {
         getProxy().sendStepReturnEnd(this);
     }
     
-    //    public boolean canResume() {
-    //        return this.getThread().canResume();
-    //    }
-    //
-    //    public boolean canSuspend() {
-    //        return this.getThread().canSuspend();
-    //    }
-    //
-    //    public boolean isSuspended() {
-    //        return this.getThread().isSuspended();
-    //    }
-    
     public void resume() {
         this.getThread().resume();
     }
@@ -108,18 +84,6 @@ public final class RubyFrame extends RubyEntity {
     public void suspend() {
         throw new UnsupportedOperationException("not implemented yet");
     }
-    
-    //    public boolean canTerminate() {
-    //        return this.getThread().canTerminate();
-    //    }
-    //
-    //    public boolean isTerminated() {
-    //        return this.getThread().isTerminated();
-    //    }
-    //
-    //    public void terminate() {
-    //        this.getThread().terminate() ;
-    //    }
     
     @Override
     public String toString() {

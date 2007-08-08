@@ -76,37 +76,6 @@ public final class RubyVariable extends RubyEntity {
         return parent;
     }
     
-    //    public void setValue(String expression) {
-    //        throw new UnsupportedOperationException("not implemented yet");
-    //    }
-    //
-    //    public void setValue(RubyValue value) {
-    //        throw new UnsupportedOperationException("not implemented yet");
-    //    }
-    //
-    //    public boolean supportsValueModification() {
-    //        return false;
-    //    }
-    //
-    //    public boolean verifyValue(String expression) {
-    //        return false;
-    //    }
-    //
-    //    public boolean verifyValue(RubyValue value) {
-    //        return false;
-    //    }
-    //
-    
-    //    public void setFrame(RubyFrame frame) {
-    //        this.frame = frame;
-    //        //        setProxy(frame.getProxy());
-    //    }
-    
-    //    public void setParent(RubyVariable parent) {
-    //        this.parent = parent;
-    //        //        this.frame = parent.getFrame();
-    //    }
-    
     public String getQualifiedName() {
         if (parent == null) {
             return this.getName();

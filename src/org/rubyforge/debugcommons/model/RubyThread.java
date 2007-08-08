@@ -11,8 +11,6 @@ public final class RubyThread extends RubyEntity {
     private RubyFrame[] frames;
     
     private boolean isSuspended;
-    //    private boolean isTerminated;
-    //    private boolean isStepping;
     
     /** Used by {@link #runTo} method. */
     private IRubyBreakpoint temporaryBreakpoint;
@@ -34,15 +32,6 @@ public final class RubyThread extends RubyEntity {
         return frames;
     }
     
-    
-    //	public int getFramesSize() {
-    //		return frames.length;
-    //	}
-    //
-    //	public boolean hasFrames() {
-    //		return isSuspended ; //TODO: change getFrames().length > 0;
-    //	}
-    
     /**
      * Returns top stack frame for this thread. Might be <code>null</code> if
      * thread is not {@link #isSuspended() suspended}.
@@ -52,21 +41,9 @@ public final class RubyThread extends RubyEntity {
         return frames.length == 0 ? null : frames[0];
     }
     
-    //	public boolean canResume() {
-    //		return isSuspended;
-    //	}
-    //
-    //	public boolean canSuspend() {
-    //		return !isSuspended;
-    //	}
-    
     public boolean isSuspended() {
         return isSuspended;
     }
-    
-    //	protected void setSuspended(boolean isSuspended) {
-    //		this.isSuspended = isSuspended;
-    //	}
     
     /*
      * Call after user wants to resume or step.
@@ -96,18 +73,10 @@ public final class RubyThread extends RubyEntity {
         }
         frames = null;
         isSuspended = true;
-        //        isStepping = false;
         this.updateName(suspensionPoint);
         RubyDebugEvent ev = new RubyDebugEvent(this, suspensionPoint);
         getProxy().fireDebugEvent(ev);
     }
-    
-    //	public void suspend() {
-    //		frames = null ;
-    //		isStepping = false;
-    //		isSuspended = true;
-    //		// TODO: send suspension command to ruby debugger
-    //	}
     
     public boolean canStepInto() throws RubyDebuggerException {
         return isSuspended && getFrames().length > 0;
@@ -117,16 +86,7 @@ public final class RubyThread extends RubyEntity {
         return isSuspended && getFrames().length > 0;
     }
     
-    //    public boolean canStepReturn() {
-    //		return false;
-    //	}
-    //
-    //	public boolean isStepping() {
-    //		return isStepping;
-    //	}
-    
     public void stepInto(boolean forceNewLine) throws RubyDebuggerException {
-        //        isStepping = true;
         this.updateName();
         RubyFrame frame = getTopFrame();
         if (frame == null) {
@@ -172,65 +132,6 @@ public final class RubyThread extends RubyEntity {
         resume();
     }
     
-    //    public boolean canTerminate() {
-    //		return !isTerminated;
-    //	}
-    //
-    //	public boolean isTerminated() {
-    //		return isTerminated;
-    //	}
-    //
-    //	public void terminate() {
-    //		RubyDebugEvent ev = new RubyDebugEvent(this, RubyDebugEvent.Type.TERMINATE);
-    //		getRubyDebuggerProxy().fireDebugEvent(ev);
-    //		this.getDebugTarget().terminate();
-    //		isTerminated = true;
-    //		this.frames = null;
-    //	}
-    //
-    //	public void setFrames(RubyFrame[] frames) {
-    //		this.frames = frames;
-    //	}
-    //
-    //	public String getName() {
-    //		return name;
-    //	}
-    //
-    //	public void setName(String name) {
-    //		this.name = name;
-    //	}
-    
-    //		return !isTerminated;
-    //	}
-    //
-    //	public boolean isTerminated() {
-    //		return isTerminated;
-    //	}
-    //
-    //	public void terminate() {
-    //		RubyDebugEvent ev = new RubyDebugEvent(this, RubyDebugEvent.Type.TERMINATE);
-    //		getRubyDebuggerProxy().fireDebugEvent(ev);
-    //		this.getDebugTarget().terminate();
-    //		isTerminated = true;
-    //		this.frames = null;
-    //	}
-    //
-    //	public RubyDebuggerProxy getRubyDebuggerProxy() {
-    //		return ((RubyDebugTarget) this.getDebugTarget()).getRubyDebuggerProxy();
-    //	}
-    //
-    //	public void setFrames(RubyFrame[] frames) {
-    //		this.frames = frames;
-    //	}
-    //
-    //	public String getName() {
-    //		return name;
-    //	}
-    //
-    //	public void setName(String name) {
-    //		this.name = name;
-    //	}
-    
     private void updateName() {
         this.updateName(null);
     }
@@ -246,26 +147,4 @@ public final class RubyThread extends RubyEntity {
         return id;
     }
     
-    //	public void setId(int id) {
-    //		this.id = id;
-    //	}
-    //
-    //    @Override
-    //    public int hashCode() {
-    //        return getId();
-    //    }
-    //
-    //    @Override
-    //    public boolean equals(Object other) {
-    //        return (other instanceof RubyThread) && getId() == ((RubyThread) other).getId();
-    //    }
-    //
-    //    @Override
-    //	public String toString() {
-    //		return "[RubyThread@" + System.identityHashCode(this) +
-    //				"> id: " + id +
-    //				", name: \"" + name + '"' +
-    //				']';
-    //	}
-    //
 }
