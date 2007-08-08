@@ -26,6 +26,7 @@
 	* Fixed RubyThread.stepReturn()
 	* Fixed IOE when process is terminated by client before connection is
 	  established.
+	* Ability to evaluate multiline expressions.
 
 0.7.1 - 0.7.2
 -------------

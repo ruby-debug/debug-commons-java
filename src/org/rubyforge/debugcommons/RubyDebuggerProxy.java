@@ -339,6 +339,7 @@ public final class RubyDebuggerProxy {
     }
     
     public RubyVariable inspectExpression(RubyFrame frame, String expression) throws RubyDebuggerException {
+        expression = expression.replaceAll("\n", "\\\\n");
         sendCommand(commandFactory.createInspect(frame, expression));
         RubyVariableInfo[] infos = getReadersSupport().readVariables();
         return infos.length == 0 ? null : new RubyVariable(infos[0], frame);
