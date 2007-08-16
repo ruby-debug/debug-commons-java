@@ -391,8 +391,6 @@ public final class RubyDebuggerProxy {
                 socket = new Socket("localhost", port);
             } catch (ConnectException e) {
                 synchronized (this) {
-                    Util.finest("MK> " + new Exception().getStackTrace()[0] + " called...." + ", " + System.currentTimeMillis());
-                    Util.finest("MK>   finished: \"" + finished + '"');
                     if (finished) { // terminated by frontend before process started
                         throw new RubyDebuggerException("Process was terminated before debugger connection was established.");
                     }
