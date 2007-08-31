@@ -17,7 +17,7 @@ public final class RubyVariableInfo {
         this.name = name;
         this.kind = kind;
         this.value = value == null ? "nil" : value;
-        this.type = type;
+        this.type = type == null ? "NilClass": type;
         this.hasChildren = hasChildren;
         this.objectId = objectId;
     }
