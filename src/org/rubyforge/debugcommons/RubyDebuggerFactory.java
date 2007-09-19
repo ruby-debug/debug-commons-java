@@ -112,13 +112,13 @@ public final class RubyDebuggerFactory {
             args.add(interpreter);
             appendIOSynchronizer(args, descriptor);
         }
+        args.addAll(descriptor.getAddtionalOptions());
         args.add(rdebugExecutable);
         args.add("-p");
         args.add(String.valueOf(descriptor.getPort()));
         if (descriptor.isVerbose()) {
             args.add("-d");
         }
-        args.addAll(descriptor.getAddtionalOptions());
         args.add("--");
         args.add(descriptor.getScriptPath());
         if (descriptor.getScriptArguments() != null) {
