@@ -79,15 +79,6 @@ public final class RubyDebuggerFactory {
     }
 
     /**
-     * Delegates to {@link #startRubyDebug(Descriptor, String, String)} with
-     * <code>null</code> for <code>interpreter</code> parameter.
-     */
-    public static RubyDebuggerProxy startRubyDebug(final Descriptor descriptor,
-            final String rdebugExecutable, final int timeout) throws IOException, RubyDebuggerException {
-        return startRubyDebug(descriptor, rdebugExecutable, null, timeout);
-    }
-    
-    /**
      * Starts Kent Sibilev's ruby-debug session for the given script. Debugger
      * waits on the first script's line.
      *

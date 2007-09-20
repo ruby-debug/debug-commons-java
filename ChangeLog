@@ -1,7 +1,8 @@
 0.8.0 - 0.8.1
 -------------
-	* Return 'NilClass' instead of null for nul('nil') values
+	* Return 'NilClass' instead of null for 'nil' values
 	* Fixed wrong position of additional options to Ruby interpreter
+	* Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
 
 0.7.2 - 0.8.0
 -------------

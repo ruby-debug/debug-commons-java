@@ -15,9 +15,9 @@ public abstract class DebuggerTestBase extends TestBase {
     
     // XXX cannot be hardcoded. Use configuration files or property or ...
     private static final String PATH_TO_CLASSIC_DEBUG_DIR =
-            "/space/ruby/sources/rubyforge.org/debug-commons/trunk/lib";
+            "/space/ruby/sources/rubyforge.org/debug-commons/trunk/classic-debug/lib";
     private static final String PATH_TO_REMOTE_DEBUG_DIR =
-            "/space/ruby/gemrepo/bin";
+            "/space/ruby/rubygems/gemrepo/bin";
     
     protected RubyThread suspendedThread;
     
@@ -29,7 +29,7 @@ public abstract class DebuggerTestBase extends TestBase {
     private DebuggerType debuggerType;
     private int timeout = 10; // 10s by default
     
-    protected ReadersSupport readersSupport;
+    ReadersSupport readersSupport;
     
     protected OutputRedirectorThread rubyStdoutRedirectorThread;
     protected OutputRedirectorThread rubyStderrRedirectorThread;
@@ -135,7 +135,7 @@ public abstract class DebuggerTestBase extends TestBase {
         case RUBY_DEBUG:
             File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
             assertTrue("rdebug-ide file exists", rdebug.isFile());
-            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), timeout);
+            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
             break;
         default:
             throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
