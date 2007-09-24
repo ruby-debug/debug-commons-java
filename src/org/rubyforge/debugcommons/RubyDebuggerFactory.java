@@ -186,7 +186,7 @@ public final class RubyDebuggerFactory {
         }
         
         public boolean isVerbose() {
-            return verbose;
+            return verbose || Boolean.getBoolean("org.rubyforge.debugcommons.verbose");
         }
         
         public void setVerbose(boolean verbose) {

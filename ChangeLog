@@ -3,6 +3,8 @@
 	* Return 'NilClass' instead of null for 'nil' values
 	* Fixed wrong position of additional options to Ruby interpreter
 	* Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
+	* Ability to affect RubyDebuggerFactory.Descriptor's verbosity through
+	  org.rubyforge.debugcommons.verbose system property.
 
 0.7.2 - 0.8.0
 -------------
