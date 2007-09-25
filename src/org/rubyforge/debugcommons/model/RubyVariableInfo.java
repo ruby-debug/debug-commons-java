@@ -2,6 +2,9 @@ package org.rubyforge.debugcommons.model;
 
 public final class RubyVariableInfo {
     
+    private static final String NIL_VALUE = "nil";
+    private static final String NIL_CLASS = "NilClass";
+    
     private final String name;
     private final String kind;
     private final String value;
@@ -16,8 +19,8 @@ public final class RubyVariableInfo {
     public RubyVariableInfo(String name, String kind, String value, String type, boolean hasChildren, String objectId) {
         this.name = name;
         this.kind = kind;
-        this.value = value == null ? "nil" : value;
-        this.type = type == null ? "NilClass": type;
+        this.value = value == null ? NIL_VALUE : value;
+        this.type = type == null ? NIL_CLASS: type;
         this.hasChildren = hasChildren;
         this.objectId = objectId;
     }
@@ -44,6 +47,10 @@ public final class RubyVariableInfo {
     
     public String getName() {
         return name;
+    }
+
+    boolean isNil() {
+        return RubyVariableInfo.NIL_VALUE.equals(getValue());
     }
 
     @Override

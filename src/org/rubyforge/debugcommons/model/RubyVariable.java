@@ -116,8 +116,36 @@ public final class RubyVariable extends RubyEntity {
         return parent != null && parent.getValue().getReferenceTypeName().equals("Hash");
     }
     
+    private boolean isNil() {
+        return info.isNil();
+    }
+
+    public @Override boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RubyVariable other = (RubyVariable) obj;
+        if (isNil()) {
+            return other.isNil();
+        }
+        return getObjectId().equals(other.getObjectId());
+    }
+
+    public @Override int hashCode() {
+        int hash = 7;
+        if (isNil()) {
+            hash = 89 * hash + (isNil() ? 1 : 0);
+        } else {
+            hash = 89 * hash + (info.getObjectId() != null ? info.getObjectId().hashCode() : 0);
+        }
+        return hash;
+    }
+
     public @Override String toString() {
-        String sep = this.isHashValue() ? " => " : " = ";
+        String sep = isHashValue() ? " => " : " = ";
         return getName() + sep + getValue() + ", INFO: (" + info + ')';
     }
     
