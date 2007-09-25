@@ -5,6 +5,8 @@
 	* Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
 	* Ability to affect RubyDebuggerFactory.Descriptor's verbosity through
 	  org.rubyforge.debugcommons.verbose system property.
+	* Implementing hashCode and equals for RubyVariable. Might be needed by
+	  frontend variables views.
 
 0.7.2 - 0.8.0
 -------------
