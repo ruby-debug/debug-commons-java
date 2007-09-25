@@ -29,11 +29,11 @@ public class ExceptionSuspensionPoint extends SuspensionPoint {
     }
     
     public void setExceptionMessage(String exceptionMessage) {
-        exceptionMessage = exceptionMessage;
+        this.exceptionMessage = exceptionMessage;
     }
     
     public void setExceptionType(String exceptionType) {
-        exceptionType = exceptionType;
+        this.exceptionType = exceptionType;
     }
     
     public String toString() {
