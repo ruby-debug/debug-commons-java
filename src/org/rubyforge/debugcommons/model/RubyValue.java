@@ -51,7 +51,7 @@ public class RubyValue extends RubyEntity {
         return hasChildren;
     }
     
-    public String toString() {
+    public @Override String toString() {
         if (this.getReferenceTypeName() == null) {
             return this.getValueString();
         }

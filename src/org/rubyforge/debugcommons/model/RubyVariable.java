@@ -116,7 +116,7 @@ public final class RubyVariable extends RubyEntity {
         return parent != null && parent.getValue().getReferenceTypeName().equals("Hash");
     }
     
-    public String toString() {
+    public @Override String toString() {
         String sep = this.isHashValue() ? " => " : " = ";
         return getName() + sep + getValue() + ", INFO: (" + info + ')';
     }

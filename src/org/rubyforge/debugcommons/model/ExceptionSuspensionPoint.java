@@ -36,7 +36,7 @@ public class ExceptionSuspensionPoint extends SuspensionPoint {
         this.exceptionType = exceptionType;
     }
     
-    public String toString() {
+    public @Override String toString() {
         return getExceptionType() + " occurred: " + getExceptionMessage() + ", threadId: " + this.getThreadId();
     }
     

@@ -27,7 +27,7 @@ public class StepSuspensionPoint extends SuspensionPoint {
         this.framesNumber = framesNumber;
     }
     
-    public String toString() {
+    public @Override String toString() {
         return "Step end at " + this.getPosition() + ", threadId: " + this.getThreadId();
     }
     
