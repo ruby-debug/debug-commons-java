@@ -474,13 +474,13 @@ public final class RubyDebuggerProxy {
         
         public void suspensionOccurred(final SuspensionPoint hit) {
             new Thread() {
-                public void run() {
+                public @Override void run() {
                     debugTarged.suspensionOccurred(hit);
                 }
             }.start();
         }
         
-        public void run() {
+        public @Override void run() {
             try {
                 Util.finest("Waiting for breakpoints.");
                 while (true) {
