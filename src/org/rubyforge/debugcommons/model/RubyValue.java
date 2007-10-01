@@ -10,7 +10,7 @@ public class RubyValue extends RubyEntity {
     private RubyVariable owner;
     private RubyVariable[] variables;
     
-    public  RubyValue(RubyVariable owner, String value, String type, boolean hasChildren) {
+    public RubyValue(RubyVariable owner, String value, String type, boolean hasChildren) {
         super(owner.getProxy());
         this.value = value;
         this.owner = owner;
@@ -19,7 +19,7 @@ public class RubyValue extends RubyEntity {
     }
     
     public String getReferenceTypeName()  {
-        return this.referenceTypeName;
+        return referenceTypeName;
     }
     
     public String getValueString() {
@@ -52,10 +52,7 @@ public class RubyValue extends RubyEntity {
     }
     
     public @Override String toString() {
-        if (this.getReferenceTypeName() == null) {
-            return this.getValueString();
-        }
-        return this.getValueString();
+        return getValueString();
     }
     
 }
