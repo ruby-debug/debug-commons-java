@@ -101,9 +101,11 @@ public final class RubyDebuggerFactory {
         List<String> args = new ArrayList<String>();
         if (interpreter != null) {
             args.add(interpreter);
-            appendIOSynchronizer(args, descriptor);
         }
         args.addAll(descriptor.getAddtionalOptions());
+        if (interpreter != null) {
+            appendIOSynchronizer(args, descriptor);
+        }
         args.add(rdebugExecutable);
         args.add("-p");
         args.add(String.valueOf(descriptor.getPort()));

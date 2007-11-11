@@ -1,5 +1,7 @@
 0.8.0 - 0.8.1
 -------------
+	* Put an interpreter options before iosynchronizer; causes problem to
+	  jruby's -J-Dxxx args
 	* Return 'NilClass' instead of null for 'nil' values
 	* Fixed wrong position of additional options to Ruby interpreter
 	* Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
