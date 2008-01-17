@@ -1,5 +1,8 @@
 0.8.0 - 0.8.1
 -------------
+	* RubyDebuggerFactory#Descriptor.setJRuby(). Possibility for a client to say
+	  that interpreter is JRuby. If yes, appropriate flags to 'enable' debugging
+	  are set
 	* Put an interpreter options before iosynchronizer; causes problem to
 	  jruby's -J-Dxxx args
 	* Return 'NilClass' instead of null for 'nil' values
@@ -50,7 +53,7 @@
 	* cleaner process termination control
 	* fast debugger also includes Descriptor.getAddtionalOptions()
 	* timeout before killing process to give the IO readers better chance to
-		finish last pieces of IOs
+	  finish last pieces of IOs
 	* send 'exit' to rdebug-ide when process termination is forced
 	* cleaned up behavior of suspended threads
 	* support for next+/step+ commands (since ruby-debug-ide 0.1.3)

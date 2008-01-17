@@ -44,6 +44,11 @@ public final class RubyDebuggerFactory {
         descriptor.setType(CLASSIC_DEBUGGER);
         List<String> args = new ArrayList<String>();
         args.add(interpreter);
+        if (descriptor.isJRuby()) {
+            // needed since JRuby 1.1
+            args.add("-J-Djruby.reflection=true");
+            args.add("-J-Djruby.compile.mode=OFF");
+        }
         args.addAll(descriptor.getAddtionalOptions());
         args.add("-I");
         args.add(pathToClassicDebugDir);
@@ -178,6 +183,7 @@ public final class RubyDebuggerFactory {
         private Map<String, String> environment;
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
+        private boolean jruby;
         
         public DebuggerType getType() {
             return type;
@@ -269,7 +275,14 @@ public final class RubyDebuggerFactory {
             }
             return coputedPort;
         }
-        
+
+        public void setJRuby(boolean jruby) {
+            this.jruby = jruby;
+        }
+
+        boolean isJRuby() {
+            return jruby;
+        }
     }
     
     /** Just helper method for logging. */
