@@ -1,0 +1,789 @@
+2008-02-01 16:14  Martin Krauskopf
+
+	* CHANGES, ChangeLog: s/ChangeLog/CHANGES - is not GNU-style
+	  ChangeLog
+
+2008-01-24 12:43  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: minor:
+	  log environment as well for the process
+
+2008-01-17 19:59  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java:
+	  Possibility for a client to say that interpreter is JRuby. If
+	  yes, appropriate flags to 'enable' debugging are set
+
+2007-11-11 15:36  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Put an
+	  interpreter options before iosynchronizer; causes problem to
+	  jruby's -J-Dxxx args
+
+2007-10-01 14:02  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyValue.java: relic -
+	  useless condition; catched by Laurent Julliard
+
+2007-09-27 07:21  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: minor:
+	  @Override annotation
+
+2007-09-25 15:49  Martin Krauskopf
+
+	* ChangeLog: Implementing hashCode and equals for RubyVariable.
+	  Might be needed by frontend variables views.
+
+2007-09-25 15:49  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/model/RubyVariableTest.java: test
+	  for RubyVariable - hashCode and equals
+
+2007-09-25 15:48  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java:
+	  Implementing hashCode and equals for RubyVariable. Might be
+	  needed by frontend variables views.
+
+2007-09-25 14:47  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/BreakpointSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/ExceptionSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/RubyValue.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/StepSuspensionPoint.java:
+	  @Override
+
+2007-09-25 14:45  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/ExceptionSuspensionPoint.java:
+	  assignment to itself
+
+2007-09-24 13:44  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Ability
+	  to affect RubyDebuggerFactory.Descriptor's verbosity through
+	  org.rubyforge.debugcommons.verbose system property
+
+2007-09-24 13:44  Martin Krauskopf
+
+	* nbproject/build-impl.xml, nbproject/genfiles.properties: metadata
+	  regenerated
+
+2007-09-20 09:07  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java:
+	  Incompatible API change. Force to pass a Ruby interpreter for
+	  ruby-debug.
+
+2007-09-19 14:12  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Fixed
+	  wrong position of additional options to Ruby interpreter
+
+2007-08-31 13:52  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java:
+	  Return 'NilClass' instead of null for nul('nil') values
+
+2007-08-16 14:58  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Removing
+	  forgotten debugging output
+
+2007-08-09 12:48  Martin Krauskopf
+
+	* ChangeLog, nbproject/project.properties: Release current trunk as
+	  0.8.0 (much more stable), switching trunk to 0.8.1
+
+2007-08-08 14:02  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java:
+	  Ability to evaluate multiline expressions.
+
+2007-08-08 10:48  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java:
+	  Fixed IOE when process is terminated by client before connection
+	  is established.
+
+2007-08-08 09:31  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java: cleanup
+
+2007-08-06 12:55  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyThreadInfo.java:
+	  toString for RubyThreadInfo
+
+2007-08-06 10:40  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java: Fixed
+	  RubyThread.stepReturn()
+
+2007-08-02 12:22  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyDebugTarget.java: Fixing
+	  deadlock
+
+2007-07-31 07:57  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java: More
+	  synchronization
+
+2007-07-31 07:46  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/DebuggerTestBase.java: fast fail
+	  if PATH_TO_CLASSIC_DEBUG_DIR and PATH_TO_REMOTE_DEBUG_DIR are set
+	  incorrectly
+
+2007-07-31 07:29  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebugEvent.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java: adding
+	  RubyDebugEvent.isStepping()
+
+2007-07-31 07:14  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: Commented
+	  failing test for synchronization issues
+
+2007-07-31 07:06  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Move
+	  initial 'cont' (start) command to startClassicDebugger()
+
+2007-07-31 06:57  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/BreakpointSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/ExceptionSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/StepSuspensionPoint.java:
+	  Show also threadId in toString() methods for better debugging
+
+2007-07-31 06:55  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/SuspensionPoint.java:
+	  Default threadId to -1, + Override annotations
+
+2007-07-27 22:41  Martin Krauskopf
+
+	* ChangeLog: updating ChangeLog
+
+2007-07-27 22:37  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Fixing
+	  threading semantics -> much better failing info
+
+2007-07-27 21:35  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java:
+	  Debugger sometimes get stuck in dumpStream
+	  (http://www.netbeans.org/nonav/issues/show_bug.cgi?id=110961)
+
+2007-07-26 09:57  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: ability to
+	  customize ReadersSupport and connecting-to-server timeouts
+
+2007-07-20 17:46  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrameInfo.java,
+	  test/org/rubyforge/debugcommons/model/RubyFrameInfoTest.java:
+	  RubyFrame and RubyFrameInfo override equal and hashcode
+
+2007-07-17 15:19  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyDebugTargetTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java: Better
+	  utilization of 'exit' and session ending/finishing
+
+2007-07-17 07:26  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java: Log 'warning'
+	  instead of 'info' for backends <error>s
+
+2007-07-16 15:06  Martin Krauskopf
+
+	* ChangeLog: forgotten commit (Changelog)
+
+2007-07-16 15:04  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Classic
+	  debugger understand 'exit' command as well since 0.9.5
+
+2007-07-16 15:04  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Adjust test to the new backend behaviour
+
+2007-07-11 15:12  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java: Get
+	  rid of non-sense RubyVariableInfo.UNKNOWN_IN_CONTEXT. Log(severe)
+	  processing exception instead. To be tuned.
+
+2007-07-11 09:26  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java:
+	  log and provide more info within the exception when debugger
+	  start fails
+
+2007-07-09 15:13  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java: -
+	  making RubyVariableInfo and RubyVariable toString() more verbose
+	  - Giving RubyVariableInfo#UNKNOWN_IN_CONTEXT default dump names
+	  instead of null
+
+2007-07-02 12:14  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java:
+	  Adding tests for class variables (are handle by both debugger
+	  since ruby-debug-ide 0.1.7)
+
+2007-07-02 12:14  Martin Krauskopf
+
+	* ChangeLog: Updating ChangeLog
+
+2007-07-02 12:13  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyValue.java:
+	  RubyValue.getVariables() javadoc (instance + class)
+
+2007-07-02 12:11  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyVariable.java: Rubyish
+	  renaming RubyVariable.isStatic() to isClass()
+
+2007-06-28 20:18  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebugEventListener.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java:
+	  Unused code and imports
+
+2007-06-28 20:12  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  Simplifying by resumeSuspendedThread() utilization
+
+2007-06-28 20:06  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  ability to adjust environment of debugged process
+
+2007-06-25 16:15  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: append
+	  IO synchronizers also to the fast debugger
+
+2007-06-25 13:40  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java:
+	  adjusted connection timeout message
+
+2007-06-18 19:53  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: use
+	  cannonical files to prevent errors mainly on Windows with long
+	  paths
+
+2007-05-23 21:18  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Prepend
+	  custom options rather than append
+
+2007-05-23 19:11  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  quick test fix
+
+2007-05-23 12:13  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  test for bug int ruby-debug-ide < 0.5
+	  * fixed subtle bug in xml_printer.rb#print_variable which caused
+	  the
+	  debugger to die when == method was overrided and did not count on
+	  nil
+	  parameters
+
+2007-05-23 11:48  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  inspection test for ruby-debug
+
+2007-05-13 15:34  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java:
+	  Support for reading of global variable
+
+2007-05-11 02:53  Martin Krauskopf
+
+	* ChangeLog: Forgotten ChangeLog
+
+2007-05-09 19:07  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java: fixed
+	  NPE from RubyThread.canStep(Into|Over) methods. The methods also
+	  throws RubyDebuggerException now
+
+2007-05-09 19:06  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: trivial:
+	  trim toString (there is always the last redundant space)
+
+2007-05-05 00:03  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: ability
+	  to customize interpreter to be used by the rdebug-ide executable
+
+2007-05-01 11:09  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java: minor
+	  refactoring in RubyDebuggerProxy: s/sendStepOverEnd/sendStepOver
+
+2007-05-01 11:08  Martin Krauskopf
+
+	* nbproject/project.properties: bumping up version to 0.7.3
+
+2007-04-30 11:38  Martin Krauskopf
+
+	* nbproject/build-impl.xml, nbproject/genfiles.properties: NetBeans
+	  metadata regenerated
+
+2007-04-30 11:37  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  support for next+/step+ commands (since ruby-debug-ide 0.1.3)
+
+2007-04-29 15:54  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java: Use
+	  'finish' command instead of 'next' command for stepReturn in fast
+	  debugger
+
+2007-04-19 14:55  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyDebugTarget.java: Just
+	  documenting fact the getThreadById might return null
+
+2007-04-19 14:00  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java:
+	  Cleaning up behavior of supsended threads
+
+2007-04-19 11:50  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/DebuggerTestBase.java: nullify
+	  thread after resuming
+
+2007-04-19 11:08  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: trivial:
+	  getProcessAsString() logging helper method
+
+2007-04-16 20:17  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/model/RubyDebugTargetTest.java:
+	  send 'exit' to rdebug-ide when process termination is forced
+	  - little bit more synchronization
+
+2007-04-16 18:59  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/model/RubyThreadTest.java:
+	  forgotten commit (handle RubyDebuggerException from
+	  RubyThread#runTo()
+
+2007-04-16 06:34  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Catch the
+	  exception and INFOrm about problem when sending initial 'cont' to
+	  Classic Debugger
+
+2007-04-16 06:04  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java: - timeout
+	  before killing process to give the IO readers better chance to
+	  finish last pieces of IOs
+	  - propagating exception to frontend
+
+2007-04-16 05:43  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  refactoring: utilize resumeSuspendedThread()
+
+2007-04-14 10:19  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java:
+	  Do not throw exception when sending command to finished process.
+	  Just emit warning, until the terminating mechanism is polished.
+
+2007-04-12 13:39  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  fast debugger also includes Descriptor.getAddtionalOptions()
+
+2007-04-11 17:37  Martin Krauskopf
+
+	* ChangeLog: cleaner process termination control
+
+2007-04-11 17:36  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  trying to have better control about termination
+	  - addition of RubyDebuggerProxy.finish()
+	  - removing of RubyDebugTarget.terminate()
+
+2007-04-11 17:36  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java: Since
+	  debugger process is just killed, exception is actually
+	  'expected'. So do not be so disruptive in the case.
+
+2007-04-11 14:22  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyDebugTarget.java: Little
+	  bit of documentation for terminate() method
+
+2007-04-11 11:57  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  test/org/rubyforge/debugcommons/model,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java: adding
+	  RubyThread.runTo() feature
+
+2007-04-11 11:56  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  refactoring as needed by RubyThreadTest
+
+2007-04-10 08:49  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Ability to disable/enable breakpoint
+
+2007-04-09 14:52  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: simple
+	  refactoring to prevent code duplication
+
+2007-04-06 15:42  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  ability to pass base directory (needed e.g. for Rails debugging)
+
+2007-04-06 15:39  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/TestBase.java: Clean working
+	  directory by default
+
+2007-04-03 19:02  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java: -
+	  run testSpaceAndSemicolonsInPath for both engines
+	  - use full path in breakpoint command
+
+2007-04-03 06:42  Martin Krauskopf
+
+	* nbproject/build-impl.xml, nbproject/genfiles.properties:
+	  upgrading meta-data
+	  probably should not use dev-builds to prevent such commits...
+
+2007-04-03 06:40  Martin Krauskopf
+
+	* ChangeLog, nbproject/project.properties,
+	  src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  migrating to ruby-debug-ide
+
+2007-03-30 14:27  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/IRubyBreakpoint.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  change/fixed breakpoint addition/removing. Removed index from
+	  IRubyBreakpoint interface. Frontend is not supposed to care about
+	  internal
+	  communication details between the library and backend
+
+2007-03-29 18:50  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  fixing wrong breakpoint addition/removing management
+
+2007-03-27 18:06  Martin Krauskopf
+
+	* ChangeLog: Fixed CME
+
+2007-03-27 16:44  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: preventing
+	  CME
+
+2007-03-24 12:24  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  Ability to pass arguments to the debuggee
+
+2007-03-24 10:12  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  Reverting changes commited by mistake (future works)
+
+2007-03-24 09:38  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebugTargetFactoryTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  trivial: InterruptedException is superfluous
+
+2007-03-22 14:11  Martin Krauskopf
+
+	* ChangeLog: short description of last change
+
+2007-03-22 14:08  Martin Krauskopf
+
+	* nbproject/genfiles.properties, nbproject/project.xml: NetBeans
+	  metadata regenerated
+
+2007-03-22 14:06  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebugTargetFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: - renaming
+	  RubyDebugTargetFactory to RubyDebuggerFactory
+	  - introducing RubyDebuggerFactory.Descriptor
+	  - possibility to optionanally synchronize output
+	  - possibility to add adidional debugging arguments
+
+2007-03-20 20:58  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/reader/XmlStreamReader.java: Don't
+	  be so talkative
+
+2007-03-20 18:10  Martin Krauskopf
+
+	* nbproject/genfiles.properties: NetBeans metadata regenerated
+
+2007-03-20 18:09  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebugTargetFactoryTest.java:
+	  test bug in the debug-commons classic debugger. Does not work
+	  with odd filenames/paths
+
+2007-03-20 18:08  Martin Krauskopf
+
+	* ChangeLog, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java: fixed
+	  NPE during reading a number of added breakpoint
+
+2007-03-18 15:57  Martin Krauskopf
+
+	* nbproject/project.properties: trunk will become 0.7.1 soon
+
+2007-03-18 15:56  Martin Krauskopf
+
+	* ChangeLog: RubyDebuggerException propagation
+
+2007-03-18 15:54  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/model/RubyValue.java,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java:
+	  propagate RubyDebuggerException and thus let the client
+	  (frontend):
+	  - to know there could be some problems (hard to discover for
+	  RuntimeException)
+	  - to decide what to do with the exception regarding to the end
+	  user
+
+2007-03-18 14:13  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java: - fixing
+	  generics error
+	  - unifying behaviour when cannot read expected information from
+	  socket (throwing RuntimeException)
+
+2007-03-18 12:16  Martin Krauskopf
+
+	* ChangeLog: let's keep rough summary of changes somewhere
+
+2007-03-18 12:05  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: Broken
+	  RubyDebuggerProxy.checkConnection() for ruby-debug + test
+
+2007-03-18 07:09  Martin Krauskopf
+
+	* nbproject: ignore private folder
+
+2007-03-18 07:09  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: timeout
+	  support when reading from socket (default 10s)
+
+2007-03-16 16:09  Martin Krauskopf
+
+	* .: ignore dist directory
+
+2007-03-16 16:08  Martin Krauskopf
+
+	* lib, lib/kxml2-2.3.0-license.txt, lib/kxml2-2.3.0.jar: commiting
+	  kxml2 XPP library for convenient building (it's small)
+
+2007-03-16 16:08  Martin Krauskopf
+
+	* build.xml, nbproject, nbproject/build-impl.xml,
+	  nbproject/genfiles.properties, nbproject/project.properties,
+	  nbproject/project.xml: NetBeans project metadata
+
+2007-03-16 16:08  Martin Krauskopf
+
+	* .classpath, .project: Eclipse project metadata
+
+2007-03-15 19:38  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: trivials
+	  (typo, redundant comment)
+
+2007-03-14 17:59  Martin Krauskopf
+
+	* intermediate-java, ., src, src/org, src/org/rubyforge,
+	  src/org/rubyforge/debugcommons,
+	  src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebugEvent.java,
+	  src/org/rubyforge/debugcommons/RubyDebugEventListener.java,
+	  src/org/rubyforge/debugcommons/RubyDebugTargetFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerException.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model,
+	  src/org/rubyforge/debugcommons/model/BreakpointSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/ExceptionSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/IRubyBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  src/org/rubyforge/debugcommons/model/RubyEntity.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrameInfo.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/model/RubyThreadInfo.java,
+	  src/org/rubyforge/debugcommons/model/RubyValue.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java,
+	  src/org/rubyforge/debugcommons/model/StepSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/SuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/reader,
+	  src/org/rubyforge/debugcommons/reader/BreakpointAddedReader.java,
+	  src/org/rubyforge/debugcommons/reader/BreakpointDeletedReader.java,
+	  src/org/rubyforge/debugcommons/reader/ErrorReader.java,
+	  src/org/rubyforge/debugcommons/reader/FramesReader.java,
+	  src/org/rubyforge/debugcommons/reader/SuspensionReader.java,
+	  src/org/rubyforge/debugcommons/reader/ThreadInfoReader.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java,
+	  src/org/rubyforge/debugcommons/reader/XmlStreamReader.java, test,
+	  test/org, test/org/rubyforge, test/org/rubyforge/debugcommons,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/OutputRedirectorThread.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/TestBase.java: Preliminary works
+	  on independent Java intermediate library based on Markus works.
+	  Without MultiReaderStrategy. It is simpler, not that abstract
+	  (yet?)....
+	  Still missing some feature, some known bugs, work in progress
+
