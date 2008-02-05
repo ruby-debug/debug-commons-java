@@ -1,6 +1,5 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 
 public class ReadersSupportTest extends DebuggerTestBase {

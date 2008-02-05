@@ -1,3 +1,22 @@
+2008-02-05 12:58  Martin Krauskopf
+
+	* CHANGES: no change, just s/<Tab>/<Spaces>
+
+2008-02-05 12:57  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: adjust
+	  JRuby's properties also for fast debugger
+
+2008-02-05 12:36  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Fail
+	  immediately in the case process failed
+
+2008-02-01 16:19  Martin Krauskopf
+
+	* ChangeLog, Rakefile, svn2cl_usermap: svn2cl support + generating
+	  ChangeLog
+
 2008-02-01 16:14  Martin Krauskopf
 
 	* CHANGES, ChangeLog: s/ChangeLog/CHANGES - is not GNU-style

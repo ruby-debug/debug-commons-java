@@ -14,7 +14,7 @@ public class OutputRedirectorThread extends Thread {
         inputStream = aInputStream;
     }
     
-    public void run() {
+    public @Override void run() {
         Util.info("OutputRedirectorThread started.");
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         String line;

@@ -1,5 +1,6 @@
 0.8.0 - 0.8.1
 -------------
+  * Fail immediately in the case process failed. Do not wait for timeout.
   * RubyDebuggerFactory#Descriptor.setJRuby(). Possibility for a client to say
     that interpreter is JRuby. If yes, appropriate flags to 'enable' debugging
     are set

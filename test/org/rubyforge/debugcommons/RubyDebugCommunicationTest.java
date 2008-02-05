@@ -1,6 +1,5 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -47,7 +46,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         assertEquals("eval_result", inspected.getName());
         assertEquals("false", inspected.getValue().getValueString());
         assertEquals("FalseClass", inspected.getValue().getReferenceTypeName());
-        RubyVariable unknown = frame.inspectExpression("unknown_in_context");
+        frame.inspectExpression("unknown_in_context");
         resumeSuspendedThread(proxy); // finish spawned thread
         
         // main thread suspended

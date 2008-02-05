@@ -2,7 +2,6 @@ package org.rubyforge.debugcommons;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Collections;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 
