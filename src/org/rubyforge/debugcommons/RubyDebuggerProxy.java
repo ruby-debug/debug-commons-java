@@ -100,7 +100,7 @@ public final class RubyDebuggerProxy {
     public synchronized boolean checkConnection() {
         return !finished && connected;
     }
-    
+
     private void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new ClassicDebuggerCommandFactory();
@@ -395,13 +395,16 @@ public final class RubyDebuggerProxy {
                         throw new RubyDebuggerException("Process was terminated before debugger connection was established.");
                     }
                     if (i == tryCount - 1) {
-                        String info = dumpProcess(debugTarged.getProcess());
-                        throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
+                        failWithInfo(e);
                     }
                 }
                 try {
-                    Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
-                    Thread.sleep(500);
+                    if (debugTarged.isRunning()) {
+                        Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
+                        Thread.sleep(500);
+                    } else {
+                        failWithInfo(e);
+                    }
                 } catch (InterruptedException e1) {
                     Util.severe("Interrupted during attaching.", e1);
                     Thread.currentThread().interrupt();
@@ -411,6 +414,11 @@ public final class RubyDebuggerProxy {
             }
         }
         return socket;
+    }
+
+    private void failWithInfo(ConnectException e) throws RubyDebuggerException {
+        String info = dumpProcess(debugTarged.getProcess());
+        throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
     }
 
     private static String dumpProcess(final Process process) {
