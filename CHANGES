@@ -1,75 +1,75 @@
 0.8.0 - 0.8.1
 -------------
-	* RubyDebuggerFactory#Descriptor.setJRuby(). Possibility for a client to say
-	  that interpreter is JRuby. If yes, appropriate flags to 'enable' debugging
-	  are set
-	* Put an interpreter options before iosynchronizer; causes problem to
-	  jruby's -J-Dxxx args
-	* Return 'NilClass' instead of null for 'nil' values
-	* Fixed wrong position of additional options to Ruby interpreter
-	* Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
-	* Ability to affect RubyDebuggerFactory.Descriptor's verbosity through
-	  org.rubyforge.debugcommons.verbose system property.
-	* Implementing hashCode and equals for RubyVariable. Might be needed by
-	  frontend variables views.
+  * RubyDebuggerFactory#Descriptor.setJRuby(). Possibility for a client to say
+    that interpreter is JRuby. If yes, appropriate flags to 'enable' debugging
+    are set
+  * Put an interpreter options before iosynchronizer; causes problem to
+    jruby's -J-Dxxx args
+  * Return 'NilClass' instead of null for 'nil' values
+  * Fixed wrong position of additional options to Ruby interpreter
+  * Incompatible API change. Force to pass a Ruby interpreter for ruby-debug.
+  * Ability to affect RubyDebuggerFactory.Descriptor's verbosity through
+    org.rubyforge.debugcommons.verbose system property.
+  * Implementing hashCode and equals for RubyVariable. Might be needed by
+    frontend variables views.
 
 0.7.2 - 0.8.0
 -------------
 
-	* minor refactoring in RubyDebuggerProxy: s/sendStepOverEnd/sendStepOver
-	* ability to customize interpreter to be used by the rdebug-ide executable
-	* fixed NPE from RubyThread.canStep(Into|Over) methods. The methods also
-	  throws RubyDebuggerException now
-	* support for reading of global variables
-	* use canonical files to prevent errors mainly on Windows with long paths
-	* adjusted connection timeout message
-	* append IO synchronizers also to the fast debugger
-	* ability to adjust environment of debugged process
-	* Rubyish renaming RubyVariable.isStatic() to isClass()
-	* log and provide more info within the exception when debugger start fails
-	* get rid of non-sense RubyVariableInfo.UNKNOWN_IN_CONTEXT. Log(severe)
-	  processing exception instead. To be tuned.
-	* send 'exit' command to classic debugger as well (supported since classic
-	  debugger backend 0.9.5)
-	* better utilization of 'exit' and session ending/finishing
-	* RubyFrame and RubyFrameInfo override equal and hashcode
-	* ability to customize ReadersSupport and connecting-to-server timeouts
-	* fixing threading problems when collecting stderr and stdout after server
-	  startup timeout (also see NetBeans issue 110961)
-	* adding RubyDebugEvent.isStepping()
-	* synchronization fixes
-	* Fixed RubyThread.stepReturn()
-	* Fixed IOE when process is terminated by client before connection is
-	  established.
-	* Ability to evaluate multiline expressions.
+  * minor refactoring in RubyDebuggerProxy: s/sendStepOverEnd/sendStepOver
+  * ability to customize interpreter to be used by the rdebug-ide executable
+  * fixed NPE from RubyThread.canStep(Into|Over) methods. The methods also
+    throws RubyDebuggerException now
+  * support for reading of global variables
+  * use canonical files to prevent errors mainly on Windows with long paths
+  * adjusted connection timeout message
+  * append IO synchronizers also to the fast debugger
+  * ability to adjust environment of debugged process
+  * Rubyish renaming RubyVariable.isStatic() to isClass()
+  * log and provide more info within the exception when debugger start fails
+  * get rid of non-sense RubyVariableInfo.UNKNOWN_IN_CONTEXT. Log(severe)
+    processing exception instead. To be tuned.
+  * send 'exit' command to classic debugger as well (supported since classic
+    debugger backend 0.9.5)
+  * better utilization of 'exit' and session ending/finishing
+  * RubyFrame and RubyFrameInfo override equal and hashcode
+  * ability to customize ReadersSupport and connecting-to-server timeouts
+  * fixing threading problems when collecting stderr and stdout after server
+    startup timeout (also see NetBeans issue 110961)
+  * adding RubyDebugEvent.isStepping()
+  * synchronization fixes
+  * Fixed RubyThread.stepReturn()
+  * Fixed IOE when process is terminated by client before connection is
+    established.
+  * Ability to evaluate multiline expressions.
 
 0.7.1 - 0.7.2
 -------------
 
-	* migrating to ruby-debug-ide
-	* ability to pass base directory (needed e.g. for Rails debugging)
-	* ability to disable/enable a breakpoint
-	* addition of RubyThread.runTo(path, line) feature
-	* cleaner process termination control
-	* fast debugger also includes Descriptor.getAddtionalOptions()
-	* timeout before killing process to give the IO readers better chance to
-	  finish last pieces of IOs
-	* send 'exit' to rdebug-ide when process termination is forced
-	* cleaned up behavior of suspended threads
-	* support for next+/step+ commands (since ruby-debug-ide 0.1.3)
+  * migrating to ruby-debug-ide
+  * ability to pass base directory (needed e.g. for Rails debugging)
+  * ability to disable/enable a breakpoint
+  * addition of RubyThread.runTo(path, line) feature
+  * cleaner process termination control
+  * fast debugger also includes Descriptor.getAddtionalOptions()
+  * timeout before killing process to give the IO readers better chance to
+    finish last pieces of IOs
+  * send 'exit' to rdebug-ide when process termination is forced
+  * cleaned up behavior of suspended threads
+  * support for next+/step+ commands (since ruby-debug-ide 0.1.3)
 
 0.7.0 - 0.7.1
 -------------
 
-	* added possibility to specify timeout until ReadersSupport gives up
-	* RubyDebuggerProxy.checkConnection() fixed for ruby-debug
-	* propagating RubyDebuggerException to the client (frontend)
-	* fixed NPE during reading a number of added breakpoint
-	* ability to synchronize $stderr and $stdout
-	* ability to pass additional debugger options
-	* ability to pass arguments to the debuggee
-	* fixed ConcurrentModificationException in RubyDebuggerProxy
-	* change/fixed breakpoint addition/removing. Removed index from
-	  IRubyBreakpoint interface. Frontend is not supposed to care about internal
-	  communication details between the library and backend.
+  * added possibility to specify timeout until ReadersSupport gives up
+  * RubyDebuggerProxy.checkConnection() fixed for ruby-debug
+  * propagating RubyDebuggerException to the client (frontend)
+  * fixed NPE during reading a number of added breakpoint
+  * ability to synchronize $stderr and $stdout
+  * ability to pass additional debugger options
+  * ability to pass arguments to the debuggee
+  * fixed ConcurrentModificationException in RubyDebuggerProxy
+  * change/fixed breakpoint addition/removing. Removed index from
+    IRubyBreakpoint interface. Frontend is not supposed to care about internal
+    communication details between the library and backend.
 
