@@ -45,9 +45,7 @@ public final class RubyDebuggerFactory {
         List<String> args = new ArrayList<String>();
         args.add(interpreter);
         if (descriptor.isJRuby()) {
-            // needed since JRuby 1.1
-            args.add("-J-Djruby.reflection=true");
-            args.add("-J-Djruby.compile.mode=OFF");
+            adjustForJRuby(args);
         }
         args.addAll(descriptor.getAddtionalOptions());
         args.add("-I");
@@ -107,6 +105,9 @@ public final class RubyDebuggerFactory {
         if (interpreter != null) {
             args.add(interpreter);
         }
+        if (descriptor.isJRuby()) {
+            adjustForJRuby(args);
+        }
         args.addAll(descriptor.getAddtionalOptions());
         if (interpreter != null) {
             appendIOSynchronizer(args, descriptor);
@@ -123,6 +124,11 @@ public final class RubyDebuggerFactory {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
         return startDebugger(descriptor, args, timeout);
+    }
+
+    private static void adjustForJRuby(List<String> args) {
+        args.add("-J-Djruby.reflection=true");
+        args.add("-J-Djruby.compile.mode=OFF");
     }
 
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args, final int timeout)
