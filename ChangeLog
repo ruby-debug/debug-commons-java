@@ -1,3 +1,23 @@
+2008-02-15 09:45  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java: -
+	  better handling of know Segmentaion Fault bug in native Ruby
+	  version '<= 1.8.6'
+	  - RubyDebuggerProxy.getReadersSupport() does not throw
+	  RubyDebuggerException
+
+2008-02-05 13:08  Martin Krauskopf
+
+	* CHANGES, ChangeLog,
+	  test/org/rubyforge/debugcommons/OutputRedirectorThread.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java:
+	  trivial: unused imports, variables, @Override
+	  - CHANGES update
+
 2008-02-05 12:58  Martin Krauskopf
 
 	* CHANGES: no change, just s/<Tab>/<Spaces>

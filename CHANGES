@@ -13,6 +13,8 @@
     org.rubyforge.debugcommons.verbose system property.
   * Implementing hashCode and equals for RubyVariable. Might be needed by
     frontend variables views.
+  * better handling of known Segmentaion Fault bug in native Ruby in versions
+    '<= 1.8.6'
 
 0.7.2 - 0.8.0
 -------------
