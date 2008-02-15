@@ -31,6 +31,12 @@ public final class VariablesReader extends XmlStreamReader {
     private void parseVariables() throws XmlPullParserException, IOException {
         List<RubyVariableInfo> variables = new ArrayList<RubyVariableInfo>();
         while (!(nextEvent() == XmlPullParser.END_TAG && "variables".equals(xpp.getName()))) {
+            // Might happen with native Ruby 1.8.6-p36 and earlier due to Seg. Fault
+            // see http://www.netbeans.org/issues/show_bug.cgi?id=127423
+            if (xpp.getName() == null) {
+                throw new XmlPullParserException("xpp.getName() returned 'null'. " +
+                        "Segmentation fault? Using Ruby in version '<= 1.8.6-p36'?");
+            }
             assert xpp.getName().equals("variable") : xpp.getName() + " encountered";
             String name = getAttributeValue("name");
             String value = getAttributeValue("value");

@@ -66,7 +66,7 @@ public final class RubyDebuggerProxy {
     }
     
     /** <b>Package-private</b> for unit tests only. */
-    ReadersSupport getReadersSupport() throws RubyDebuggerException {
+    ReadersSupport getReadersSupport() {
         return readersSupport;
     }
     
@@ -489,21 +489,16 @@ public final class RubyDebuggerProxy {
         }
         
         public @Override void run() {
-            try {
-                Util.finest("Waiting for breakpoints.");
-                while (true) {
-                    SuspensionPoint hit = getReadersSupport().readSuspension();
-                    if (hit == SuspensionPoint.END) {
-                        break;
-                    }
-                    Util.finest(hit.toString());
-                    RubyLoop.this.suspensionOccurred(hit);
+            Util.finest("Waiting for breakpoints.");
+            while (true) {
+                SuspensionPoint hit = getReadersSupport().readSuspension();
+                if (hit == SuspensionPoint.END) {
+                    break;
                 }
-            } catch (RubyDebuggerException e) {
-                Util.severe("Exception in socket reader loop.", e);
-            } finally {
-                finish(false);
+                Util.finest(hit.toString());
+                RubyLoop.this.suspensionOccurred(hit);
             }
+            finish(getReadersSupport().isUnexpectedFail());
             Util.finest("Socket reader loop finished.");
         }
     }

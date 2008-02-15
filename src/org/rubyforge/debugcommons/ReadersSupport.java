@@ -51,6 +51,7 @@ final class ReadersSupport {
     private final BlockingQueue<Integer> removedBreakpoints;
     
     private boolean finished;
+    private boolean unexpectedFail;
     
     /**
      * @param timeout reading timeout until giving up when polling information
@@ -203,6 +204,10 @@ final class ReadersSupport {
             return null;
         }
     }
+
+    boolean isUnexpectedFail() {
+        return unexpectedFail;
+    }
     
     private static XmlPullParser getXpp(final InputStream is)  throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance(
@@ -235,8 +240,10 @@ final class ReadersSupport {
                 //  - no XmlPullParser.END_DOCUMENT is sent
                 //  - incorectly handling finishing of the session in the backends
                 Util.fine("SocketException. Loop [" + getName() + "]: " + e.getMessage());
+                ReadersSupport.this.unexpectedFail = true;
             } catch (XmlPullParserException e) {
                 Util.severe("Exception during ReadersSupport loop [" + getName() + ']', e);
+                ReadersSupport.this.unexpectedFail = true;
             } finally {
                 suspensions.add(SuspensionPoint.END);
                 try {
