@@ -15,14 +15,12 @@ public abstract class DebuggerTestBase extends TestBase {
     
     // XXX cannot be hardcoded. Use configuration files or property or ...
     private static final String PATH_TO_CLASSIC_DEBUG_DIR =
-            "/space/ruby/sources/rubyforge.org/debug-commons/trunk/classic-debug/lib";
-    private static final String PATH_TO_REMOTE_DEBUG_DIR =
-            "/space/ruby/rubygems/gemrepo/bin";
+            "/path/to/debug-commons/trunk/classic-debug/lib";
+    private static final String PATH_TO_RDEBUG_IDE =
+            "/path/to/gem-repo/bin/rdebug-ide";
     
     protected RubyThread suspendedThread;
     
-    //    private Socket socket;
-    //    private PrintWriter socketWritter;
     protected File testFile;
     protected String testFilePath;
     private RubyDebugTarget debugTarget;
@@ -42,9 +40,9 @@ public abstract class DebuggerTestBase extends TestBase {
     protected void setUp() throws Exception {
         super.setUp();
         assertTrue("Correctly set DebuggerTestBase.PATH_TO_CLASSIC_DEBUG_DIR",
-                new File(PATH_TO_CLASSIC_DEBUG_DIR, "classic-debug.rb").exists());
+                new File(PATH_TO_CLASSIC_DEBUG_DIR, "classic-debug.rb").isFile());
         assertTrue("Correctly set DebuggerTestBase.PATH_TO_REMOTE_DEBUG_DIR",
-                new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide").exists());
+                new File(PATH_TO_RDEBUG_IDE).isFile());
     }
     
     @Override
@@ -65,19 +63,6 @@ public abstract class DebuggerTestBase extends TestBase {
     protected void setTimeout(final int timeout) {
         this.timeout = timeout;
     }
-    
-    //    public void sendCont() {
-    //        sendRuby("cont");
-    //    }
-    
-    //    protected void sendRuby(String debuggerCommand) {
-    //        if (debugTarget.isRunning()) {
-    //            Util.info("Sending: " + debuggerCommand);
-    //            socketWritter.println(debuggerCommand);
-    //        } else {
-    //            throw new RuntimeException("Ruby debugger has finished prematurely.");
-    //        }
-    //    }
     
     protected File writeFile(String name, String... content) throws FileNotFoundException {
         File file = new File(getWorkDir(),  name);
@@ -133,7 +118,7 @@ public abstract class DebuggerTestBase extends TestBase {
                     PATH_TO_CLASSIC_DEBUG_DIR, "ruby", timeout);
             break;
         case RUBY_DEBUG:
-            File rdebug = new File(PATH_TO_REMOTE_DEBUG_DIR, "rdebug-ide");
+            File rdebug = new File(PATH_TO_RDEBUG_IDE);
             assertTrue("rdebug-ide file exists", rdebug.isFile());
             proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
             break;
@@ -147,51 +132,6 @@ public abstract class DebuggerTestBase extends TestBase {
         rubyStdoutRedirectorThread.start();
         return proxy;
     }
-    
-    //    private Socket connect(int port) throws IOException {
-    //        for (int tryCount = 8, i = 0; i < tryCount && socket == null; i++) {
-    //            try {
-    //                socket = new Socket("localhost", port + 1);
-    //            } catch (ConnectException e) {
-    //                if (i == tryCount - 1) {
-    //                    throw new RuntimeException(
-    //                            "Ruby process finished prematurely. Last line in stderr: "
-    //                            + rubyStderrRedirectorThread.getLastLine(), e);
-    //                }
-    //                try {
-    //                    System.err.println("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
-    //                    Thread.sleep(500);
-    //                } catch (InterruptedException e1) {
-    //                    e1.printStackTrace();
-    //                    Thread.currentThread().interrupt();
-    //                }
-    //            }
-    //        }
-    //        return socket;
-    //    }
-    //
-    //    protected int readBreakpointNo() {
-    //        return readersSupport.readBreakpointNo();
-    //    }
-    //
-    //    protected int readThreads() {
-    //        return readersSupport.readThreads();
-    //    }
-    //
-    //    protected void assertSuspension(String file, int line, boolean isBreakpoint, int threadId) throws Exception {
-    //        SuspensionPoint suspension = readersSupport.readSuspension();
-    //        assertEquals(file, suspension.getFile());
-    //        assertEquals(line, suspension.getLine());
-    //        assertEquals(isBreakpoint, suspension.isBreakpoint());
-    //    }
-    //
-    //    protected void assertSuspension(String file, int line, boolean isBreakpoint) throws Exception {
-    //        assertSuspension(file, line, isBreakpoint, 1);
-    //    }
-    //
-    //    protected void assertTestSuspension(int line, boolean isBreakpoint) throws Exception {
-    //        assertSuspension("test.rb", line, isBreakpoint, 1);
-    //    }
     
     protected void startDebugging(
             final RubyDebuggerProxy proxy,
