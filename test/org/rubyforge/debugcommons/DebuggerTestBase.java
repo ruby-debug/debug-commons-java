@@ -3,7 +3,11 @@ package org.rubyforge.debugcommons;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
@@ -13,12 +17,39 @@ import org.rubyforge.debugcommons.model.RubyThread;
 
 public abstract class DebuggerTestBase extends TestBase {
     
-    // XXX cannot be hardcoded. Use configuration files or property or ...
-    private static final String PATH_TO_CLASSIC_DEBUG_DIR =
-            "/path/to/debug-commons/trunk/classic-debug/lib";
-    private static final String PATH_TO_RDEBUG_IDE =
-            "/path/to/gem-repo/bin/rdebug-ide";
+    private static final String PATH_TO_CLASSIC_DEBUG_DIR;
+    private static final String PATH_TO_RDEBUG_IDE;
+    private static final String GEM_HOME;
+    private static final String GEM_PATH;
     
+    static {
+        InputStream stream = null;
+        Properties config = new Properties();
+        try {
+            String resourceName = "/org/rubyforge/debugcommons/testconfig.properties";
+            stream = DebuggerTestBase.class.getResourceAsStream(resourceName);
+            if (stream == null) {
+                throw new RuntimeException("Resource not found: " + resourceName);
+            }
+            config.load(stream);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // silently ignore
+                }
+            }
+        }
+        
+        PATH_TO_CLASSIC_DEBUG_DIR = config.getProperty("classic.debug.lib.dir");
+        PATH_TO_RDEBUG_IDE = config.getProperty("rdebug.executable");
+        GEM_HOME = config.getProperty("gem.home");
+        GEM_PATH = config.getProperty("gem.path");
+    }
+
     protected RubyThread suspendedThread;
     
     protected File testFile;
@@ -39,9 +70,9 @@ public abstract class DebuggerTestBase extends TestBase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        assertTrue("Correctly set DebuggerTestBase.PATH_TO_CLASSIC_DEBUG_DIR",
+        assertTrue("Correctly set testconfig.properties#classic.debug.lib.dir",
                 new File(PATH_TO_CLASSIC_DEBUG_DIR, "classic-debug.rb").isFile());
-        assertTrue("Correctly set DebuggerTestBase.PATH_TO_REMOTE_DEBUG_DIR",
+        assertTrue("Correctly set testconfig.properties#rdebug.executable",
                 new File(PATH_TO_RDEBUG_IDE).isFile());
     }
     
@@ -120,6 +151,19 @@ public abstract class DebuggerTestBase extends TestBase {
         case RUBY_DEBUG:
             File rdebug = new File(PATH_TO_RDEBUG_IDE);
             assertTrue("rdebug-ide file exists", rdebug.isFile());
+            Map<String, String> env = descriptor.getEnvironment();
+            if (env == null) {
+                env = new HashMap<String, String>();
+            } else {
+                env = new HashMap<String, String>(env);
+            }
+            if (GEM_HOME != null) {
+                env.put("GEM_HOME", GEM_HOME);
+            }
+            if (GEM_PATH != null) {
+                env.put("GEM_PATH", GEM_PATH);
+            }
+            descriptor.setEnvironment(env);
             proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
             break;
         default:
