@@ -212,10 +212,10 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         final TestBreakpoint[] breakpoints = new TestBreakpoint[]{
             new TestBreakpoint("test.rb", 2, "i>7"),
         };
-        startDebugging(proxy, breakpoints, 1); // i == 3
+        startDebugging(proxy, breakpoints, 1); // i == 8
 
-        resumeSuspendedThread(proxy); // i == 6
         resumeSuspendedThread(proxy); // i == 9
+        resumeSuspendedThread(proxy); // i == 10
         resumeSuspendedThread(proxy); // finish
     }
 }

@@ -1,3 +1,41 @@
+2008-05-14 12:50  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/IRubyBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/reader/ConditionSetReader.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Support for setting condition on breakpoint
+
+2008-05-14 09:41  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/testconfig.properties: Making
+	  test environment configurable
+
+2008-05-08 10:57  Martin Krauskopf
+
+	* nbproject/build-impl.xml, nbproject/genfiles.properties,
+	  nbproject/project.properties, nbproject/project.xml: Updating
+	  NetBeans metadata for 6.1 final
+
+2008-02-15 10:37  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/DebuggerTestBase.java: - unsuded
+	  code
+	  - use path to 'rdebug-ide' directly
+
+2008-02-15 09:48  Martin Krauskopf
+
+	* CHANGES, ChangeLog: changes
+
 2008-02-15 09:45  Martin Krauskopf
 
 	* src/org/rubyforge/debugcommons/ReadersSupport.java,
@@ -778,7 +816,7 @@
 
 2007-03-14 17:59  Martin Krauskopf
 
-	* intermediate-java, ., src, src/org, src/org/rubyforge,
+	* ., src, src/org, src/org/rubyforge,
 	  src/org/rubyforge/debugcommons,
 	  src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
 	  src/org/rubyforge/debugcommons/ICommandFactory.java,
