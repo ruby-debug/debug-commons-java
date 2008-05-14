@@ -24,6 +24,7 @@ final class ReadersSupport {
     private static final String MESSAGE_ELEMENT = "message";
     private static final String BREAKPOINT_ADDED_ELEMENT = "breakpointAdded";
     private static final String BREAKPOINT_DELETED_ELEMENT = "breakpointDeleted";
+    private static final String CONDITION_SET_ELEMENT = "conditionSet";
     
     private static final String THREADS_ELEMENT = "threads";
     private static final String FRAMES_ELEMENT = "frames";
@@ -49,6 +50,7 @@ final class ReadersSupport {
     private final BlockingQueue<SuspensionPoint> suspensions;
     private final BlockingQueue<Integer> addedBreakpoints;
     private final BlockingQueue<Integer> removedBreakpoints;
+    private final BlockingQueue<Integer> conditionSets;
     
     private boolean finished;
     private boolean unexpectedFail;
@@ -65,6 +67,7 @@ final class ReadersSupport {
         this.suspensions = new LinkedBlockingQueue<SuspensionPoint>();
         this.addedBreakpoints = new LinkedBlockingQueue<Integer>();
         this.removedBreakpoints = new LinkedBlockingQueue<Integer>();
+        this.conditionSets = new LinkedBlockingQueue<Integer>();
     }
     
     void startCommandLoop(final InputStream is) throws RubyDebuggerException {
@@ -111,6 +114,8 @@ final class ReadersSupport {
         } else if (BREAKPOINT_ELEMENT.equals(element)) {
             SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
             suspensions.add(sp);
+        } else if (CONDITION_SET_ELEMENT.equals(element)) {
+            conditionSets.add(ConditionSetReader.readBreakpointNo(xpp));
         } else if (SUSPENDED_ELEMENT.equals(element)) {
             SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
             suspensions.add(sp);
@@ -164,36 +169,34 @@ final class ReadersSupport {
     }
     
     int readAddedBreakpointNo() throws RubyDebuggerException {
-        try {
-            Integer breakpointNo = addedBreakpoints.poll(timeout, TimeUnit.SECONDS);
-            if (breakpointNo == null) {
-                throw new RubyDebuggerException("Unable to read added breakpoint number in the specified timeout [" + timeout + "s]");
-            } else {
-                return breakpointNo;
-            }
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new RubyDebuggerException("Interruped during reading added breakpoint number", ex);
-        }
+        return pollInteger(addedBreakpoints, "added breakpoint number");
+    }
+    
+    int readConditionSet() throws RubyDebuggerException {
+        return pollInteger(conditionSets, "breakpoint number of the set condition");
     }
     
     int waitForRemovedBreakpoint(int breakpointID) throws RubyDebuggerException {
+        int removedID = pollInteger(removedBreakpoints, "breakpoint number of the removed breakpoint (" + breakpointID + ")");
+        if (removedID != breakpointID) {
+            throw new RubyDebuggerException("Unexpected breakpoint removed. " +
+                    "Received id: " + removedID + ", expected: " + breakpointID);
+        }
+        return removedID;
+    }
+    
+    private int pollInteger(final BlockingQueue<Integer> queue, final String toRead) throws RubyDebuggerException {
         try {
-            Integer removedID = removedBreakpoints.poll(timeout, TimeUnit.SECONDS);
-            if (removedID == null) {
-                throw new RubyDebuggerException("Unable to read breakpoint number of the removed breakpoint ("
-                        + breakpointID + ") in the specified timeout [" + timeout + "s]");
-            } else if (removedID != breakpointID) {
-                throw new RubyDebuggerException("Unexpected breakpoint removed. " +
-                        "Received id: " + removedID + ", expected: " + breakpointID);
+            Integer num = queue.poll(timeout, TimeUnit.SECONDS);
+            if (num == null) {
+                throw new RubyDebuggerException("Unable to read " + toRead + " in the specified timeout [" + timeout + "s]");
             } else {
-                return removedID;
+                return num;
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new RubyDebuggerException("Interruped during reading added breakpoint number", ex);
+            throw new RubyDebuggerException("Interruped during reading " + toRead, ex);
         }
-        
     }
     
     SuspensionPoint readSuspension() {

@@ -201,5 +201,21 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
             resumeSuspendedThread(proxy);
         }
     }
+    
+    public void testCondition() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "1.upto(10) do |i|",
+                "  sleep 0.01",
+                "  sleep 0.01",
+                "end");
+        final TestBreakpoint[] breakpoints = new TestBreakpoint[]{
+            new TestBreakpoint("test.rb", 2, "i>7"),
+        };
+        startDebugging(proxy, breakpoints, 1); // i == 3
 
+        resumeSuspendedThread(proxy); // i == 6
+        resumeSuspendedThread(proxy); // i == 9
+        resumeSuspendedThread(proxy); // finish
+    }
 }

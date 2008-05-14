@@ -141,6 +141,13 @@ public final class RubyDebuggerFactory {
             pb.environment().putAll(desc.getEnvironment());
         }
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType(), timeout);
+        
+        // set whether backend support condition on breakpoints
+        String rdebugIDEVer = desc.getRubyDebugIDEVersion();
+        boolean suitableVersion = rdebugIDEVer == null || Util.compareVersions(rdebugIDEVer, "0.1.10") > 0;
+        boolean supportsCondition = desc.getType() == RUBY_DEBUG && suitableVersion;
+        proxy.setConditionSupport(supportsCondition);
+        
         RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
                 desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
         proxy.connect(target);
@@ -191,6 +198,7 @@ public final class RubyDebuggerFactory {
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
         private boolean jruby;
+        private String rubyDebugIDEVersion;
         
         public DebuggerType getType() {
             return type;
@@ -289,6 +297,16 @@ public final class RubyDebuggerFactory {
 
         boolean isJRuby() {
             return jruby;
+        }
+
+        /** Used for RUBY_DEBUG type. */
+        public void setRubyDebugIDEVersion(String rubyDebugIDEVersion) {
+            this.rubyDebugIDEVersion = rubyDebugIDEVersion;
+        }
+
+        /** Used for RUBY_DEBUG type. */
+        private String getRubyDebugIDEVersion() {
+            return rubyDebugIDEVersion;
         }
     }
     

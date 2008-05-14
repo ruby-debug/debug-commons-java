@@ -245,10 +245,16 @@ public abstract class DebuggerTestBase extends TestBase {
         private int line;
         private int index;
         private boolean enabled;
+        private String condition;
         
         public TestBreakpoint(String file, int line) {
+            this(file, line, null);
+        }
+        
+        public TestBreakpoint(String file, int line, String condition) {
             this.file = file;
             this.line = line;
+            this.condition = condition;
             this.enabled = true;
         }
         
@@ -274,6 +280,10 @@ public abstract class DebuggerTestBase extends TestBase {
         
         public int getIndex() {
             return index;
+        }
+
+        public String getCondition() {
+            return condition;
         }
         
     }

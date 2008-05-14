@@ -127,6 +127,7 @@ public final class RubyThread extends RubyEntity {
             public boolean isEnabled() { return true; }
             public String getFilePath() { return path; }
             public int getLineNumber() { return line; }
+            public String getCondition() { return null; }
         };
         getProxy().addBreakpoint(temporaryBreakpoint);
         resume();

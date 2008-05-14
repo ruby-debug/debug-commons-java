@@ -30,6 +30,8 @@ public interface ICommandFactory {
     
     String createResume(RubyThread thread);
     
+    String createSetCondition(int bpNum, String condition);
+    
     String createAddBreakpoint(String file, int line);
     
     String createRemoveBreakpoint(int index);

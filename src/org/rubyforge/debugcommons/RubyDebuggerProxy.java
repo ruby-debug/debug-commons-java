@@ -45,6 +45,8 @@ public final class RubyDebuggerProxy {
     private ICommandFactory commandFactory;
     private ReadersSupport readersSupport;
     
+    private boolean supportsCondition;
+    
     public RubyDebuggerProxy(final DebuggerType debuggerType) {
         this(debuggerType, 10); // default reading timeout 10s
     }
@@ -157,9 +159,20 @@ public final class RubyDebuggerProxy {
     
     public void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
         if (breakpoint.isEnabled()) {
-            String command = commandFactory.createAddBreakpoint(breakpoint.getFilePath(), breakpoint.getLineNumber());
+            String command = commandFactory.createAddBreakpoint(
+                    breakpoint.getFilePath(), breakpoint.getLineNumber());
             sendCommand(command);
             Integer id = getReadersSupport().readAddedBreakpointNo();
+            String condition = breakpoint.getCondition();
+            if (condition != null && supportsCondition) {
+                command = commandFactory.createSetCondition(id, condition);
+                if (command != null) {
+                    sendCommand(command);
+                    getReadersSupport().readConditionSet(); // read response
+                } else {
+                    Util.info("conditional breakpoints are not supported by backend");
+                }
+            }
             breakpointsIDs.put(id, breakpoint);
         }
     }
@@ -472,6 +485,14 @@ public final class RubyDebuggerProxy {
         } catch (IOException e) {
             Util.LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
         }
+    }
+
+    /**
+     * Tells the proxy whether condition on breakpoint is supported. Older
+     * engines version do not support it.
+     */
+    void setConditionSupport(final boolean supportsCondition) {
+        this.supportsCondition = supportsCondition;
     }
 
     private class RubyLoop extends Thread {

@@ -84,5 +84,9 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
     public String createCatchOff() {
         return "catch off";
     }
+
+    public String createSetCondition(int bpNum, String condition) {
+        return null;
+    }
     
 }

@@ -86,5 +86,9 @@ public class RubyDebugCommandFactory implements ICommandFactory {
     public String createThreadStop(RubyThread thread) {
         return "thread stop " + thread.getId();
     }
-    
+
+    public String createSetCondition(int bpNum, String condition) {
+        return "condition " + bpNum + ' ' + condition;
+    }
+
 }
