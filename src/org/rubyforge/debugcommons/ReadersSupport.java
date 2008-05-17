@@ -20,6 +20,7 @@ final class ReadersSupport {
     
     private static final String BREAKPOINT_ELEMENT = "breakpoint";
     private static final String SUSPENDED_ELEMENT = "suspended";
+    private static final String EXCEPTION_ELEMENT = "exception";
     private static final String ERROR_ELEMENT = "error";
     private static final String MESSAGE_ELEMENT = "message";
     private static final String BREAKPOINT_ADDED_ELEMENT = "breakpointAdded";
@@ -111,14 +112,11 @@ final class ReadersSupport {
             addedBreakpoints.add(BreakpointAddedReader.readBreakpointNo(xpp));
         } else if (BREAKPOINT_DELETED_ELEMENT.equals(element)) {
             removedBreakpoints.add(BreakpointDeletedReader.readBreakpointNo(xpp));
-        } else if (BREAKPOINT_ELEMENT.equals(element)) {
+        } else if (BREAKPOINT_ELEMENT.equals(element) || SUSPENDED_ELEMENT.equals(element) || EXCEPTION_ELEMENT.equals(element)) {
             SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
             suspensions.add(sp);
         } else if (CONDITION_SET_ELEMENT.equals(element)) {
             conditionSets.add(ConditionSetReader.readBreakpointNo(xpp));
-        } else if (SUSPENDED_ELEMENT.equals(element)) {
-            SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
-            suspensions.add(sp);
         } else if (ERROR_ELEMENT.equals(element)) {
             Util.warning(ErrorReader.readMessage(xpp));
         } else if (MESSAGE_ELEMENT.equals(element)) {

@@ -1,5 +1,6 @@
 package org.rubyforge.debugcommons;
 
+import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThread;
 import org.rubyforge.debugcommons.model.RubyVariable;
@@ -81,6 +82,10 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
         return "delete " + index;
     }
     
+    public String createCatchOn(IRubyExceptionBreakpoint breakpoint) {
+        return "catch " + breakpoint.getException();
+    }
+    
     public String createCatchOff() {
         return "catch off";
     }
@@ -88,5 +93,5 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
     public String createSetCondition(int bpNum, String condition) {
         return null;
     }
-    
+
 }

@@ -1,6 +1,6 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
 import org.rubyforge.debugcommons.model.RubyVariable;
@@ -23,7 +23,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
                 "s.join",           // 6
                 "b=10",             // 7
                 "b=11");            // 8
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 3),
             new TestBreakpoint("test.rb", 7)
         };
@@ -94,7 +94,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
                 "end",
                 "a = A.new",
                 "puts a");
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 7)
         };
         startDebugging(proxy, breakpoints, 1);

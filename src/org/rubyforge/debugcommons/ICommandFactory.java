@@ -1,5 +1,6 @@
 package org.rubyforge.debugcommons;
 
+import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThread;
 import org.rubyforge.debugcommons.model.RubyVariable;
@@ -35,7 +36,9 @@ public interface ICommandFactory {
     String createAddBreakpoint(String file, int line);
     
     String createRemoveBreakpoint(int index);
-    
+
+    String createCatchOn(IRubyExceptionBreakpoint breakpoint);
+
     String createCatchOff();
     
     String createLoad(String filename);

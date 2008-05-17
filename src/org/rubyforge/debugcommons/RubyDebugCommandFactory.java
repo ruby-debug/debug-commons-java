@@ -1,5 +1,6 @@
 package org.rubyforge.debugcommons;
 
+import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyThread;
 import org.rubyforge.debugcommons.model.RubyVariable;
@@ -78,11 +79,11 @@ public class RubyDebugCommandFactory implements ICommandFactory {
     public String createCatchOff() {
         return "catch off";
     }
-    
-    //	public String createCatchOn(IRubyBreakpoint breakpoint) {
-    //		return "catch " + ((RubyExceptionBreakpoint) breakpoint).getException();
-    //	}
-    
+
+    public String createCatchOn(IRubyExceptionBreakpoint breakpoint) {
+        return "catch " + breakpoint.getException();
+    }
+
     public String createThreadStop(RubyThread thread) {
         return "thread stop " + thread.getId();
     }

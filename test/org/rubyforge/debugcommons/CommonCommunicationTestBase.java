@@ -1,7 +1,7 @@
 package org.rubyforge.debugcommons;
 
 import java.util.Arrays;
-import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 import org.rubyforge.debugcommons.model.RubyFrame;
 import org.rubyforge.debugcommons.model.RubyVariable;
 
@@ -13,7 +13,7 @@ public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
     
     public void testGlobalVariables() throws Exception {
         final RubyDebuggerProxy proxy = prepareProxy("sleep 0.1");
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
         startDebugging(proxy, breakpoints, 1);
@@ -46,7 +46,7 @@ public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
                 "a = A.new",
                 "sleep 0.1");
 
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 9),
         };
         startDebugging(proxy, breakpoints, 1);

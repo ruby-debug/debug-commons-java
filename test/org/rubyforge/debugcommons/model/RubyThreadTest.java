@@ -18,7 +18,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
                     "b=2",  // 2
                     "b=3",  // 2
                     "b=4"); // 3
-            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
                 new TestBreakpoint("test.rb", 1),
             };
             startDebugging(proxy, breakpoints, 1);
@@ -53,7 +53,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
                     "  puts a",
                     "end");
             TestBreakpoint bp2 = new TestBreakpoint("test.rb", 2);
-            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
                 bp2,
             };
             startDebugging(proxy, breakpoints, 1);
@@ -85,7 +85,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
                 "b.join");
         TestBreakpoint bp2 = new TestBreakpoint("test.rb", 2);
         TestBreakpoint bp6 = new TestBreakpoint("test.rb", 6);
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             bp2, bp6
         };
         startDebugging(proxy, breakpoints, 2);

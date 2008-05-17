@@ -1,6 +1,6 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 
 public class ReadersSupportTest extends DebuggerTestBase {
     
@@ -13,7 +13,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         final RubyDebuggerProxy proxy = prepareProxy(
                 "b=10",  // 1
                 "b=11"); // 2
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
         startDebugging(proxy, breakpoints, 1);
@@ -31,7 +31,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         final RubyDebuggerProxy proxy = prepareProxy(
                 "b=10",  // 1
                 "b=11"); // 2
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
         startDebugging(proxy, breakpoints, 1);

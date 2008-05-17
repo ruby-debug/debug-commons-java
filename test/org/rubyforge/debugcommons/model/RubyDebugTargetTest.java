@@ -16,7 +16,7 @@ public class RubyDebugTargetTest extends DebuggerTestBase {
                     "a = Thread.start {",
                     "    puts '1'",
                     "}");
-            final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
                 new TestBreakpoint("test.rb", 2)
             };
             startDebugging(proxy, breakpoints, 1);

@@ -13,7 +13,7 @@ public final class RubyThread extends RubyEntity {
     private boolean isSuspended;
     
     /** Used by {@link #runTo} method. */
-    private IRubyBreakpoint temporaryBreakpoint;
+    private IRubyLineBreakpoint temporaryBreakpoint;
     
     public RubyThread(RubyDebugTarget target, int id) {
         super(target.getProxy());
@@ -123,7 +123,7 @@ public final class RubyThread extends RubyEntity {
     }
     
     public void runTo(final String path, final int line) throws RubyDebuggerException {
-        temporaryBreakpoint = new IRubyBreakpoint() {
+        temporaryBreakpoint = new IRubyLineBreakpoint() {
             public boolean isEnabled() { return true; }
             public String getFilePath() { return path; }
             public int getLineNumber() { return line; }

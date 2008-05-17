@@ -12,6 +12,8 @@ import java.util.concurrent.CountDownLatch;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
 import org.rubyforge.debugcommons.model.RubyThread;
 
@@ -239,7 +241,25 @@ public abstract class DebuggerTestBase extends TestBase {
         proxy.removeRubyDebugEventListener(listener);
     }
     
-    protected static final class TestBreakpoint implements IRubyBreakpoint {
+    protected static final class TestExceptionBreakpoint implements IRubyExceptionBreakpoint {
+        
+        private String exception;
+
+        public TestExceptionBreakpoint(String exception) {
+            this.exception = exception;
+        }
+        
+        public boolean isEnabled() {
+            return true;
+        }
+
+        public String getException() {
+            return exception;
+        }
+        
+    }
+    
+    protected static final class TestBreakpoint implements IRubyLineBreakpoint {
         
         private String file;
         private int line;

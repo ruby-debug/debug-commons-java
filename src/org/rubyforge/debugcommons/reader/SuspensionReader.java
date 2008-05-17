@@ -18,7 +18,7 @@ public final class SuspensionReader extends XmlStreamReader {
     
     private void parse() throws XmlPullParserException, IOException {
         String name = xpp.getName();
-        assert name.equals("breakpoint") || name.equals("suspended");
+        assert name.equals("breakpoint") || name.equals("suspended") || name.equals("exception");
         if (name.equals("breakpoint")) {
             suspensionPoint = new BreakpointSuspensionPoint();
         } else if (name.equals("exception")) {

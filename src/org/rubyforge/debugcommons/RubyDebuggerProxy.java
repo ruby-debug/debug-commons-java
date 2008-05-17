@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
@@ -31,7 +33,7 @@ public final class RubyDebuggerProxy {
     public static final List<RubyDebuggerProxy> PROXIES = new CopyOnWriteArrayList<RubyDebuggerProxy>();
     
     private final List<RubyDebugEventListener> listeners;
-    private final Map<Integer, IRubyBreakpoint> breakpointsIDs;
+    private final Map<Integer, IRubyLineBreakpoint> breakpointsIDs;
     private final int timeout;
     
     private final DebuggerType debuggerType;
@@ -54,7 +56,7 @@ public final class RubyDebuggerProxy {
     public RubyDebuggerProxy(final DebuggerType debuggerType, final int timeout) {
         this.debuggerType = debuggerType;
         this.listeners = new CopyOnWriteArrayList<RubyDebugEventListener>();
-        this.breakpointsIDs = new HashMap<Integer, IRubyBreakpoint>();
+        this.breakpointsIDs = new HashMap<Integer, IRubyLineBreakpoint>();
         this.timeout = timeout;
     }
     
@@ -159,21 +161,33 @@ public final class RubyDebuggerProxy {
     
     public void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
         if (breakpoint.isEnabled()) {
-            String command = commandFactory.createAddBreakpoint(
-                    breakpoint.getFilePath(), breakpoint.getLineNumber());
-            sendCommand(command);
-            Integer id = getReadersSupport().readAddedBreakpointNo();
-            String condition = breakpoint.getCondition();
-            if (condition != null && supportsCondition) {
-                command = commandFactory.createSetCondition(id, condition);
-                if (command != null) {
-                    sendCommand(command);
-                    getReadersSupport().readConditionSet(); // read response
-                } else {
-                    Util.info("conditional breakpoints are not supported by backend");
+            if (breakpoint instanceof IRubyLineBreakpoint) {
+                IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+                String command = commandFactory.createAddBreakpoint(
+                        lineBreakpoint.getFilePath(), lineBreakpoint.getLineNumber());
+                sendCommand(command);
+                Integer id = getReadersSupport().readAddedBreakpointNo();
+                String condition = lineBreakpoint.getCondition();
+                if (condition != null && supportsCondition) {
+                    command = commandFactory.createSetCondition(id, condition);
+                    if (command != null) {
+                        sendCommand(command);
+                        getReadersSupport().readConditionSet(); // read response
+                    } else {
+                        Util.info("conditional breakpoints are not supported by backend");
+                    }
                 }
+                breakpointsIDs.put(id, lineBreakpoint);
+            } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
+                IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
+                String command = commandFactory.createCatchOn(excBreakpoint);
+                sendCommand(command);
+                // TODO: Read response. Now the protocol sends back just a
+                // message. Will be changed to the confirmation. Then read it
+                // here.
+            } else {
+                throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
             }
-            breakpointsIDs.put(id, breakpoint);
         }
     }
     
@@ -189,19 +203,26 @@ public final class RubyDebuggerProxy {
      *        has not been set in this session
      */
     public void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
-        Integer id = findBreakpointId(breakpoint);
-        if (id != null) {
-            String command = commandFactory.createRemoveBreakpoint(id);
-            try {
-                sendCommand(command);
-                getReadersSupport().waitForRemovedBreakpoint(id);
-                breakpointsIDs.remove(id);
-            } catch (RubyDebuggerException e) {
-                Util.severe("Exception during removing breakpoint.", e);
+        if (breakpoint instanceof IRubyLineBreakpoint) {
+            IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+            Integer id = findBreakpointId(lineBreakpoint);
+            if (id != null) {
+                String command = commandFactory.createRemoveBreakpoint(id);
+                try {
+                    sendCommand(command);
+                    getReadersSupport().waitForRemovedBreakpoint(id);
+                    breakpointsIDs.remove(id);
+                } catch (RubyDebuggerException e) {
+                    Util.severe("Exception during removing breakpoint.", e);
+                }
+            } else if (!silent) {
+                Util.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
+                        "its ID cannot be found. Might have been alread removed.");
             }
-        } else if(!silent) {
-            Util.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
-                    "its ID cannot be found. Might have been alread removed.");
+        } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
+            throw new UnsupportedOperationException("not implemented yet");
+        } else {
+            throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
         }
     }
     
@@ -220,10 +241,10 @@ public final class RubyDebuggerProxy {
      *
      * @return found ID; might be <tt>null</tt> if none is found
      */
-    private Integer findBreakpointId(final IRubyBreakpoint wantedBP) {
-        for (Iterator<Map.Entry<Integer, IRubyBreakpoint>> it = breakpointsIDs.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Integer, IRubyBreakpoint> breakpointID = it.next();
-            IRubyBreakpoint bp = breakpointID.getValue();
+    private Integer findBreakpointId(final IRubyLineBreakpoint wantedBP) {
+        for (Iterator<Map.Entry<Integer, IRubyLineBreakpoint>> it = breakpointsIDs.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Integer, IRubyLineBreakpoint> breakpointID = it.next();
+            IRubyLineBreakpoint bp = breakpointID.getValue();
             int id = breakpointID.getKey();
             if (wantedBP.getFilePath().equals(bp.getFilePath()) &&
                     wantedBP.getLineNumber() == bp.getLineNumber()) {

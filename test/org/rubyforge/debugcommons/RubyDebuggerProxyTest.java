@@ -2,7 +2,7 @@ package org.rubyforge.debugcommons;
 
 import org.rubyforge.debugcommons.DebuggerTestBase.TestBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
-import org.rubyforge.debugcommons.model.RubyFrame;
+import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
 
 public final class RubyDebuggerProxyTest extends DebuggerTestBase {
     
@@ -17,7 +17,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
                 "  b=10",     // 2
                 "  b=11",     // 3
                 "end");       // 4
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 2),
             new TestBreakpoint("test.rb", 3),
         };
@@ -27,7 +27,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 2 -> 3
         resumeSuspendedThread(proxy); // 3 -> 2
         
-        IRubyBreakpoint second = breakpoints[1];
+        IRubyLineBreakpoint second = breakpoints[1];
         proxy.removeBreakpoint(second);
         
         // finish
@@ -42,7 +42,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
                 "  b=10",     // 2
                 "  b=11",     // 3
                 "end");       // 4
-        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 2),
             new TestBreakpoint("test.rb", 3),
         };
@@ -52,7 +52,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 2 -> 3
         resumeSuspendedThread(proxy); // 3 -> 2
         
-        final IRubyBreakpoint first = breakpoints[0];
+        final IRubyLineBreakpoint first = breakpoints[0];
         proxy.removeBreakpoint(first);
         
         // finish
@@ -111,7 +111,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
             proxy.finish(true);
         }
     }
-    
+
     public void testStepOver() throws Exception {
         setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
@@ -129,7 +129,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         doStepOver(proxy, false);
         doStepOver(proxy, true);
     }
-    
+
     public void testStepReturnOnFrame() throws Exception {
         setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
@@ -163,7 +163,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         assertEquals("one frame", 1, suspendedThread.getFrames().length);
         resumeSuspendedThread(proxy);
     }
-    
+
     public void testStepReturnOnThread() throws Exception {
         for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
             setDebuggerType(type);
@@ -201,7 +201,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
             resumeSuspendedThread(proxy);
         }
     }
-    
+
     public void testCondition() throws Exception {
         setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
@@ -216,6 +216,22 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
 
         resumeSuspendedThread(proxy); // i == 9
         resumeSuspendedThread(proxy); // i == 10
+        resumeSuspendedThread(proxy); // finish
+    }
+    
+    public void testCatchpoint() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "sleep 0.01",
+                "5/0",
+                "sleep 0.01");
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[] {
+            new TestBreakpoint("test.rb", 1),
+            new TestExceptionBreakpoint("ZeroDivisionError"),
+        };
+        startDebugging(proxy, breakpoints, 1); // 1
+        doStepOver(proxy, false);
+        doStepOver(proxy, false);
         resumeSuspendedThread(proxy); // finish
     }
 }
