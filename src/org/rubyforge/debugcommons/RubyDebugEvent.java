@@ -1,12 +1,14 @@
 package org.rubyforge.debugcommons;
 
+import org.rubyforge.debugcommons.model.ExceptionSuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThread;
+import org.rubyforge.debugcommons.model.StepSuspensionPoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 
 public final class RubyDebugEvent {
-    
+
     /** Types of the event. */
-    public enum Type { SUSPEND, TERMINATE };
+    public enum Type { SUSPEND, TERMINATE, EXCEPTION };
     
     private final Type type;
     private final RubyThread rubyThread;
@@ -20,7 +22,17 @@ public final class RubyDebugEvent {
     }
     
     public RubyDebugEvent(final RubyThread rubyThread, final SuspensionPoint sp) {
-        this(rubyThread, Type.SUSPEND, sp.getFile(), sp.getLine(), sp.isStep());
+        this(rubyThread, getType(sp), sp.getFile(), sp.getLine(), sp.isStep());
+    }
+    
+    private static Type getType(final SuspensionPoint sp) {
+        if (sp.isStep() || sp.isBreakpoint()) {
+            return Type.SUSPEND;
+        } else if (sp.isException()) {
+            return Type.EXCEPTION;
+        } else {
+            throw new AssertionError("Unknown SuspensionPoint type: ");
+        }
     }
 
     public RubyDebugEvent(final RubyThread rubyThread,
@@ -28,7 +40,7 @@ public final class RubyDebugEvent {
             final String filePath,
             final int line,
             final boolean stepping) {
-        if (type == Type.SUSPEND) {
+        if (type == Type.SUSPEND || type == Type.EXCEPTION) {
             assert rubyThread != null;
         }
         this.rubyThread = rubyThread;
@@ -44,6 +56,10 @@ public final class RubyDebugEvent {
     
     public boolean isTerminateType() {
         return this.type == Type.TERMINATE;
+    }
+    
+    public boolean isExceptionType() {
+        return this.type == Type.EXCEPTION;
     }
     
     public RubyThread getRubyThread() {

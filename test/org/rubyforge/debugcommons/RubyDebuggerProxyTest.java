@@ -3,6 +3,7 @@ package org.rubyforge.debugcommons;
 import org.rubyforge.debugcommons.DebuggerTestBase.TestBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
+import org.rubyforge.debugcommons.model.RubyFrame;
 
 public final class RubyDebuggerProxyTest extends DebuggerTestBase {
     

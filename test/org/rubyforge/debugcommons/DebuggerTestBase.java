@@ -225,7 +225,7 @@ public abstract class DebuggerTestBase extends TestBase {
         final CountDownLatch events = new CountDownLatch(n);
         RubyDebugEventListener listener = new RubyDebugEventListener() {
             public void onDebugEvent(RubyDebugEvent e) {
-                if (e.isSuspensionType()) {
+                if (e.isSuspensionType() || e.isExceptionType()) {
                     synchronized(DebuggerTestBase.this) {
                         DebuggerTestBase.this.suspendedThread = e.getRubyThread();
                     }
