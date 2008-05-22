@@ -1,65 +1,38 @@
 package org.rubyforge.debugcommons;
 
-import org.rubyforge.debugcommons.model.ExceptionSuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThread;
-import org.rubyforge.debugcommons.model.StepSuspensionPoint;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 
 public final class RubyDebugEvent {
 
-    /** Types of the event. */
-    public enum Type { SUSPEND, TERMINATE, EXCEPTION };
-    
-    private final Type type;
     private final RubyThread rubyThread;
+    private final SuspensionPoint sp;
+    private boolean isTerminate;
     
-    private final String filePath;
-    private final int line;
-    private final boolean stepping;
-    
-    public RubyDebugEvent(final Type type) {
-        this(null, type, null, -1, false);
+    static RubyDebugEvent createTerminateEvent() {
+        RubyDebugEvent e = new RubyDebugEvent(null, null);
+        e.isTerminate = true;
+        return e;
     }
     
     public RubyDebugEvent(final RubyThread rubyThread, final SuspensionPoint sp) {
-        this(rubyThread, getType(sp), sp.getFile(), sp.getLine(), sp.isStep());
-    }
-    
-    private static Type getType(final SuspensionPoint sp) {
-        if (sp.isStep() || sp.isBreakpoint()) {
-            return Type.SUSPEND;
-        } else if (sp.isException()) {
-            return Type.EXCEPTION;
-        } else {
-            throw new AssertionError("Unknown SuspensionPoint type: ");
-        }
-    }
-
-    public RubyDebugEvent(final RubyThread rubyThread,
-            final Type type,
-            final String filePath,
-            final int line,
-            final boolean stepping) {
-        if (type == Type.SUSPEND || type == Type.EXCEPTION) {
+        if (sp != null) {
             assert rubyThread != null;
         }
+        this.sp = sp;
         this.rubyThread = rubyThread;
-        this.type = type;
-        this.filePath = filePath;
-        this.line = line;
-        this.stepping = stepping;
     }
 
     public boolean isSuspensionType() {
-        return this.type == Type.SUSPEND;
+        return !isTerminate && (sp.isBreakpoint() || sp.isStep());
     }
     
     public boolean isTerminateType() {
-        return this.type == Type.TERMINATE;
+        return isTerminate;
     }
     
     public boolean isExceptionType() {
-        return this.type == Type.EXCEPTION;
+        return !isTerminate && sp.isException();
     }
     
     public RubyThread getRubyThread() {
@@ -67,24 +40,27 @@ public final class RubyDebugEvent {
     }
     
     public String getFilePath() {
-        return filePath;
+        return sp.getFile();
     }
     
     public int getLine() {
-        return line;
+        return sp.getLine();
     }
 
     public boolean isStepping() {
-        return stepping;
+        return sp.isStep();
     }
     
     @Override
     public String toString() {
+        if (isTerminate) {
+            return "[RubyDebugEvent@" + System.identityHashCode(this) + "> Terminate Event";
+        }
         return "[RubyDebugEvent@" + System.identityHashCode(this) +
-                "> type: " + type +
+                "> type: " + sp +
                 ", rubyThread: " + rubyThread +
-                ", line: " + line  +
-                ", filePath: " + filePath +
+                ", line: " + sp.getLine()  +
+                ", filePath: " + sp.getFile() +
                 ']';
     }
     

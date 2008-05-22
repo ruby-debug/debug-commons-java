@@ -1,3 +1,39 @@
+2008-05-18 17:05  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebugEvent.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  RubyDebugEvent#isExceptionType
+
+2008-05-17 20:51  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/IRubyExceptionBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/IRubyLineBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/reader/SuspensionReader.java,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyDebugTargetTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java:
+	  Support for catchpoints
+
+2008-05-14 14:58  Martin Krauskopf
+
+	* CHANGES, ChangeLog,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java: -
+	  fixing RubyDebuggerProxyTest helper comments
+	  - CHANGES update
+
 2008-05-14 12:50  Martin Krauskopf
 
 	* src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,

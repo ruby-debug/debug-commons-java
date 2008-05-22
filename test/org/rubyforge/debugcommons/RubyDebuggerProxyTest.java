@@ -235,4 +235,48 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         doStepOver(proxy, false);
         resumeSuspendedThread(proxy); // finish
     }
+
+    public void testCatchpointRemoving() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "1.upto(10) do",
+                "  sleep 0.1",
+                "  abc = 3/0 rescue ZeroDivisionError",
+                "end");
+        IRubyBreakpoint catchpoint = new TestExceptionBreakpoint("ZeroDivisionError");
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[]{
+            catchpoint,
+        };
+        startDebugging(proxy, breakpoints, 1); // 1
+        resumeSuspendedThread(proxy);
+        resumeSuspendedThread(proxy);
+        proxy.removeBreakpoint(catchpoint);
+        resumeSuspendedThread(proxy);
+    }
+
+    public void testCatchpointReAdding() throws Exception {
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "1.upto(10) do",
+                "  sleep 0.1",
+                "  abc = 3/0 rescue ZeroDivisionError",
+                "end");
+        IRubyBreakpoint catchpoint = new TestExceptionBreakpoint("ZeroDivisionError");
+        TestBreakpoint breakpoint = new TestBreakpoint("test.rb", 2);
+        final IRubyBreakpoint[] breakpoints = new IRubyBreakpoint[]{
+            breakpoint,
+            catchpoint,
+        };
+        startDebugging(proxy, breakpoints, 1); // 2
+        resumeSuspendedThread(proxy); // 2 -> 3
+        resumeSuspendedThread(proxy); // 3 -> 2
+        proxy.removeBreakpoint(catchpoint);
+        resumeSuspendedThread(proxy); // 2 -> 2
+        proxy.removeBreakpoint(breakpoint);
+        proxy.addBreakpoint(catchpoint);
+        resumeSuspendedThread(proxy); // 2 -> 3
+        resumeSuspendedThread(proxy); // 3 -> 3
+        proxy.removeBreakpoint(catchpoint);
+        resumeSuspendedThread(proxy); // 3 -> finish
+    }
 }

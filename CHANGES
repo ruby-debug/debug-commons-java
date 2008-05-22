@@ -1,5 +1,6 @@
 0.8.0 - 0.8.1
 -------------
+  * Support for exception breakpoints (catchpoints)
   * Support for setting condition (expression returning boolean) on breakpoint
   * better handling of known Segmentaion Fault bug in native Ruby in versions
     '<= 1.8.6'

@@ -66,7 +66,6 @@ public final class RubyDebugTarget extends RubyEntity {
     }
     
     public void suspensionOccurred(SuspensionPoint suspensionPoint) {
-        RubyThread thread = null;
         try {
             updateThreads();
         } catch (RubyDebuggerException e) {
@@ -77,7 +76,7 @@ public final class RubyDebugTarget extends RubyEntity {
                 return;
             }
         }
-        thread = getThreadById(suspensionPoint.getThreadId());
+        RubyThread thread = getThreadById(suspensionPoint.getThreadId());
         if (thread == null) {
             Util.warning("Thread with id " + suspensionPoint.getThreadId() + " was not found");
             return;

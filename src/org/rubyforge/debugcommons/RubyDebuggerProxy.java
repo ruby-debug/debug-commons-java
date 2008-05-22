@@ -6,11 +6,14 @@ import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import org.rubyforge.debugcommons.model.ExceptionSuspensionPoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
@@ -49,6 +52,11 @@ public final class RubyDebuggerProxy {
     
     private boolean supportsCondition;
     
+    // catchpoint removing is not supported by backend yet, handle it in the
+    // debug-commons-java until the support is added
+    // http://rubyforge.org/tracker/index.php?func=detail&aid=20237&group_id=1900&atid=7436
+    private Set<String> removedCatchpoints;
+    
     public RubyDebuggerProxy(final DebuggerType debuggerType) {
         this(debuggerType, 10); // default reading timeout 10s
     }
@@ -57,6 +65,7 @@ public final class RubyDebuggerProxy {
         this.debuggerType = debuggerType;
         this.listeners = new CopyOnWriteArrayList<RubyDebugEventListener>();
         this.breakpointsIDs = new HashMap<Integer, IRubyLineBreakpoint>();
+        this.removedCatchpoints = new HashSet<String>();
         this.timeout = timeout;
     }
     
@@ -180,11 +189,14 @@ public final class RubyDebuggerProxy {
                 breakpointsIDs.put(id, lineBreakpoint);
             } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
                 IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
-                String command = commandFactory.createCatchOn(excBreakpoint);
-                sendCommand(command);
-                // TODO: Read response. Now the protocol sends back just a
-                // message. Will be changed to the confirmation. Then read it
-                // here.
+                // just 're-enable' if contained in removedCatchpoints
+                if (!removedCatchpoints.remove(excBreakpoint.getException())) {
+                    String command = commandFactory.createCatchOn(excBreakpoint);
+                    sendCommand(command);
+                    // TODO: Read response. Now the protocol sends back just a
+                    // message. Will be changed to the confirmation. Then read
+                    // it here.
+                }
             } else {
                 throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
             }
@@ -199,7 +211,7 @@ public final class RubyDebuggerProxy {
      * Remove the given breakpoint from this debugging session.
      *
      * @param breakpoint breakpoint to be removed
-     * @param silent whether info message should be ommited if the breakpoint
+     * @param silent whether info message should be omitted if the breakpoint
      *        has not been set in this session
      */
     public void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
@@ -220,7 +232,11 @@ public final class RubyDebuggerProxy {
                         "its ID cannot be found. Might have been alread removed.");
             }
         } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
-            throw new UnsupportedOperationException("not implemented yet");
+            // catchpoint removing is not supported by backend yet, handle in
+            // the debug-commons-java until the support is added
+            // http://rubyforge.org/tracker/index.php?func=detail&aid=20237&group_id=1900&atid=7436
+            IRubyExceptionBreakpoint catchpoint = (IRubyExceptionBreakpoint) breakpoint;
+            removedCatchpoints.add(catchpoint.getException());
         } else {
             throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
         }
@@ -400,7 +416,7 @@ public final class RubyDebuggerProxy {
                 getDebugTarged().getProcess().destroy();
             }
         }
-        fireDebugEvent(new RubyDebugEvent(RubyDebugEvent.Type.TERMINATE));
+        fireDebugEvent(RubyDebugEvent.createTerminateEvent());
     }
     
     private synchronized void sendExit() {
@@ -533,12 +549,25 @@ public final class RubyDebuggerProxy {
         public @Override void run() {
             Util.finest("Waiting for breakpoints.");
             while (true) {
-                SuspensionPoint hit = getReadersSupport().readSuspension();
-                if (hit == SuspensionPoint.END) {
+                SuspensionPoint sp = getReadersSupport().readSuspension();
+                if (sp == SuspensionPoint.END) {
                     break;
                 }
-                Util.finest(hit.toString());
-                RubyLoop.this.suspensionOccurred(hit);
+                Util.finest(sp.toString());
+
+                // see removedCatchpoints's JavaDoc
+                if (sp.isException()) {
+                    ExceptionSuspensionPoint exceptionSP = (ExceptionSuspensionPoint) sp;
+                    if (removedCatchpoints.contains(exceptionSP.getExceptionType())) {
+                        RubyThread thread = getDebugTarged().getThreadById(sp.getThreadId());
+                        if (thread != null) {
+                            RubyDebuggerProxy.this.resume(thread);
+                            continue;
+                        }
+                    }
+                }
+
+                RubyLoop.this.suspensionOccurred(sp);
             }
             finish(getReadersSupport().isUnexpectedFail());
             Util.finest("Socket reader loop finished.");
