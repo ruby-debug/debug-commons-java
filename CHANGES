@@ -1,9 +1,8 @@
-0.8.0 - 0.8.1
+0.8.0 - 0.9.0
 -------------
   * Support for exception breakpoints (catchpoints)
   * Support for setting condition (expression returning boolean) on breakpoint
-  * better handling of known Segmentaion Fault bug in native Ruby in versions
-    '<= 1.8.6'
+  * better handling of Segmentaion Fault bug in native Ruby
   * Fail immediately in the case process failed. Do not wait for timeout.
   * RubyDebuggerFactory#Descriptor.setJRuby(). Possibility for a client to say
     that interpreter is JRuby. If yes, appropriate flags to 'enable' debugging
@@ -17,6 +16,7 @@
     org.rubyforge.debugcommons.verbose system property.
   * Implementing hashCode and equals for RubyVariable. Might be needed by
     frontend variables views.
+  * Fix: invoke appropriate rdebug-ide version when it was set
 
 0.7.2 - 0.8.0
 -------------

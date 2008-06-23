@@ -113,6 +113,10 @@ public final class RubyDebuggerFactory {
             appendIOSynchronizer(args, descriptor);
         }
         args.add(rdebugExecutable);
+        String version = descriptor.getRubyDebugIDEVersion();
+        if (version != null) { // invoke appropriate rdebug-ide version when set
+            args.add('_' + version + '_');
+        }
         args.add("-p");
         args.add(String.valueOf(descriptor.getPort()));
         if (descriptor.isVerbose()) {
