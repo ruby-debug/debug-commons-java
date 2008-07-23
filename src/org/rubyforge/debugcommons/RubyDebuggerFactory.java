@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.RubyDebugTarget;
 
@@ -82,7 +85,7 @@ public final class RubyDebuggerFactory {
     }
 
     /**
-     * Starts Kent Sibilev's ruby-debug session for the given script. Debugger
+     * Starts <tt>ruby-debug-ide</tt> session for the given script. Debugger
      * waits on the first script's line.
      *
      * @param descriptor {@link Descriptor} to be used
@@ -130,6 +133,51 @@ public final class RubyDebuggerFactory {
         return startDebugger(descriptor, args, timeout);
     }
 
+    /**
+     * Starts <tt>ruby-debug-ide</tt> session for the given script. Debugger
+     * waits on the first script's line.
+     * <p>
+     * This method takes a preconstructed command line and inserts the computed
+     * rdebug values into the appropriate <tt>${ }</tt> bracketed variables
+     * contained therein. Supported variables are:
+     * <p>
+     * <tt>${rdebug.path}</tt> = fully qualified to rdebug script<br/>
+     * <tt>${rdebug.port}</tt> = port rdebug should use<br/>
+     * <tt>${rdebug.version}</tt> = underscore bracketed version, or blank if unknown.<br/>
+     * <tt>${rdebug.iosynch}</tt> = fully qualified path to io-synch script for rdebug.<br/>
+     *
+     * @param descriptor {@link Descriptor} to be used
+     * @param args
+     * @param rdebugExecutable fully qualified path to rdebug-ide
+     * @param timeout time to wait before assuming failure
+     * @return {@link RubyDebugTarget} instance
+     * @throws java.io.IOException
+     * @throws org.rubyforge.debugcommons.RubyDebuggerException
+     */
+    public static RubyDebuggerProxy startRubyDebug(
+            final Descriptor descriptor,
+            final List<String> args,
+            final String rdebugExecutable,
+            final int timeout) throws IOException, RubyDebuggerException {
+        descriptor.setType(RUBY_DEBUG);
+        
+        Map<String, String> varMap = new HashMap<String, String>();
+        varMap.put("rdebug.path", rdebugExecutable);
+        varMap.put("rdebug.port", Integer.toString(descriptor.getPort()));
+        String version = descriptor.getRubyDebugIDEVersion();
+        varMap.put("rdebug.version", version != null ? ('_' + version + '_') : "");
+        // would be nice to use a continuation here -- if the replacement was
+        // never needed, we wouldn't even create the file.
+        varMap.put("rdebug.iosynch", createIOSynchronizer());
+
+        int size = args.size();
+        for(int i = 0; i < size; i++) {
+            args.set(i, substitute(args.get(i), varMap));
+        }
+
+        return startDebugger(descriptor, args, timeout);
+    }
+    
     private static void adjustForJRuby(List<String> args) {
         args.add("-J-Djruby.reflection=true");
         args.add("-J-Djruby.compile.mode=OFF");
@@ -321,6 +369,37 @@ public final class RubyDebuggerFactory {
             sb.append(arg).append(' ');
         }
         return sb.toString().trim();
+    }
+    
+    private static Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
+
+    private static String substitute(String value, Map<String, String> varMap) {
+        try {
+            Matcher matcher = pattern.matcher(value);
+            boolean result = matcher.find();
+            if(result) {
+                StringBuffer sb = new StringBuffer();
+                do {
+                    String key = matcher.group(1);
+                    String replacement = varMap.get(key);
+                    if(replacement == null) {
+                        replacement = System.getProperty(key);
+                        if(replacement != null) {
+                            replacement = replacement.replace("\\", "\\\\").replace("$", "\\$");
+                        } else {
+                            replacement = "\\$\\{" + key + "\\}";
+                        }
+                    }
+                    matcher.appendReplacement(sb, replacement);
+                    result = matcher.find();
+                } while(result);
+                matcher.appendTail(sb);
+                value = sb.toString();
+            }
+        } catch(Exception ex) {
+            Util.severe(ex);
+        }
+        return value;
     }
     
 }
