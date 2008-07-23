@@ -1,3 +1,20 @@
+2008-07-23 10:36  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Patch
+	  from Peter Williams providing general method for custom
+	  rdebug-ide starting
+	  - e.g. for being able to debug JRuby under Glassfish
+
+2008-07-23 09:40  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/model/IRubyBreakpoint.java:
+	  Forgotten commit (had locally broken repo)
+
+2008-06-23 18:36  Martin Krauskopf
+
+	* CHANGES, ChangeLog, nbproject/project.properties: trunk was
+	  release as 0.9.0 (incompatible changes), increasing version
+
 2008-06-23 18:30  Martin Krauskopf
 
 	* CHANGES, src/org/rubyforge/debugcommons/RubyDebuggerFactory.java:

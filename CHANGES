@@ -1,5 +1,7 @@
 0.9.0 - 0.9.1
 -------------
+  * general method for custom rdebug-ide starting - e.g. for being able to
+    debug JRuby under Glassfish (patch from Peter Williams)
 
 0.8.0 - 0.9.0
 -------------
