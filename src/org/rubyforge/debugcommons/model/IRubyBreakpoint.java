@@ -4,10 +4,4 @@ public interface IRubyBreakpoint {
     
     boolean isEnabled();
     
-    String getFilePath();
-    
-    int getLineNumber();
-    
-    String getCondition();
-    
 }
