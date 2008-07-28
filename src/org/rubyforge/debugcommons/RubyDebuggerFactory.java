@@ -361,7 +361,7 @@ public final class RubyDebuggerFactory {
             return rubyDebugIDEVersion;
         }
     }
-    
+
     /** Just helper method for logging. */
     private static String getProcessAsString(List<? extends String> process) {
         StringBuilder sb = new StringBuilder();
@@ -373,33 +373,32 @@ public final class RubyDebuggerFactory {
     
     private static Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
-    private static String substitute(String value, Map<String, String> varMap) {
+    static String substitute(String value, Map<String, String> varMap) {
         try {
             Matcher matcher = pattern.matcher(value);
             boolean result = matcher.find();
-            if(result) {
+            if (result) {
                 StringBuffer sb = new StringBuffer();
                 do {
                     String key = matcher.group(1);
                     String replacement = varMap.get(key);
-                    if(replacement == null) {
+                    if (replacement == null) {
                         replacement = System.getProperty(key);
-                        if(replacement != null) {
-                            replacement = replacement.replace("\\", "\\\\").replace("$", "\\$");
-                        } else {
-                            replacement = "\\$\\{" + key + "\\}";
-                        }
+                    }
+                    if (replacement != null) {
+                        replacement = replacement.replace("\\", "\\\\").replace("$", "\\$");
+                    } else {
+                        replacement = "\\$\\{" + key + "\\}";
                     }
                     matcher.appendReplacement(sb, replacement);
                     result = matcher.find();
-                } while(result);
+                } while (result);
                 matcher.appendTail(sb);
                 value = sb.toString();
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Util.severe(ex);
         }
         return value;
     }
-    
 }
