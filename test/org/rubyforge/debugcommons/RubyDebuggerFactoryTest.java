@@ -3,7 +3,6 @@ package org.rubyforge.debugcommons;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
@@ -112,8 +111,6 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         subMap.put("dollar.sign", "$dollar$");
         subMap.put("spaces", "this phrase has spaces");
         subMap.put("japanese", "日本語");
-
-        assertSubstitute("nothing", "nothing", subMap);
 
         assertSubstitute("nothing", "nothing", subMap);
         assertSubstitute("${simple}", "simple", subMap);
