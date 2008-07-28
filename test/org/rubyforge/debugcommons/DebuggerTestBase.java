@@ -82,11 +82,13 @@ public abstract class DebuggerTestBase extends TestBase {
     protected void tearDown() throws Exception {
         String name = this.getName();
         System.out.println("Waiting for the server process to finish...");
-        for (int i = 0; i < 8 && debugTarget.isRunning(); i++) {
-            Thread.sleep(250);
-            System.out.println(i + " (" + name + ")");
+        if (debugTarget != null) {
+            for (int i = 0; i < 8 && debugTarget.isRunning(); i++) {
+                Thread.sleep(250);
+                System.out.println(i + " (" + name + ")");
+            }
+            assertFalse("server process did not finish", debugTarget.isRunning());
         }
-        assertFalse("server process did not finish", debugTarget.isRunning());
     }
     
     protected void setDebuggerType(final DebuggerType debuggerType) {
