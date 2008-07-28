@@ -113,31 +113,31 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         subMap.put("spaces", "this phrase has spaces");
         subMap.put("japanese", "日本語");
 
-        // map as cheap version of Tuple<String, String>
-        Map<String, String> testData = new LinkedHashMap<String, String>();
-        testData.put("nothing", "nothing");
-        testData.put("${simple}", "simple");
-        testData.put("Not so ${simple}", "Not so simple");
-        testData.put("Not ${simple}r either", "Not simpler either");
-        testData.put("Just ${number}", "Just 1000");
-        testData.put("Is it ${simple} with more? ${number}", "Is it simple with more? 1000");
-        testData.put("Forward slashes ${unix.path}", "Forward slashes /unix/path");
-        testData.put("Backslashes ${windows.path}", "Backslashes c:\\windows\\path");
-        testData.put("Dollars can be ${dollar.sign} finicky", "Dollars can be $dollar$ finicky");
-        testData.put("Dunno about '${spaces}'", "Dunno about 'this phrase has spaces'");
-        testData.put("Lots of them: ${simple}, ${dollar}, in ${unix.path} plus \"${spaces}\"",
-                "Lots of them: simple, $dollar$, in /unix/path plus \"this phrase has spaces\"");
-        testData.put("System properties too, java.home=${java.home}",
-                "System properties too, java.home=" + System.getProperty("java.home"));
-        testData.put("No matching ${subs} here", "No matching ${subs} here");
-        testData.put("Check { curlies } too", "Check { curlies } too");
-        testData.put("Check ${greedy} match too :-}", "Check greedy match too :-}");
-        testData.put("Japanese chars: ${japanese} here", "Japanese chars: 日本語 here");
+        assertSubstitute("nothing", "nothing", subMap);
 
-        for (Map.Entry<String, String> entry : testData.entrySet()) {
-            String result = RubyDebuggerFactory.substitute(entry.getKey(), subMap);
-            assertEquals(entry.getValue(), entry.getValue(), result);
-        }
+        assertSubstitute("nothing", "nothing", subMap);
+        assertSubstitute("${simple}", "simple", subMap);
+        assertSubstitute("Not so ${simple}", "Not so simple", subMap);
+        assertSubstitute("Not ${simple}r either", "Not simpler either", subMap);
+        assertSubstitute("Just ${number}", "Just 1000", subMap);
+        assertSubstitute("Is it ${simple} with more? ${number}", "Is it simple with more? 1000", subMap);
+        assertSubstitute("Forward slashes ${unix.path}", "Forward slashes /unix/path", subMap);
+        assertSubstitute("Backslashes ${windows.path}", "Backslashes c:\\windows\\path", subMap);
+        assertSubstitute("Dollars can be ${dollar.sign} finicky", "Dollars can be $dollar$ finicky", subMap);
+        assertSubstitute("Dunno about '${spaces}'", "Dunno about 'this phrase has spaces'", subMap);
+        assertSubstitute("Lots of them: ${simple}, ${dollar}, in ${unix.path} plus \"${spaces}\"",
+                "Lots of them: simple, $dollar$, in /unix/path plus \"this phrase has spaces\"", subMap);
+        assertSubstitute("System properties too, java.home=${java.home}",
+                "System properties too, java.home=" + System.getProperty("java.home"), subMap);
+        assertSubstitute("No matching ${subs} here", "No matching ${subs} here", subMap);
+        assertSubstitute("Check { curlies } too", "Check { curlies } too", subMap);
+        assertSubstitute("Check ${greedy} match too :-}", "Check greedy match too :-}", subMap);
+        assertSubstitute("Japanese chars: ${japanese} here", "Japanese chars: 日本語 here", subMap);
+    }
+    
+    private void assertSubstitute(String toSubstitute, String expectedResult, Map<String, String> subMap) {
+        String result = RubyDebuggerFactory.substitute(toSubstitute, subMap);
+        assertEquals(result, expectedResult);
     }
 
 }
