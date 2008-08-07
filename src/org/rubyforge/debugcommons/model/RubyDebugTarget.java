@@ -19,7 +19,7 @@ public final class RubyDebugTarget extends RubyEntity {
         super(proxy);
         this.process = process;
         this.port = port;
-        this.debuggedFile = new File(debuggedFile).getName();
+        this.debuggedFile = debuggedFile;
         this.baseDir = baseDir;
         this.threads = new RubyThread[0];
     }
