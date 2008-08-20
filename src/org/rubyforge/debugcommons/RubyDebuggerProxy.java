@@ -439,7 +439,10 @@ public final class RubyDebuggerProxy {
         Socket socket = null;
         for (int tryCount = (timeout*2), i = 0; i < tryCount && socket == null; i++) {
             try {
-                socket = new Socket(InetAddress.getLocalHost(), port);
+                // do NOT use InetAddress.getLocalHost() instead of "localhost".
+                // Does not work on Windows for some reason:
+                // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
+                socket = new Socket("localhost", port);
             } catch (ConnectException e) {
                 synchronized (this) {
                     if (finished) { // terminated by frontend before process started
