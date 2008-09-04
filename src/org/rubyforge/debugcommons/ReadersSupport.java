@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -241,6 +242,7 @@ final class ReadersSupport {
                 //  - no XmlPullParser.END_DOCUMENT is sent
                 //  - incorectly handling finishing of the session in the backends
                 Util.fine("SocketException. Loop [" + getName() + "]: " + e.getMessage());
+                Util.LOGGER.log(Level.FINE, e.getMessage(), e);
                 ReadersSupport.this.unexpectedFail = true;
             } catch (XmlPullParserException e) {
                 Util.severe("Exception during ReadersSupport loop [" + getName() + ']', e);

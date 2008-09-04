@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.ConnectException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,6 @@ public final class RubyDebuggerProxy {
     private boolean finished;
     
     private PrintWriter commandWriter;
-    private RubyLoop rubyLoop;
     private ICommandFactory commandFactory;
     private ReadersSupport readersSupport;
     
@@ -272,8 +270,7 @@ public final class RubyDebuggerProxy {
     }
     
     private void startRubyLoop() {
-        rubyLoop = new RubyLoop();
-        rubyLoop.start();
+        new RubyLoop().start();
     }
     
     public Socket getCommandSocket() throws RubyDebuggerException {
@@ -443,6 +440,7 @@ public final class RubyDebuggerProxy {
                 // Does not work on Windows for some reason:
                 // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
                 socket = new Socket("localhost", port);
+                Util.finest("Successfully attached to localhost:" + port);
             } catch (ConnectException e) {
                 synchronized (this) {
                     if (finished) { // terminated by frontend before process started
