@@ -10,18 +10,15 @@ public class RubyDebugTargetTest extends DebuggerTestBase {
     }
     
     public void testFinishWhenSpawnedThreadIsSuspended() throws Exception {
-        for (RubyDebuggerProxy.DebuggerType type : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(type);
-            final RubyDebuggerProxy proxy = prepareProxy(
-                    "a = Thread.start {",
-                    "    puts '1'",
-                    "}");
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint("test.rb", 2)
-            };
-            startDebugging(proxy, breakpoints, 1);
-            proxy.finish(true);
-        }
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "a = Thread.start {",
+                "    puts '1'",
+                "}");
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint("test.rb", 2)
+        };
+        startDebugging(proxy, breakpoints, 1);
+        proxy.finish(true);
     }
     
 }

@@ -67,6 +67,7 @@ public abstract class DebuggerTestBase extends TestBase {
     
     public DebuggerTestBase(String name) {
         super(name);
+        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
     }
 
     @Override
@@ -80,6 +81,7 @@ public abstract class DebuggerTestBase extends TestBase {
     
     @Override
     protected void tearDown() throws Exception {
+        super.tearDown();
         String name = this.getName();
         System.out.println("Waiting for the server process to finish...");
         if (debugTarget != null) {
@@ -147,31 +149,31 @@ public abstract class DebuggerTestBase extends TestBase {
     
     public RubyDebuggerProxy startDebugger(final Descriptor descriptor) throws IOException, RubyDebuggerException {
         RubyDebuggerProxy proxy;
-        switch(debuggerType) {
-        case CLASSIC_DEBUGGER:
-            proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
-                    PATH_TO_CLASSIC_DEBUG_DIR, "ruby", timeout);
-            break;
-        case RUBY_DEBUG:
-            File rdebug = new File(PATH_TO_RDEBUG_IDE);
-            assertTrue("rdebug-ide file exists", rdebug.isFile());
-            Map<String, String> env = descriptor.getEnvironment();
-            if (env == null) {
-                env = new HashMap<String, String>();
-            } else {
-                env = new HashMap<String, String>(env);
-            }
-            if (GEM_HOME != null) {
-                env.put("GEM_HOME", GEM_HOME);
-            }
-            if (GEM_PATH != null) {
-                env.put("GEM_PATH", GEM_PATH);
-            }
-            descriptor.setEnvironment(env);
-            proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
-            break;
-        default:
-            throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
+        switch (debuggerType) {
+            case CLASSIC_DEBUGGER:
+                proxy = RubyDebuggerFactory.startClassicDebugger(descriptor,
+                        PATH_TO_CLASSIC_DEBUG_DIR, "ruby", timeout);
+                break;
+            case RUBY_DEBUG:
+                File rdebug = new File(PATH_TO_RDEBUG_IDE);
+                assertTrue("rdebug-ide file exists", rdebug.isFile());
+                Map<String, String> env = descriptor.getEnvironment();
+                if (env == null) {
+                    env = new HashMap<String, String>();
+                } else {
+                    env = new HashMap<String, String>(env);
+                }
+                if (GEM_HOME != null) {
+                    env.put("GEM_HOME", GEM_HOME);
+                }
+                if (GEM_PATH != null) {
+                    env.put("GEM_PATH", GEM_PATH);
+                }
+                descriptor.setEnvironment(env);
+                proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
+                break;
+            default:
+                throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
         }
         debugTarget = proxy.getDebugTarged();
         rubyStderrRedirectorThread = new OutputRedirectorThread(debugTarget.getProcess().getErrorStream());

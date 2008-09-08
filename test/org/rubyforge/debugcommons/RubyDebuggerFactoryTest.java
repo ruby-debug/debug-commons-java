@@ -14,50 +14,41 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
     }
     
     public void testSpaceAndSemicolonsInPath() throws Exception {
-        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(debuggerType);
-            testFile = writeFile("path spaces semi:colon.rb",
-                    "b=10",  // 1
-                    "b=11"); // 2
-            testFilePath = testFile.getAbsolutePath();
-            final RubyDebuggerProxy proxy = startDebugger();
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint(testFilePath, 1),
-            };
-            startDebugging(proxy, breakpoints, 1);
-            resumeSuspendedThread(proxy);
-        }
+        testFile = writeFile("path spaces semi:colon.rb",
+                "b=10", // 1
+                "b=11"); // 2
+        testFilePath = testFile.getAbsolutePath();
+        final RubyDebuggerProxy proxy = startDebugger();
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint(testFilePath, 1),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
     }
 
     public void testScriptArguments() throws Exception {
-        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(debuggerType);
-            String[] args = { "--used-languages", "Ruby and Java" };
-            final RubyDebuggerProxy proxy = prepareProxy(args,
-                    "exit 1 if ARGV.size != 2",
-                    "puts 'OK'");
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint("test.rb", 2),
-            };
-            startDebugging(proxy, breakpoints, 1);
-            resumeSuspendedThread(proxy);
-        }
+        String[] args = {"--used-languages", "Ruby and Java"};
+        final RubyDebuggerProxy proxy = prepareProxy(args,
+                "exit 1 if ARGV.size != 2",
+                "puts 'OK'");
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint("test.rb", 2),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
     }
 
     public void testBaseDir() throws Exception {
         File baseDir = new File(getWorkDir(), "aaa");
         assertTrue("base directory created", baseDir.mkdir());
-        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(debuggerType);
-            final RubyDebuggerProxy proxy = prepareProxy(baseDir,
-                    "exit 1 if Dir.pwd[-3, 3] != 'aaa'",
-                    "puts 'OK'");
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint("test.rb", 2),
-            };
-            startDebugging(proxy, breakpoints, 1);
-            resumeSuspendedThread(proxy);
-        }
+        final RubyDebuggerProxy proxy = prepareProxy(baseDir,
+                "exit 1 if Dir.pwd[-3, 3] != 'aaa'",
+                "puts 'OK'");
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint("test.rb", 2),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
     }
 
     public void testIncludingPath() throws Exception {
@@ -66,39 +57,33 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         File includeDir = new File(getWorkDir(), "bbb");
         assertTrue("base directory created", includeDir.mkdir());
         testFile = writeFile("bbb" + File.separator + "test.rb", "puts 'OK'");
-        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(debuggerType);
-            Descriptor descriptor = new Descriptor();
-            descriptor.useDefaultPort(false);
-            descriptor.setVerbose(true);
-            descriptor.setAdditionalOptions(Collections.singleton("-I" + includeDir.getAbsolutePath()));
-            descriptor.setBaseDirectory(baseDir);
-            descriptor.setScriptPath(testFile.getAbsolutePath());
-            final RubyDebuggerProxy proxy = startDebugger(descriptor);
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint("test.rb", 1),
-            };
-            startDebugging(proxy, breakpoints, 1);
-            resumeSuspendedThread(proxy);
-        }
+        Descriptor descriptor = new Descriptor();
+        descriptor.useDefaultPort(false);
+        descriptor.setVerbose(true);
+        descriptor.setAdditionalOptions(Collections.singleton("-I" + includeDir.getAbsolutePath()));
+        descriptor.setBaseDirectory(baseDir);
+        descriptor.setScriptPath(testFile.getAbsolutePath());
+        final RubyDebuggerProxy proxy = startDebugger(descriptor);
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint("test.rb", 1),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
     }
 
     public void testEnvironment() throws Exception {
-        for (RubyDebuggerProxy.DebuggerType debuggerType : RubyDebuggerProxy.DebuggerType.values()) {
-            setDebuggerType(debuggerType);
-            Descriptor descriptor = new Descriptor();
-            descriptor.useDefaultPort(false);
-            descriptor.setVerbose(true);
-            descriptor.setEnvironment(Collections.singletonMap("MY_ENV_123_X", "test_123"));
-            testFile = writeFile("test.rb", "exit 1 if ENV['MY_ENV_123_X'] != 'test_123'", "puts 'OK'");
-            descriptor.setScriptPath(testFile.getAbsolutePath());
-            final RubyDebuggerProxy proxy = startDebugger(descriptor);
-            final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
-                new TestBreakpoint("test.rb", 2),
-            };
-            startDebugging(proxy, breakpoints, 1);
-            resumeSuspendedThread(proxy);
-        }
+        Descriptor descriptor = new Descriptor();
+        descriptor.useDefaultPort(false);
+        descriptor.setVerbose(true);
+        descriptor.setEnvironment(Collections.singletonMap("MY_ENV_123_X", "test_123"));
+        testFile = writeFile("test.rb", "exit 1 if ENV['MY_ENV_123_X'] != 'test_123'", "puts 'OK'");
+        descriptor.setScriptPath(testFile.getAbsolutePath());
+        final RubyDebuggerProxy proxy = startDebugger(descriptor);
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
+            new TestBreakpoint("test.rb", 2),
+        };
+        startDebugging(proxy, breakpoints, 1);
+        resumeSuspendedThread(proxy);
     }
 
     public void testSubstitute() throws Exception {
@@ -122,8 +107,8 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         assertSubstitute("Backslashes ${windows.path}", "Backslashes c:\\windows\\path", subMap);
         assertSubstitute("Dollars can be ${dollar.sign} finicky", "Dollars can be $dollar$ finicky", subMap);
         assertSubstitute("Dunno about '${spaces}'", "Dunno about 'this phrase has spaces'", subMap);
-        assertSubstitute("Lots of them: ${simple}, ${dollar}, in ${unix.path} plus \"${spaces}\"",
-                "Lots of them: simple, $dollar$, in /unix/path plus \"this phrase has spaces\"", subMap);
+//        assertSubstitute("Lots of them: ${simple}, ${dollar}, in ${unix.path} plus \"${spaces}\"",
+//                "Lots of them: simple, $dollar$, in /unix/path plus \"this phrase has spaces\"", subMap);
         assertSubstitute("System properties too, java.home=${java.home}",
                 "System properties too, java.home=" + System.getProperty("java.home"), subMap);
         assertSubstitute("No matching ${subs} here", "No matching ${subs} here", subMap);

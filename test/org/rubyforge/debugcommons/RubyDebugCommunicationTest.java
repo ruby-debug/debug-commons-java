@@ -10,7 +10,6 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
     
     public RubyDebugCommunicationTest(final String name) {
         super(name);
-        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
     }
     
     public void testComprehensive() throws Exception {

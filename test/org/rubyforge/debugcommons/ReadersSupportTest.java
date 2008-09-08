@@ -9,7 +9,6 @@ public class ReadersSupportTest extends DebuggerTestBase {
     }
     
     public void testRubyDebuggerExceptionIsThrown() throws Exception {
-        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
                 "b=10",  // 1
                 "b=11"); // 2
@@ -27,7 +26,6 @@ public class ReadersSupportTest extends DebuggerTestBase {
     }
     
     public void testNPENotThrownWhenReadingAddedBreakpoints() throws Exception {
-        setDebuggerType(RubyDebuggerProxy.RUBY_DEBUG);
         final RubyDebuggerProxy proxy = prepareProxy(
                 "b=10",  // 1
                 "b=11"); // 2
