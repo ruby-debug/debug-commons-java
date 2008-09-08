@@ -192,9 +192,7 @@ public final class RubyDebuggerProxy {
                 if (!removedCatchpoints.remove(excBreakpoint.getException())) {
                     String command = commandFactory.createCatchOn(excBreakpoint);
                     sendCommand(command);
-                    // TODO: Read response. Now the protocol sends back just a
-                    // message. Will be changed to the confirmation. Then read
-                    // it here.
+                    getReadersSupport().readCatchpointSet(); // read response
                 }
             } else {
                 throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);

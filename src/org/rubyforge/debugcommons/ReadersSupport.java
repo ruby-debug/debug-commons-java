@@ -27,6 +27,7 @@ final class ReadersSupport {
     private static final String BREAKPOINT_ADDED_ELEMENT = "breakpointAdded";
     private static final String BREAKPOINT_DELETED_ELEMENT = "breakpointDeleted";
     private static final String CONDITION_SET_ELEMENT = "conditionSet";
+    private static final String CATCHPOINT_SET_ELEMENT = "catchpointSet";
     
     private static final String THREADS_ELEMENT = "threads";
     private static final String FRAMES_ELEMENT = "frames";
@@ -53,6 +54,7 @@ final class ReadersSupport {
     private final BlockingQueue<Integer> addedBreakpoints;
     private final BlockingQueue<Integer> removedBreakpoints;
     private final BlockingQueue<Integer> conditionSets;
+    private final BlockingQueue<String> catchpointSets;
     
     private boolean finished;
     private boolean unexpectedFail;
@@ -70,6 +72,7 @@ final class ReadersSupport {
         this.addedBreakpoints = new LinkedBlockingQueue<Integer>();
         this.removedBreakpoints = new LinkedBlockingQueue<Integer>();
         this.conditionSets = new LinkedBlockingQueue<Integer>();
+        this.catchpointSets = new LinkedBlockingQueue<String>();
     }
     
     void startCommandLoop(final InputStream is) throws RubyDebuggerException {
@@ -118,6 +121,8 @@ final class ReadersSupport {
             suspensions.add(sp);
         } else if (CONDITION_SET_ELEMENT.equals(element)) {
             conditionSets.add(ConditionSetReader.readBreakpointNo(xpp));
+        } else if (CATCHPOINT_SET_ELEMENT.equals(element)) {
+            catchpointSets.add(CatchpointSetReader.readExceptionClassName(xpp));
         } else if (ERROR_ELEMENT.equals(element)) {
             Util.warning(ErrorReader.readMessage(xpp));
         } else if (MESSAGE_ELEMENT.equals(element)) {
@@ -168,15 +173,19 @@ final class ReadersSupport {
     }
     
     int readAddedBreakpointNo() throws RubyDebuggerException {
-        return pollInteger(addedBreakpoints, "added breakpoint number");
+        return poll(addedBreakpoints, "added breakpoint number");
     }
     
     int readConditionSet() throws RubyDebuggerException {
-        return pollInteger(conditionSets, "breakpoint number of the set condition");
+        return poll(conditionSets, "breakpoint number of the set condition");
     }
-    
+
+    String readCatchpointSet() throws RubyDebuggerException {
+        return poll(catchpointSets, "catchpoint set");
+    }
+
     int waitForRemovedBreakpoint(int breakpointID) throws RubyDebuggerException {
-        int removedID = pollInteger(removedBreakpoints, "breakpoint number of the removed breakpoint (" + breakpointID + ")");
+        int removedID = poll(removedBreakpoints, "breakpoint number of the removed breakpoint (" + breakpointID + ")");
         if (removedID != breakpointID) {
             throw new RubyDebuggerException("Unexpected breakpoint removed. " +
                     "Received id: " + removedID + ", expected: " + breakpointID);
@@ -184,20 +193,20 @@ final class ReadersSupport {
         return removedID;
     }
     
-    private int pollInteger(final BlockingQueue<Integer> queue, final String toRead) throws RubyDebuggerException {
+    private <T> T poll(final BlockingQueue<T> queue, final String toRead) throws RubyDebuggerException {
         try {
-            Integer num = queue.poll(timeout, TimeUnit.SECONDS);
-            if (num == null) {
+            T t = queue.poll(timeout, TimeUnit.SECONDS);
+            if (t == null) {
                 throw new RubyDebuggerException("Unable to read " + toRead + " in the specified timeout [" + timeout + "s]");
             } else {
-                return num;
+                return t;
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new RubyDebuggerException("Interruped during reading " + toRead, ex);
         }
     }
-    
+
     SuspensionPoint readSuspension() {
         try {
             return suspensions.take();
