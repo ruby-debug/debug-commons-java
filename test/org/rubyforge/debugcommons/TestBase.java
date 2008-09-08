@@ -9,7 +9,9 @@ import java.util.logging.LogRecord;
 import junit.framework.TestCase;
 
 public class TestBase extends TestCase {
-    
+
+    private TestHandler testHandler;
+
     protected TestBase(final String name) {
         super(name);
     }
@@ -20,9 +22,16 @@ public class TestBase extends TestCase {
         super.setUp();
         Util.LOGGER.setLevel(Level.ALL);
         Util.LOGGER.setUseParentHandlers(false);
-        Util.LOGGER.addHandler(new TestHandler(getName()));
+        testHandler = new TestHandler(getName());
+        Util.LOGGER.addHandler(testHandler);
     }
-    
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        Util.LOGGER.removeHandler(testHandler);
+    }
+
     /**
      * Tries to create directory in the system <code>tmp</code> directory and
      * then returns it.
