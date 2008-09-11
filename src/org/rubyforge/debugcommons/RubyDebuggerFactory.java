@@ -187,11 +187,11 @@ public final class RubyDebuggerFactory {
             throws IOException, RubyDebuggerException {
         Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
-        Util.fine("Environment: " + pb.environment());
         pb.directory(desc.getBaseDirectory());
         if (desc.getEnvironment() != null) {
             pb.environment().putAll(desc.getEnvironment());
         }
+        Util.fine("Environment: " + pb.environment());
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType(), timeout);
         
         // set whether backend support condition on breakpoints
