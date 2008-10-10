@@ -287,8 +287,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         startDebugging(proxy, breakpoints, 1);
 
         final CountDownLatch remove = new CountDownLatch(breakpoints.length);
-        for (int i = 0; i < breakpoints.length; i++) {
-            final IRubyLineBreakpoint bp = breakpoints[i];
+        for (final IRubyLineBreakpoint bp : breakpoints) {
             new Thread(new Runnable() {
                 public void run() {
                     proxy.removeBreakpoint(bp);
