@@ -172,7 +172,10 @@ public final class RubyDebuggerProxy {
     
     public synchronized void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
         LOGGER.fine("Adding breakpoint: " + breakpoint);
-        assert !finished : "Attempt to add breakpoint (" + breakpoint + ") to finished session";
+        if (finished) {
+            LOGGER.fine("Session already finished, skipping addition of breakpoint: " + breakpoint);
+            return;
+        }
         if (breakpoint.isEnabled()) {
             if (breakpoint instanceof IRubyLineBreakpoint) {
                 IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
@@ -218,7 +221,10 @@ public final class RubyDebuggerProxy {
      */
     public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
         LOGGER.fine("Removing breakpoint: " + breakpoint);
-        assert !finished : "Attempt to remove breakpoint (" + breakpoint + ") from finished session";
+        if (finished) {
+            LOGGER.fine("Session already finished, skipping removing of breakpoint: " + breakpoint);
+            return;
+        }
         if (breakpoint instanceof IRubyLineBreakpoint) {
             IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
             Integer id = findBreakpointId(lineBreakpoint);
@@ -234,7 +240,7 @@ public final class RubyDebuggerProxy {
                 }
             } else if (!silent) {
                 LOGGER.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
-                        "its ID cannot be found. Might have been alread removed.");
+                        "its ID cannot be found. Might have been already removed.");
             }
         } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
             // catchpoint removing is not supported by backend yet, handle in
