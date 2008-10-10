@@ -170,7 +170,8 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    public void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
+    public synchronized void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
+        LOGGER.fine("Adding breakpoint: " + breakpoint);
         assert !finished : "Attempt to add breakpoint (" + breakpoint + ") to finished session";
         if (breakpoint.isEnabled()) {
             if (breakpoint instanceof IRubyLineBreakpoint) {
@@ -204,7 +205,7 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    public void removeBreakpoint(final IRubyBreakpoint breakpoint) {
+    public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint) {
         removeBreakpoint(breakpoint, false);
     }
     
@@ -215,7 +216,8 @@ public final class RubyDebuggerProxy {
      * @param silent whether info message should be omitted if the breakpoint
      *        has not been set in this session
      */
-    public void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
+    public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
+        LOGGER.fine("Removing breakpoint: " + breakpoint);
         assert !finished : "Attempt to remove breakpoint (" + breakpoint + ") from finished session";
         if (breakpoint instanceof IRubyLineBreakpoint) {
             IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
@@ -226,6 +228,7 @@ public final class RubyDebuggerProxy {
                     sendCommand(command);
                     getReadersSupport().waitForRemovedBreakpoint(id);
                     breakpointsIDs.remove(id);
+                    LOGGER.fine("Breakpoint " + breakpoint + " with id " + id + " successfully removed");
                 } catch (RubyDebuggerException e) {
                     LOGGER.log(Level.SEVERE, "Exception during removing breakpoint.", e);
                 }
@@ -259,7 +262,7 @@ public final class RubyDebuggerProxy {
      *
      * @return found ID; might be <tt>null</tt> if none is found
      */
-    private Integer findBreakpointId(final IRubyLineBreakpoint wantedBP) {
+    private synchronized Integer findBreakpointId(final IRubyLineBreakpoint wantedBP) {
         for (Iterator<Map.Entry<Integer, IRubyLineBreakpoint>> it = breakpointsIDs.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Integer, IRubyLineBreakpoint> breakpointID = it.next();
             IRubyLineBreakpoint bp = breakpointID.getValue();

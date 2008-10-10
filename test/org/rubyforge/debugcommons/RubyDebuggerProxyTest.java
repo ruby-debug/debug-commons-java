@@ -1,5 +1,6 @@
 package org.rubyforge.debugcommons;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rubyforge.debugcommons.DebuggerTestBase.TestBreakpoint;
@@ -266,5 +267,37 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         resumeSuspendedThread(proxy); // 3 -> 3
         proxy.removeBreakpoint(catchpoint);
         resumeSuspendedThread(proxy); // 3 -> finish
+    }
+
+    public void testRemovingBreakpointFromMultipleThreads() throws Exception {
+        final RubyDebuggerProxy proxy = prepareProxy(
+                "sleep 0.001", // 1
+                "sleep 0.001", // 2
+                "sleep 0.001", // 3
+                "sleep 0.001", // 4
+                "sleep 0.001", // 5
+                "sleep 0.001", // 6
+                "sleep 0.001", // 7
+                "sleep 0.001", // 8
+                "sleep 0.001");// 9
+        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[9];
+        for (int i = 0; i < breakpoints.length; i++) {
+            breakpoints[i] = new TestBreakpoint("test.rb", i + 1);
+        }
+        startDebugging(proxy, breakpoints, 1);
+
+        final CountDownLatch remove = new CountDownLatch(breakpoints.length);
+        for (int i = 0; i < breakpoints.length; i++) {
+            final IRubyLineBreakpoint bp = breakpoints[i];
+            new Thread(new Runnable() {
+                public void run() {
+                    proxy.removeBreakpoint(bp);
+                    remove.countDown();
+                }
+            }).start();
+        }
+        remove.await();
+
+        resumeSuspendedThread(proxy); // finish
     }
 }
