@@ -1,3 +1,38 @@
+2008-10-10 14:10  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Tweak: use forEach
+
+2008-10-10 14:08  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Properly synchronize breakpoint management to prevent CME (cf.
+	  testRemovingBreakpointFromMultipleThreads)
+
+2008-10-10 12:51  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java,
+	  src/org/rubyforge/debugcommons/reader/XmlStreamReader.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/OutputRedirectorThread.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java,
+	  test/org/rubyforge/debugcommons/TestBase.java,
+	  test/org/rubyforge/debugcommons/testconfig.properties: User
+	  logger per class to have more fine-grained logging
+
+2008-09-11 10:15  Martin Krauskopf
+
+	* ChangeLog,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java: Do not
+	  log environment until the CLASSPATH is tweaked
+
 2008-09-08 08:37  Martin Krauskopf
 
 	* test/org/rubyforge/debugcommons/DebuggerTestBase.java,
