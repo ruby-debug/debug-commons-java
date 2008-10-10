@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
@@ -20,7 +22,9 @@ import static org.rubyforge.debugcommons.RubyDebuggerProxy.CLASSIC_DEBUGGER;
 import static org.rubyforge.debugcommons.RubyDebuggerProxy.RUBY_DEBUG;
 
 public final class RubyDebuggerFactory {
-    
+
+    private static final Logger LOGGER = Logger.getLogger(RubyDebuggerFactory.class.getName());
+
     private static final String CLASSIC_DEBUG_NAME = "classic-debug.rb";
     private static final String CLASSIC_VERBOSE_DEBUG_NAME = "classic-debug-verbose.rb";
     
@@ -60,7 +64,7 @@ public final class RubyDebuggerFactory {
                     args.add("-r");
                     args.add(path);
                 } catch (IOException e) {
-                    Util.severe("Could not create 'RemoteDebugPortFile'. Using default port.", e);
+                    LOGGER.log(Level.SEVERE, "Could not create 'RemoteDebugPortFile'. Using default port.", e);
                 }
             }
         }
@@ -185,13 +189,13 @@ public final class RubyDebuggerFactory {
 
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args, final int timeout)
             throws IOException, RubyDebuggerException {
-        Util.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
+        LOGGER.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(desc.getBaseDirectory());
         if (desc.getEnvironment() != null) {
             pb.environment().putAll(desc.getEnvironment());
         }
-        Util.fine("Environment: " + pb.environment());
+        LOGGER.fine("Environment: " + pb.environment());
         RubyDebuggerProxy proxy = new RubyDebuggerProxy(desc.getType(), timeout);
         
         // set whether backend support condition on breakpoints
@@ -397,7 +401,7 @@ public final class RubyDebuggerFactory {
                 value = sb.toString();
             }
         } catch (Exception ex) {
-            Util.severe(ex);
+            LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
         }
         return value;
     }

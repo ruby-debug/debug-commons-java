@@ -28,7 +28,7 @@ public abstract class XmlStreamReader {
         int eventType = -1;
         while ((eventType = xpp.next()) == XmlPullParser.TEXT) {
             // skip
-            // Util.finest("Skipping text event");
+            // LOGGER.finest("Skipping text event");
         }
         return eventType;
     }

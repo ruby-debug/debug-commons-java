@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.RubyDebuggerFactory.Descriptor;
 import org.rubyforge.debugcommons.RubyDebuggerProxy.DebuggerType;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
@@ -19,6 +20,8 @@ import org.rubyforge.debugcommons.model.RubyThread;
 
 public abstract class DebuggerTestBase extends TestBase {
     
+    private static final Logger LOGGER = Logger.getLogger(DebuggerTestBase.class.getName());
+
     private static final String PATH_TO_CLASSIC_DEBUG_DIR;
     private static final String PATH_TO_RDEBUG_IDE;
     private static final String GEM_HOME;
@@ -234,9 +237,9 @@ public abstract class DebuggerTestBase extends TestBase {
                         DebuggerTestBase.this.suspendedThread = e.getRubyThread();
                     }
                 }
-                Util.finest("Received event: " + e);
+                LOGGER.finest("Received event: " + e);
                 events.countDown();
-                Util.finest("Current events count: " + events.getCount());
+                LOGGER.finest("Current events count: " + events.getCount());
             }
         };
         proxy.addRubyDebugEventListener(listener);

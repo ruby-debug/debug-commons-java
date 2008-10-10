@@ -6,9 +6,12 @@ import java.io.PrintStream;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 public class TestBase extends TestCase {
+
+    private static final Logger LOGGER = Logger.getLogger(TestBase.class.getName());
 
     private TestHandler testHandler;
 
@@ -20,16 +23,16 @@ public class TestBase extends TestCase {
     protected void setUp() throws Exception {
         clearWorkDir();
         super.setUp();
-        Util.LOGGER.setLevel(Level.ALL);
-        Util.LOGGER.setUseParentHandlers(false);
+        LOGGER.setLevel(Level.ALL);
+        LOGGER.setUseParentHandlers(false);
         testHandler = new TestHandler(getName());
-        Util.LOGGER.addHandler(testHandler);
+        LOGGER.addHandler(testHandler);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        Util.LOGGER.removeHandler(testHandler);
+        LOGGER.removeHandler(testHandler);
     }
 
     /**

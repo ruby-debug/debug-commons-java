@@ -3,12 +3,14 @@ package org.rubyforge.debugcommons.reader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.rubyforge.debugcommons.Util;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.RubyVariableInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 public final class VariablesReader extends XmlStreamReader {
+
+    private static final Logger LOGGER = Logger.getLogger(VariablesReader.class.getName());
 
     private RubyVariableInfo[] variables;
 
@@ -58,7 +60,7 @@ public final class VariablesReader extends XmlStreamReader {
     }
 
     private void parseProcessingException() throws XmlPullParserException, IOException {
-        Util.severe("Processing exception occured." +
+        LOGGER.severe("Processing exception occured." +
                 " exceptionMessage: " + getAttributeValue("message") +
                 ", exceptionType: " + getAttributeValue("type"));
         ensureEndTag("processingException");

@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -18,6 +19,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 final class ReadersSupport {
+
+    private static final Logger LOGGER = Logger.getLogger(ReadersSupport.class.getName());
     
     private static final String BREAKPOINT_ELEMENT = "breakpoint";
     private static final String SUSPENDED_ELEMENT = "suspended";
@@ -94,7 +97,7 @@ final class ReadersSupport {
                 assert false : "Unexpected state: end tag " + xpp.getName();
             } else if (eventType == XmlPullParser.TEXT) {
                 if (xpp.getText().contains(RUBY_DEBUG_PROMPT)) {
-                    Util.finest("got ruby-debug prompt message");
+                    LOGGER.finest("got ruby-debug prompt message");
                 } else {
                     assert false : "Unexpected state: text " + xpp.getText();
                 }
@@ -124,12 +127,12 @@ final class ReadersSupport {
         } else if (CATCHPOINT_SET_ELEMENT.equals(element)) {
             catchpointSets.add(CatchpointSetReader.readExceptionClassName(xpp));
         } else if (ERROR_ELEMENT.equals(element)) {
-            Util.warning(ErrorReader.readMessage(xpp));
+            LOGGER.warning(ErrorReader.readMessage(xpp));
         } else if (MESSAGE_ELEMENT.equals(element)) {
             String text = ErrorReader.readMessage(xpp);
-            Util.info(text);
+            LOGGER.info(text);
             if (text.equals(FINISHED)) {
-                Util.fine("Got <message>, text == finished");
+                LOGGER.fine("Got <message>, text == finished");
                 finished = true;
             }
         } else if (THREADS_ELEMENT.equals(element)) {
@@ -211,7 +214,7 @@ final class ReadersSupport {
         try {
             return suspensions.take();
         } catch (InterruptedException ex) {
-            Util.severe("Interruped during reading suspension point", ex);
+            LOGGER.log(Level.SEVERE, "Interruped during reading suspension point", ex);
             return null;
         }
     }
@@ -242,19 +245,19 @@ final class ReadersSupport {
         @Override
         public void run() {
             try {
-                Util.fine("Starting ReadersSupport readloop: " + getName());
+                LOGGER.fine("Starting ReadersSupport readloop: " + getName());
                 startXPPLoop(xpp);
-                Util.fine("ReadersSupport readloop [" + getName() + "] successfully finished.");
+                LOGGER.fine("ReadersSupport readloop [" + getName() + "] successfully finished.");
             } catch (IOException e) {
                 // Debugger is just killed. So this is currently more or less
                 // expected behaviour.
                 //  - no XmlPullParser.END_DOCUMENT is sent
                 //  - incorectly handling finishing of the session in the backends
-                Util.fine("SocketException. Loop [" + getName() + "]: " + e.getMessage());
-                Util.LOGGER.log(Level.FINE, e.getMessage(), e);
+                LOGGER.fine("SocketException. Loop [" + getName() + "]: " + e.getMessage());
+                LOGGER.log(Level.FINE, e.getMessage(), e);
                 ReadersSupport.this.unexpectedFail = true;
             } catch (XmlPullParserException e) {
-                Util.severe("Exception during ReadersSupport loop [" + getName() + ']', e);
+                LOGGER.log(Level.SEVERE, "Exception during ReadersSupport loop [" + getName() + ']', e);
                 ReadersSupport.this.unexpectedFail = true;
             } finally {
                 suspensions.add(SuspensionPoint.END);
@@ -262,9 +265,9 @@ final class ReadersSupport {
                     is.close();
                     Thread.sleep(1000); // Avoid Commodification Exceptions
                 } catch (IOException e) {
-                    Util.severe("Cannot close socket's input stream", e);
+                    LOGGER.log(Level.SEVERE, "Cannot close socket's input stream", e);
                 } catch (InterruptedException e) {
-                    Util.severe("Readers loop interrupted", e);
+                    LOGGER.log(Level.SEVERE, "Readers loop interrupted", e);
                 }
             }
         }

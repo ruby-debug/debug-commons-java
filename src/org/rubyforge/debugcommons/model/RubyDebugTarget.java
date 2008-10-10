@@ -1,12 +1,15 @@
 package org.rubyforge.debugcommons.model;
 
 import java.io.File;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.RubyDebuggerException;
 import org.rubyforge.debugcommons.RubyDebuggerProxy;
 import org.rubyforge.debugcommons.Util;
 
 public final class RubyDebugTarget extends RubyEntity {
     
+    private static final Logger LOGGER = Logger.getLogger(RubyDebugTarget.class.getName());
+
     private final Process process;
     private final int port;
     private final String debuggedFile;
@@ -45,7 +48,7 @@ public final class RubyDebugTarget extends RubyEntity {
         // 1) both threadInfos and updatedThreads are sorted by their id attribute
         // 2) once a thread has died its id is never reused for new threads again.
         //    Instead each new thread gets an id which is the currently highest id + 1.
-        Util.fine("udpating threads");
+        LOGGER.fine("udpating threads");
         RubyThreadInfo[] threadInfos = getProxy().readThreadInfo();
         RubyThread[] updatedThreads = new RubyThread[threadInfos.length];
         int threadIndex = 0;
@@ -72,13 +75,13 @@ public final class RubyDebugTarget extends RubyEntity {
             if (getProxy().checkConnection()) {
                 throw new RuntimeException("Cannot update threads", e);
             } else {
-                Util.fine("Session has finished. Ignoring unsuccessful thread update.");
+                LOGGER.fine("Session has finished. Ignoring unsuccessful thread update.");
                 return;
             }
         }
         RubyThread thread = getThreadById(suspensionPoint.getThreadId());
         if (thread == null) {
-            Util.warning("Thread with id " + suspensionPoint.getThreadId() + " was not found");
+            LOGGER.warning("Thread with id " + suspensionPoint.getThreadId() + " was not found");
             return;
         }
         thread.suspend(suspensionPoint);

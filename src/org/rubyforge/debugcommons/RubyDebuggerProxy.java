@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.model.ExceptionSuspensionPoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyExceptionBreakpoint;
@@ -27,6 +28,8 @@ import org.rubyforge.debugcommons.model.RubyVariable;
 import org.rubyforge.debugcommons.model.RubyVariableInfo;
 
 public final class RubyDebuggerProxy {
+
+    private static final Logger LOGGER = Logger.getLogger(RubyDebuggerProxy.class.getName());
 
     public static enum DebuggerType { CLASSIC_DEBUGGER, RUBY_DEBUG }
     
@@ -168,6 +171,7 @@ public final class RubyDebuggerProxy {
     }
     
     public void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
+        assert !finished : "Attempt to add breakpoint (" + breakpoint + ") to finished session";
         if (breakpoint.isEnabled()) {
             if (breakpoint instanceof IRubyLineBreakpoint) {
                 IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
@@ -182,7 +186,7 @@ public final class RubyDebuggerProxy {
                         sendCommand(command);
                         getReadersSupport().readConditionSet(); // read response
                     } else {
-                        Util.info("conditional breakpoints are not supported by backend");
+                        LOGGER.info("conditional breakpoints are not supported by backend");
                     }
                 }
                 breakpointsIDs.put(id, lineBreakpoint);
@@ -212,6 +216,7 @@ public final class RubyDebuggerProxy {
      *        has not been set in this session
      */
     public void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
+        assert !finished : "Attempt to remove breakpoint (" + breakpoint + ") from finished session";
         if (breakpoint instanceof IRubyLineBreakpoint) {
             IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
             Integer id = findBreakpointId(lineBreakpoint);
@@ -222,10 +227,10 @@ public final class RubyDebuggerProxy {
                     getReadersSupport().waitForRemovedBreakpoint(id);
                     breakpointsIDs.remove(id);
                 } catch (RubyDebuggerException e) {
-                    Util.severe("Exception during removing breakpoint.", e);
+                    LOGGER.log(Level.SEVERE, "Exception during removing breakpoint.", e);
                 }
             } else if (!silent) {
-                Util.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
+                LOGGER.fine("Breakpoint [" + breakpoint + "] cannot be removed since " +
                         "its ID cannot be found. Might have been alread removed.");
             }
         } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
@@ -282,12 +287,12 @@ public final class RubyDebuggerProxy {
         try {
             sendCommand(commandFactory.createResume(thread));
         } catch (RubyDebuggerException e) {
-            Util.severe("resuming of " + thread.getId() + " failed", e);
+            LOGGER.log(Level.SEVERE, "resuming of " + thread.getId() + " failed", e);
         }
     }
     
     private void sendCommand(final String s) throws RubyDebuggerException {
-        Util.fine("Sending command debugger: " + s);
+        LOGGER.fine("Sending command debugger: " + s);
         if (!debugTarged.isRunning()) {
             throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process");
         }
@@ -303,7 +308,7 @@ public final class RubyDebuggerProxy {
                 sendCommand(commandFactory.createStepOver(frame));
             }
         } catch (RubyDebuggerException e) {
-            Util.severe("Stepping failed", e);
+            LOGGER.log(Level.SEVERE, "Stepping failed", e);
         }
     }
     
@@ -311,7 +316,7 @@ public final class RubyDebuggerProxy {
         try {
             sendCommand(commandFactory.createStepReturn(frame));
         } catch (RubyDebuggerException e) {
-            Util.severe("Stepping failed", e);
+            LOGGER.log(Level.SEVERE, "Stepping failed", e);
         }
     }
     
@@ -323,7 +328,7 @@ public final class RubyDebuggerProxy {
                 sendCommand(commandFactory.createStepInto(frame));
             }
         } catch (RubyDebuggerException e) {
-            Util.severe("Stepping failed", e);
+            LOGGER.log(Level.SEVERE, "Stepping failed", e);
         }
     }
     
@@ -395,7 +400,7 @@ public final class RubyDebuggerProxy {
         synchronized(this) {
             if (finished) {
                 // possible if client call this explicitly and then second time from RubyLoop
-                Util.fine("Trying to finish the same proxy more than once: " + this);
+                LOGGER.fine("Trying to finish the same proxy more than once: " + this);
                 return;
             }
             finished = true;
@@ -407,7 +412,7 @@ public final class RubyDebuggerProxy {
                     // output streams.
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    Util.LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
+                    LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
                 }
                 getDebugTarged().getProcess().destroy();
             }
@@ -420,7 +425,7 @@ public final class RubyDebuggerProxy {
             try {
                 sendCommand("exit");
             } catch (RubyDebuggerException ex) {
-                Util.fine("'exit' command failed. Process died? " + debugTarged.isRunning());
+                LOGGER.fine("'exit' command failed. Process died? " + debugTarged.isRunning());
             }
         }
     }
@@ -438,7 +443,7 @@ public final class RubyDebuggerProxy {
                 // Does not work on Windows for some reason:
                 // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
                 socket = new Socket("localhost", port);
-                Util.finest("Successfully attached to localhost:" + port);
+                LOGGER.finest("Successfully attached to localhost:" + port);
             } catch (ConnectException e) {
                 synchronized (this) {
                     if (finished) { // terminated by frontend before process started
@@ -450,13 +455,13 @@ public final class RubyDebuggerProxy {
                 }
                 try {
                     if (debugTarged.isRunning()) {
-                        Util.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
+                        LOGGER.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
                         Thread.sleep(500);
                     } else {
                         failWithInfo(e);
                     }
                 } catch (InterruptedException e1) {
-                    Util.severe("Interrupted during attaching.", e1);
+                    LOGGER.log(Level.SEVERE, "Interrupted during attaching.", e1);
                     Thread.currentThread().interrupt();
                 }
             } catch (IOException e) {
@@ -497,16 +502,16 @@ public final class RubyDebuggerProxy {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Util.severe(ex);
+                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
             }
             collector.interrupt();
         } else {
             collect(stream, output);
         }
         if (output.length() > 0) {
-            Util.LOGGER.log(level, msgPrefix);
+            LOGGER.log(level, msgPrefix);
             String outputS = output.toString();
-            Util.LOGGER.log(level, outputS);
+            LOGGER.log(level, outputS);
             return msgPrefix + '\n' + outputS;
         } else {
             return "";
@@ -520,7 +525,7 @@ public final class RubyDebuggerProxy {
                 output.append((char) c);
             }
         } catch (IOException e) {
-            Util.LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
         }
     }
 
@@ -547,13 +552,13 @@ public final class RubyDebuggerProxy {
         }
         
         public @Override void run() {
-            Util.finest("Waiting for breakpoints.");
+            LOGGER.finest("Waiting for breakpoints.");
             while (true) {
                 SuspensionPoint sp = getReadersSupport().readSuspension();
                 if (sp == SuspensionPoint.END) {
                     break;
                 }
-                Util.finest(sp.toString());
+                LOGGER.finest(sp.toString());
 
                 // see removedCatchpoints's JavaDoc
                 if (sp.isException()) {
@@ -570,7 +575,7 @@ public final class RubyDebuggerProxy {
                 RubyLoop.this.suspensionOccurred(sp);
             }
             finish(getReadersSupport().isUnexpectedFail());
-            Util.finest("Socket reader loop finished.");
+            LOGGER.finest("Socket reader loop finished.");
         }
     }
     

@@ -1,5 +1,7 @@
 package org.rubyforge.debugcommons;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.DebuggerTestBase.TestBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyBreakpoint;
 import org.rubyforge.debugcommons.model.IRubyLineBreakpoint;
@@ -7,6 +9,8 @@ import org.rubyforge.debugcommons.model.RubyFrame;
 
 public final class RubyDebuggerProxyTest extends DebuggerTestBase {
     
+    private static final Logger LOGGER = Logger.getLogger(RubyDebuggerProxyTest.class.getName());
+
     public RubyDebuggerProxyTest(String testName) {
         super(testName);
     }
@@ -183,7 +187,7 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
                     suspendedThread.stepReturn();
                     suspendedThread = null;
                 } catch (RubyDebuggerException e) {
-                    Util.severe(e);
+                    LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
                 }
             }
         });

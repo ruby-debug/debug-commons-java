@@ -1,10 +1,12 @@
 package org.rubyforge.debugcommons.model;
 
+import java.util.logging.Logger;
 import org.rubyforge.debugcommons.RubyDebugEvent;
 import org.rubyforge.debugcommons.RubyDebuggerException;
-import org.rubyforge.debugcommons.Util;
 
 public final class RubyThread extends RubyEntity {
+    
+    private static final Logger LOGGER = Logger.getLogger(RubyThread.class.getName());
     
     private final int id;
     private String name;
@@ -90,7 +92,7 @@ public final class RubyThread extends RubyEntity {
         this.updateName();
         RubyFrame frame = getTopFrame();
         if (frame == null) {
-            Util.fine("stepInto failed, not top stack frame (thread is not suspended?)");
+            LOGGER.fine("stepInto failed, not top stack frame (thread is not suspended?)");
         } else {
             frame.stepInto(forceNewLine);
         }
@@ -103,7 +105,7 @@ public final class RubyThread extends RubyEntity {
     public void stepOver(boolean forceNewLine) throws RubyDebuggerException {
         RubyFrame frame = getTopFrame();
         if (frame == null) {
-            Util.fine("stepOver failed, not top stack frame (thread is not suspended?)");
+            LOGGER.fine("stepOver failed, not top stack frame (thread is not suspended?)");
         } else {
             frame.stepOver(forceNewLine);
         }
@@ -116,7 +118,7 @@ public final class RubyThread extends RubyEntity {
     public void stepReturn() throws RubyDebuggerException {
         RubyFrame frame = getTopFrame();
         if (frame == null) {
-            Util.fine("stepReturn failed, empty frame stack (thread is not suspended?)");
+            LOGGER.fine("stepReturn failed, empty frame stack (thread is not suspended?)");
         } else {
             frame.stepReturn();
         }
