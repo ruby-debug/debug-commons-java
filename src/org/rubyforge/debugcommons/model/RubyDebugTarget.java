@@ -105,5 +105,13 @@ public final class RubyDebugTarget extends RubyEntity {
     public boolean isRunning() {
         return Util.isRunning(process);
     }
-    
+
+    @Override
+    public String toString() {
+        return "RubyDebugTarget@" + System.identityHashCode(this) + '[' +
+                "baseDir: " + getBaseDir() +
+                ", debuggedFile: " + getDebuggedFile() +
+                ", port: " + getPort() + ']';
+    }
+
 }

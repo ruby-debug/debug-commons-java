@@ -74,6 +74,7 @@ public final class RubyDebuggerProxy {
     public void connect(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
         this.debugTarged = debugTarged;
         this.readersSupport = new ReadersSupport(timeout);
+        LOGGER.fine("Proxy connected to the debuggee: " + debugTarged);
     }
     
     public RubyDebugTarget getDebugTarged() {
@@ -303,7 +304,7 @@ public final class RubyDebuggerProxy {
     private void sendCommand(final String s) throws RubyDebuggerException {
         LOGGER.fine("Sending command debugger: " + s);
         if (!debugTarged.isRunning()) {
-            throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process");
+            throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process (debuggee: " + getDebugTarged() + ')');
         }
         getCommandWriter().println(s);
     }
@@ -423,6 +424,7 @@ public final class RubyDebuggerProxy {
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
                 }
+                LOGGER.fine("Destroying process: " + getDebugTarged());
                 getDebugTarged().getProcess().destroy();
             }
         }
