@@ -66,7 +66,7 @@ final class ReadersSupport {
      * @param timeout reading timeout until giving up when polling information
      *        from socket communication.
      */
-    ReadersSupport(final long timeout) throws RubyDebuggerException {
+    ReadersSupport(final long timeout) {
         this.timeout = timeout;
         this.threads = new LinkedBlockingQueue<RubyThreadInfo[]>();
         this.frames = new LinkedBlockingQueue<RubyFrameInfo[]>();

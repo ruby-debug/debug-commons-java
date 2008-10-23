@@ -194,7 +194,7 @@ public abstract class DebuggerTestBase extends TestBase {
             public void run() {
                 try {
                     proxy.startDebugging(breakpoints);
-                    assertTrue("proxy connected", proxy.checkConnection());
+                    assertFalse("proxy alive", proxy.isFinished());
                 } catch (RubyDebuggerException e) {
                     fail("Cannot start debugger: " + e);
                 }

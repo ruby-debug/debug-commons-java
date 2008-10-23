@@ -206,7 +206,7 @@ public final class RubyDebuggerFactory {
         
         RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
                 desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
-        proxy.connect(target);
+        proxy.setDebugTarget(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
         return proxy;
     }

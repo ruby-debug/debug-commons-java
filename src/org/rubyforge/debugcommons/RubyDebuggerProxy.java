@@ -45,7 +45,6 @@ public final class RubyDebuggerProxy {
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
     private Socket commandSocket;
-    private boolean connected;
     private boolean finished;
     
     private PrintWriter commandWriter;
@@ -69,12 +68,12 @@ public final class RubyDebuggerProxy {
         this.breakpointsIDs = new HashMap<Integer, IRubyLineBreakpoint>();
         this.removedCatchpoints = new HashSet<String>();
         this.timeout = timeout;
+        this.readersSupport = new ReadersSupport(timeout);
     }
     
-    public void connect(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
+    public void setDebugTarget(RubyDebugTarget debugTarged) throws IOException, RubyDebuggerException {
         this.debugTarged = debugTarged;
-        this.readersSupport = new ReadersSupport(timeout);
-        LOGGER.fine("Proxy connected to the debuggee: " + debugTarged);
+        LOGGER.fine("Proxy target: " + debugTarged);
     }
     
     public RubyDebugTarget getDebugTarged() {
@@ -112,15 +111,21 @@ public final class RubyDebuggerProxy {
         }
         startRubyLoop();
     }
-    
-    public synchronized boolean checkConnection() {
-        return !finished && connected;
+
+    /**
+     * Whether client might send command to the proxy. When the debuggee
+     * finished (in a standard manner or unexpectedly, e.g. was killed) this
+     * returns false.
+     */
+    public synchronized boolean isFinished() {
+        return finished || !getDebugTarged().isRunning();
     }
 
     private void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new ClassicDebuggerCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
+            commandWriter = new PrintWriter(getCommandSocket().getOutputStream(), true);
             setBreakpoints(initialBreakpoints);
             sendCommand("cont");
         } catch (IOException ex) {
@@ -132,6 +137,7 @@ public final class RubyDebuggerProxy {
         try {
             commandFactory = new RubyDebugCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
+            commandWriter = new PrintWriter(getCommandSocket().getOutputStream(), true);
             setBreakpoints(initialBreakpoints);
             sendCommand("start");
         } catch (IOException ex) {
@@ -153,58 +159,55 @@ public final class RubyDebuggerProxy {
         listeners.remove(listener);
     }
     
-    private synchronized PrintWriter getCommandWriter() throws RubyDebuggerException {
-        if (commandWriter == null) {
-            try {
-                commandWriter = new PrintWriter(getCommandSocket().getOutputStream(), true);
-                connected = true;
-            } catch (IOException e) {
-                throw new RubyDebuggerException(e);
-            }
-        }
+    private PrintWriter getCommandWriter() throws RubyDebuggerException {
+        assert commandWriter != null : "Proxy has to be started, before using the writer";
         return commandWriter;
     }
-    
+
     protected void setBreakpoints(final IRubyBreakpoint[] breakpoints) throws RubyDebuggerException {
         for (IRubyBreakpoint breakpoint: breakpoints) {
             addBreakpoint(breakpoint);
         }
     }
     
-    public synchronized void addBreakpoint(final IRubyBreakpoint breakpoint) throws RubyDebuggerException {
+    public synchronized void addBreakpoint(final IRubyBreakpoint breakpoint) {
         LOGGER.fine("Adding breakpoint: " + breakpoint);
-        if (finished) {
-            LOGGER.fine("Session already finished, skipping addition of breakpoint: " + breakpoint);
+        if (isFinished()) {
+            LOGGER.fine("Session and/or debuggee has already finished, skipping addition of breakpoint: " + breakpoint);
             return;
         }
         if (breakpoint.isEnabled()) {
-            if (breakpoint instanceof IRubyLineBreakpoint) {
-                IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
-                String command = commandFactory.createAddBreakpoint(
-                        lineBreakpoint.getFilePath(), lineBreakpoint.getLineNumber());
-                sendCommand(command);
-                Integer id = getReadersSupport().readAddedBreakpointNo();
-                String condition = lineBreakpoint.getCondition();
-                if (condition != null && supportsCondition) {
-                    command = commandFactory.createSetCondition(id, condition);
-                    if (command != null) {
-                        sendCommand(command);
-                        getReadersSupport().readConditionSet(); // read response
-                    } else {
-                        LOGGER.info("conditional breakpoints are not supported by backend");
-                    }
-                }
-                breakpointsIDs.put(id, lineBreakpoint);
-            } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
-                IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
-                // just 're-enable' if contained in removedCatchpoints
-                if (!removedCatchpoints.remove(excBreakpoint.getException())) {
-                    String command = commandFactory.createCatchOn(excBreakpoint);
+            try {
+                if (breakpoint instanceof IRubyLineBreakpoint) {
+                    IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+                    String command = commandFactory.createAddBreakpoint(
+                            lineBreakpoint.getFilePath(), lineBreakpoint.getLineNumber());
                     sendCommand(command);
-                    getReadersSupport().readCatchpointSet(); // read response
+                    Integer id = getReadersSupport().readAddedBreakpointNo();
+                    String condition = lineBreakpoint.getCondition();
+                    if (condition != null && supportsCondition) {
+                        command = commandFactory.createSetCondition(id, condition);
+                        if (command != null) {
+                            sendCommand(command);
+                            getReadersSupport().readConditionSet(); // read response
+                        } else {
+                            LOGGER.info("conditional breakpoints are not supported by backend");
+                        }
+                    }
+                    breakpointsIDs.put(id, lineBreakpoint);
+                } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
+                    IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
+                    // just 're-enable' if contained in removedCatchpoints
+                    if (!removedCatchpoints.remove(excBreakpoint.getException())) {
+                        String command = commandFactory.createCatchOn(excBreakpoint);
+                        sendCommand(command);
+                        getReadersSupport().readCatchpointSet(); // read response
+                    }
+                } else {
+                    throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
                 }
-            } else {
-                throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
+            } catch (final RubyDebuggerException ex) {
+                LOGGER.log(Level.WARNING, "Cannot add breakpoint: " + ex.getLocalizedMessage(), ex);
             }
         }
     }
@@ -222,8 +225,8 @@ public final class RubyDebuggerProxy {
      */
     public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
         LOGGER.fine("Removing breakpoint: " + breakpoint);
-        if (finished) {
-            LOGGER.fine("Session already finished, skipping removing of breakpoint: " + breakpoint);
+        if (isFinished()) {
+            LOGGER.fine("Session and/or debuggee has already finished, skipping removing of breakpoint: " + breakpoint);
             return;
         }
         if (breakpoint instanceof IRubyLineBreakpoint) {
@@ -303,13 +306,12 @@ public final class RubyDebuggerProxy {
     
     private void sendCommand(final String s) throws RubyDebuggerException {
         LOGGER.fine("Sending command debugger: " + s);
-        if (!debugTarged.isRunning()) {
+        if (isFinished()) {
             throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process (debuggee: " + getDebugTarged() + ')');
         }
         getCommandWriter().println(s);
     }
-    
-    
+
     public void sendStepOver(RubyFrame frame, boolean forceNewLine) {
         try {
             if (forceNewLine) {
@@ -353,7 +355,7 @@ public final class RubyDebuggerProxy {
             sendCommand(commandFactory.createReadFrames(thread));
             infos = getReadersSupport().readFrames();
         } catch (RubyDebuggerException e) {
-            if (checkConnection()) {
+            if (isFinished()) {
                 throw e;
             }
             infos = new RubyFrameInfo[0];
