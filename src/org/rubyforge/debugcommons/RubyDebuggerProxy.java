@@ -176,6 +176,7 @@ public final class RubyDebuggerProxy {
             LOGGER.fine("Session and/or debuggee has already finished, skipping addition of breakpoint: " + breakpoint);
             return;
         }
+        assert breakpoint != null : "breakpoint cannot be null";
         if (breakpoint.isEnabled()) {
             try {
                 if (breakpoint instanceof IRubyLineBreakpoint) {
