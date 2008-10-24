@@ -109,7 +109,7 @@ public final class RubyDebuggerProxy {
             PROXIES.remove(this);
             throw e;
         }
-        startRubyLoop();
+        startSuspensionReaderLoop();
     }
 
     /**
@@ -286,8 +286,8 @@ public final class RubyDebuggerProxy {
         return null;
     }
     
-    private void startRubyLoop() {
-        new RubyLoop().start();
+    private void startSuspensionReaderLoop() {
+        new SuspensionReaderLoop().start();
     }
     
     public Socket getCommandSocket() throws RubyDebuggerException {
@@ -551,9 +551,9 @@ public final class RubyDebuggerProxy {
         this.supportsCondition = supportsCondition;
     }
 
-    private class RubyLoop extends Thread {
+    private class SuspensionReaderLoop extends Thread {
         
-        RubyLoop() {
+        SuspensionReaderLoop() {
             this.setName("RubyDebuggerLoop [" + System.currentTimeMillis() + ']');
         }
         
@@ -586,7 +586,7 @@ public final class RubyDebuggerProxy {
                     }
                 }
 
-                RubyLoop.this.suspensionOccurred(sp);
+                SuspensionReaderLoop.this.suspensionOccurred(sp);
             }
             finish(getReadersSupport().isUnexpectedFail());
             LOGGER.finest("Socket reader loop finished.");
