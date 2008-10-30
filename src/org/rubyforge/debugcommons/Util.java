@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 public final class Util {
     
@@ -94,5 +96,45 @@ public final class Util {
 
         // Just do silly alphabetical comparison
         return version1.compareTo(version2);
+    }
+
+    public static void logEvent(final XmlPullParser xpp) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            if ("message".equals(xpp.getName())) { // message is handled specially
+                return;
+            }
+            StringBuilder toXml = new StringBuilder();
+            toXml.append("<");
+            try {
+                if (xpp.getEventType() == XmlPullParser.END_TAG) {
+                    toXml.append('/');
+                }
+            } catch (XmlPullParserException ex) {
+                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            }
+            toXml.append(xpp.getName());
+            for (int i = 0; i < xpp.getAttributeCount(); i++) {
+                toXml.append(' ').
+                        append(xpp.getAttributeName(i)).
+                        append("='").
+                        append(xpp.getAttributeValue(i)).
+                        append("'");
+            }
+            toXml.append('>');
+            LOGGER.finest("Received: " + toXml.toString());
+        }
+    }
+
+    public static void logMessage(final String message, final boolean debug) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            StringBuilder messageXml = new StringBuilder("<message");
+            if (debug) {
+                messageXml.append(" debug='true'");
+            }
+            messageXml.append('>');
+            messageXml.append(message);
+            messageXml.append("</message>");
+            LOGGER.finest("Received: " + messageXml.toString());
+        }
     }
 }

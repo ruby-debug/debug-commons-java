@@ -127,7 +127,7 @@ public final class RubyDebuggerFactory {
         args.add("-p");
         args.add(String.valueOf(descriptor.getPort()));
         if (descriptor.isVerbose()) {
-            args.add("-d");
+            args.add("--xml-debug");
         }
         args.add("--");
         args.add(descriptor.getScriptPath());

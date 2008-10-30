@@ -110,6 +110,7 @@ final class ReadersSupport {
                 break;
             }
             eventType = xpp.next();
+            Util.logEvent(xpp);
         } while (eventType != XmlPullParser.END_DOCUMENT);
     }
     
@@ -130,9 +131,8 @@ final class ReadersSupport {
             LOGGER.warning(ErrorReader.readMessage(xpp));
         } else if (MESSAGE_ELEMENT.equals(element)) {
             String text = ErrorReader.readMessage(xpp);
-            LOGGER.info(text);
             if (text.equals(FINISHED)) {
-                LOGGER.fine("Got <message>, text == finished");
+                LOGGER.fine("Got 'finished' <message>, text == finished");
                 finished = true;
             }
         } else if (THREADS_ELEMENT.equals(element)) {
@@ -230,7 +230,7 @@ final class ReadersSupport {
         xpp.setInput(new BufferedReader(new InputStreamReader(is)));
         return xpp;
     }
-    
+
     private class XPPLoop extends Thread {
         
         private final XmlPullParser xpp;

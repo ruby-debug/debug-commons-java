@@ -8,6 +8,10 @@
       * relaxing addBreakpoint, to emit warning instead of exception (debuggee
         could die)
     * ReadersSupport does not throw redundant RubyDebuggerException anymore
+  * Utilizing --xml-debug introduced in ruby-debug-ide 0.4.0
+    * do not mess up debugger debug output with the debuggee output
+  * more robustness
+  * more info during failures
 
 0.9.0 - 0.9.1
 -------------

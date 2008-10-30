@@ -1,10 +1,14 @@
 package org.rubyforge.debugcommons.reader;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+import org.rubyforge.debugcommons.Util;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 public abstract class XmlStreamReader {
+    
+    private static final Logger LOGGER = Logger.getLogger(XmlStreamReader.class.getName());
     
     protected final XmlPullParser xpp;
     
@@ -30,6 +34,7 @@ public abstract class XmlStreamReader {
             // skip
             // LOGGER.finest("Skipping text event");
         }
+        Util.logEvent(xpp);
         return eventType;
     }
     
@@ -42,7 +47,7 @@ public abstract class XmlStreamReader {
     }
     
     protected boolean getAttributeBoolValue(final String attrName) {
-        return getAttributeValue(attrName).equals("true");
+        return "true".equals(getAttributeValue(attrName));
     }
     
 }

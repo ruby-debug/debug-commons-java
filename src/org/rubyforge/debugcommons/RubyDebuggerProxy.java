@@ -308,7 +308,9 @@ public final class RubyDebuggerProxy {
     private void sendCommand(final String s) throws RubyDebuggerException {
         LOGGER.fine("Sending command debugger: " + s);
         if (isFinished()) {
-            throw new RubyDebuggerException("Trying to send a command [" + s + "] to terminated process (debuggee: " + getDebugTarged() + ')');
+            throw new RubyDebuggerException("Trying to send a command [" + s +
+                    "] to terminated process (debuggee: " + getDebugTarged() + ", output: \n\n" +
+                    dumpProcess(debugTarged.getProcess()));
         }
         getCommandWriter().println(s);
     }
