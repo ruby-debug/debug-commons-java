@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rubyforge.debugcommons.model.Message;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
 import org.rubyforge.debugcommons.model.SuspensionPoint;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
@@ -25,8 +26,6 @@ final class ReadersSupport {
     private static final String BREAKPOINT_ELEMENT = "breakpoint";
     private static final String SUSPENDED_ELEMENT = "suspended";
     private static final String EXCEPTION_ELEMENT = "exception";
-    private static final String ERROR_ELEMENT = "error";
-    private static final String MESSAGE_ELEMENT = "message";
     private static final String BREAKPOINT_ADDED_ELEMENT = "breakpointAdded";
     private static final String BREAKPOINT_DELETED_ELEMENT = "breakpointDeleted";
     private static final String CONDITION_SET_ELEMENT = "conditionSet";
@@ -42,7 +41,7 @@ final class ReadersSupport {
     
     /** Message sent by debugger backend when debugger has finished. */
     private static final String FINISHED = "finished";
-    
+
     /**
      * Reading timeout until giving up when polling information from socket
      * communication.
@@ -99,7 +98,7 @@ final class ReadersSupport {
                 if (xpp.getText().contains(RUBY_DEBUG_PROMPT)) {
                     LOGGER.finest("got ruby-debug prompt message");
                 } else {
-                    assert false : "Unexpected state: text " + xpp.getText();
+                    assert false : "Unexpected state: got text \"" + xpp.getText() + '"';
                 }
             } else if (eventType == XmlPullParser.START_DOCUMENT) {
                 // OK, first cycle, do nothing.
@@ -127,14 +126,6 @@ final class ReadersSupport {
             conditionSets.add(ConditionSetReader.readBreakpointNo(xpp));
         } else if (CATCHPOINT_SET_ELEMENT.equals(element)) {
             catchpointSets.add(CatchpointSetReader.readExceptionClassName(xpp));
-        } else if (ERROR_ELEMENT.equals(element)) {
-            LOGGER.warning(ErrorReader.readMessage(xpp));
-        } else if (MESSAGE_ELEMENT.equals(element)) {
-            String text = ErrorReader.readMessage(xpp);
-            if (text.equals(FINISHED)) {
-                LOGGER.fine("Got 'finished' <message>, text == finished");
-                finished = true;
-            }
         } else if (THREADS_ELEMENT.equals(element)) {
             threads.add(ThreadInfoReader.readThreads(xpp));
         } else if (FRAMES_ELEMENT.equals(element)) {
@@ -145,10 +136,18 @@ final class ReadersSupport {
             VariablesReader.logProcessingException(xpp);
             variables.add(new RubyVariableInfo[0]);
         } else {
-            assert false : "Unexpected element: " + element;
+            Message message = ErrorReader.tryToReadMessageOrError(xpp, element);
+            if (message != null) {
+                if (message.getText().equals(FINISHED)) {
+                    LOGGER.fine("Got 'finished' <message>, text == finished");
+                    finished = true;
+                }
+            } else {
+                assert false : "Unexpected element: " + element;
+            }
         }
     }
-    
+
     private <T> T[] readInfo(BlockingQueue<T[]> queue) throws RubyDebuggerException {
         try {
             T[] result = queue.poll(timeout, TimeUnit.SECONDS);

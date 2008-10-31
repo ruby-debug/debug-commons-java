@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyVariableInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -31,7 +32,7 @@ public final class VariablesReader extends XmlStreamReader {
     }
 
     private void parseVariables() throws XmlPullParserException, IOException {
-        List<RubyVariableInfo> variables = new ArrayList<RubyVariableInfo>();
+        List<RubyVariableInfo> _variables = new ArrayList<RubyVariableInfo>();
         while (!(nextEvent() == XmlPullParser.END_TAG && "variables".equals(xpp.getName()))) {
             // Seems to happen on this place from time to time.
             if (xpp.getName() == null) {
@@ -40,7 +41,8 @@ public final class VariablesReader extends XmlStreamReader {
                         "Please provide possibly exact steps to reproduce " +
                         "and file a bug against Ruby or debug-commons tracker.");
             }
-            assert xpp.getName().equals("variable") : xpp.getName() + " encountered";
+            ErrorReader.flushPossibleMessage(xpp);
+            assert xpp.getName().equals("variable") : xpp.getName() + "(type: " + Util.getType(xpp) + ") encountered";
             String name = getAttributeValue("name");
             String value = getAttributeValue("value");
             String kind = getAttributeValue("kind");
@@ -53,10 +55,10 @@ public final class VariablesReader extends XmlStreamReader {
                 String objectId = getAttributeValue("objectId");
                 newVariable = new RubyVariableInfo(name, kind, value, type, hasChildren, objectId);
             }
-            variables.add(newVariable);
+            _variables.add(newVariable);
             ensureEndTag("variable");
         }
-        this.variables = variables.toArray(new RubyVariableInfo[variables.size()]);
+        this.variables = _variables.toArray(new RubyVariableInfo[_variables.size()]);
     }
 
     private void parseProcessingException() throws XmlPullParserException, IOException {

@@ -17,7 +17,7 @@ public abstract class XmlStreamReader {
     }
     
     protected void ensureEndTag(final String name) throws XmlPullParserException, IOException {
-        int nextTag = xpp.nextTag();
+        int nextTag = xpp.next();
         if (nextTag != XmlPullParser.END_TAG && !name.equals(xpp.getName())) {
             throw new IllegalStateException(
                     "Unexpected event. Expecting " + name + " end tag." + xpp.getName());
@@ -32,7 +32,7 @@ public abstract class XmlStreamReader {
         int eventType = -1;
         while ((eventType = xpp.next()) == XmlPullParser.TEXT) {
             // skip
-            // LOGGER.finest("Skipping text event");
+            Util.logEvent(xpp);
         }
         Util.logEvent(xpp);
         return eventType;

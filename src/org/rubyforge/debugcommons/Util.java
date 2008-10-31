@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.rubyforge.debugcommons.model.Message;
+import org.rubyforge.debugcommons.reader.VariablesReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -100,41 +102,74 @@ public final class Util {
 
     public static void logEvent(final XmlPullParser xpp) {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            if ("message".equals(xpp.getName())) { // message is handled specially
-                return;
-            }
-            StringBuilder toXml = new StringBuilder();
-            toXml.append("<");
             try {
-                if (xpp.getEventType() == XmlPullParser.END_TAG) {
+                int eventType = xpp.getEventType();
+                if (eventType == XmlPullParser.END_DOCUMENT) {
+                    LOGGER.finest("Received: END_DOCUMENT event");
+                    return;
+                }
+                if ("message".equals(xpp.getName())) { // message is handled specially
+                    return;
+                }
+                if (xpp.getName() == null) {
+                    LOGGER.warning("Unexpected type: (" + Util.getType(xpp) + ") encountered in logEvent");
+                    return;
+                }
+                StringBuilder toXml = new StringBuilder();
+                if (eventType == XmlPullParser.TEXT) {
+                    return;
+                }
+                toXml.append("<");
+                if (eventType == XmlPullParser.END_TAG) {
                     toXml.append('/');
                 }
+                toXml.append(xpp.getName());
+                for (int i = 0; i < xpp.getAttributeCount(); i++) {
+                    toXml.append(' ').
+                            append(xpp.getAttributeName(i)).
+                            append("='").
+                            append(xpp.getAttributeValue(i)).
+                            append("'");
+                }
+                toXml.append('>');
+                LOGGER.finest("Received: " + toXml.toString());
             } catch (XmlPullParserException ex) {
                 LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
             }
-            toXml.append(xpp.getName());
-            for (int i = 0; i < xpp.getAttributeCount(); i++) {
-                toXml.append(' ').
-                        append(xpp.getAttributeName(i)).
-                        append("='").
-                        append(xpp.getAttributeValue(i)).
-                        append("'");
-            }
-            toXml.append('>');
-            LOGGER.finest("Received: " + toXml.toString());
         }
     }
 
-    public static void logMessage(final String message, final boolean debug) {
+    public static void logMessage(final Message message) {
         if (LOGGER.isLoggable(Level.FINEST)) {
             StringBuilder messageXml = new StringBuilder("<message");
-            if (debug) {
+            if (message.isDebug()) {
                 messageXml.append(" debug='true'");
             }
             messageXml.append('>');
-            messageXml.append(message);
+            messageXml.append(message.getText());
             messageXml.append("</message>");
-            LOGGER.finest("Received: " + messageXml.toString());
+            LOGGER.finest("Received message: " + messageXml.toString());
+        }
+    }
+
+    public static String getType(final XmlPullParser xpp) {
+        try {
+            if (xpp.getEventType() == XmlPullParser.END_TAG) {
+                return "END_TAG";
+            } else if (xpp.getEventType() == XmlPullParser.START_TAG) {
+                return "START_TAG";
+            } else if (xpp.getEventType() == XmlPullParser.TEXT) {
+                return "TEXT";
+            } else if (xpp.getEventType() == XmlPullParser.START_DOCUMENT) {
+                return "START_DOCUMENT";
+            } else if (xpp.getEventType() == XmlPullParser.END_DOCUMENT) {
+                return "END_DOCUMENT";
+            } else {
+                return "UNKNOWN: " + xpp.getEventType();
+            }
+        } catch (XmlPullParserException e) {
+            Logger.getLogger(VariablesReader.class.getName()).log(Level.SEVERE, null, e);
+            return "<Unable to find a type>";
         }
     }
 }
