@@ -11,8 +11,6 @@ import junit.framework.TestCase;
 
 public class TestBase extends TestCase {
 
-    private static final Logger LOGGER = Logger.getLogger(TestBase.class.getName());
-
     private TestHandler testHandler;
 
     protected TestBase(final String name) {
@@ -23,16 +21,17 @@ public class TestBase extends TestCase {
     protected void setUp() throws Exception {
         clearWorkDir();
         super.setUp();
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.setUseParentHandlers(false);
+        Logger logger = Logger.getLogger("org.rubyforge.debugcommons");
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
         testHandler = new TestHandler(getName());
-        LOGGER.addHandler(testHandler);
+        logger.addHandler(testHandler);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        LOGGER.removeHandler(testHandler);
+        Logger.getLogger("org.rubyforge.debugcommons").removeHandler(testHandler);
     }
 
     /**
