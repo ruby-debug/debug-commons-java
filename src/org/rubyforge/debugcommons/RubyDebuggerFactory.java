@@ -265,7 +265,7 @@ public final class RubyDebuggerFactory {
         }
         
         public boolean isVerbose() {
-            return verbose || Boolean.getBoolean("org.rubyforge.debugcommons.verbose");
+            return verbose || Level.FINEST.equals(Logger.getLogger("org.rubyforge.debugcommons").getLevel());
         }
         
         public void setVerbose(boolean verbose) {
