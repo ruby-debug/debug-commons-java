@@ -1,3 +1,88 @@
+2008-10-31 08:12  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/Message.java,
+	  src/org/rubyforge/debugcommons/reader/ErrorReader.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java,
+	  src/org/rubyforge/debugcommons/reader/XmlStreamReader.java:
+	  Robustness, strictness, logging:
+	  
+	  - let <message>s to come asynchronously
+	  - strict debug-commons protocol checking
+	  - better logging infrastructure
+
+2008-10-31 08:07  Martin Krauskopf
+
+	* test/org/rubyforge/debugcommons/TestBase.java: Detailed logging
+	  during tests running.
+
+2008-10-30 20:54  Martin Krauskopf
+
+	* CHANGES, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/reader/ErrorReader.java,
+	  src/org/rubyforge/debugcommons/reader/XmlStreamReader.java:
+	  Utilizing --xml-debug introduced in ruby-debug-ide 0.4.0
+	  
+	  - do not mess up debugger debug output with the debuggee output
+	  - more robustness
+	  - more info during failures
+
+2008-10-24 09:43  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: trivial:
+	  s/RubyLoop/SuspensionReaderLoop
+
+2008-10-23 15:21  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: sanity
+	  check for the given breakpoint
+
+2008-10-23 15:14  Martin Krauskopf
+
+	* build.xml, nbproject/build-impl.xml,
+	  nbproject/genfiles.properties, nbproject/project.properties:
+	  updating NetBeans project metadata
+
+2008-10-23 15:14  Martin Krauskopf
+
+	* CHANGES, src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java: Some
+	  progress. Code cleanup, API changes (increasing middle version of
+	  trunk).
+	  
+	  - RubyDebuggerProxy
+	  - use isFinished instead of checkConnection, getting rid of
+	  'connected'
+	  - s/connect/setDebugTarget (this what it actually do now)
+	  - non-lazy initialization of commandWriter
+	  - relaxing addBreakpoint, to emit warning instead of exception
+	  (debuggee could die)
+	  - ReadersSupport does not throw redundant RubyDebuggerException
+	  anymore
+
+2008-10-15 07:00  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java: A bit
+	  more logging. Appropriate RubyDebugTarget#toString.
+
+2008-10-10 14:35  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Be little
+	  bit more nicer to clients when trying to manage breakpoints when
+	  session is finished. (+ fixing typo)
+
+2008-10-10 14:15  Martin Krauskopf
+
+	* CHANGES, ChangeLog: CHANGES and ChangeLog update
+
 2008-10-10 14:10  Martin Krauskopf
 
 	* test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
