@@ -1,14 +1,11 @@
 package org.rubyforge.debugcommons.reader;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 import org.rubyforge.debugcommons.Util;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 public abstract class XmlStreamReader {
-    
-    private static final Logger LOGGER = Logger.getLogger(XmlStreamReader.class.getName());
     
     protected final XmlPullParser xpp;
     
@@ -31,7 +28,7 @@ public abstract class XmlStreamReader {
     protected int nextEvent() throws XmlPullParserException, IOException {
         int eventType = -1;
         while ((eventType = xpp.next()) == XmlPullParser.TEXT) {
-            // skip
+            // skip, just log
             Util.logEvent(xpp);
         }
         Util.logEvent(xpp);
