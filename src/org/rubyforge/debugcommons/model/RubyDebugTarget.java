@@ -72,8 +72,8 @@ public final class RubyDebugTarget extends RubyEntity {
         try {
             updateThreads();
         } catch (RubyDebuggerException e) {
-            if (getProxy().isFinished()) {
-                throw new RuntimeException("Cannot update threads", e);
+            if (!getProxy().isReady()) {
+                throw new RuntimeException("Cannot update threads. Proxy is not ready.", e);
             } else {
                 LOGGER.fine("Session has finished. Ignoring unsuccessful thread update.");
                 return;

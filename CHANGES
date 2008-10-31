@@ -3,7 +3,7 @@
   * Some progress. Code cleanup, API changes (increasing middle version of
     trunk).
     * RubyDebuggerProxy
-      * use isFinished instead of checkConnection, getting rid of 'connected'
+      * use #isReady instead of #checkConnection
       * s/connect/setDebugTarget (this what it actually do now)
       * relaxing addBreakpoint, to emit warning instead of exception (debuggee
         could die)

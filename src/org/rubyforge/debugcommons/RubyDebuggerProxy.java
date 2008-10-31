@@ -45,6 +45,7 @@ public final class RubyDebuggerProxy {
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
     private Socket commandSocket;
+    private boolean started;
     private boolean finished;
     
     private PrintWriter commandWriter;
@@ -112,16 +113,17 @@ public final class RubyDebuggerProxy {
         startSuspensionReaderLoop();
     }
 
+
     /**
-     * Whether client might send command to the proxy. When the debuggee
-     * finished (in a standard manner or unexpectedly, e.g. was killed) this
-     * returns false.
+     * Whether client might send command to the proxy. When the debuggee has
+     * finished (in a standard manner or unexpectedly, e.g. was killed) or the
+     * proxy did not start yet, false is returned.
      */
-    public synchronized boolean isFinished() {
-        return finished || !getDebugTarged().isRunning();
+    public synchronized boolean isReady() {
+        return !finished && commandWriter != null && getDebugTarged().isRunning();
     }
 
-    private void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
+    private synchronized void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new ClassicDebuggerCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
@@ -133,7 +135,7 @@ public final class RubyDebuggerProxy {
         }
     }
 
-    private void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
+    private synchronized void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new RubyDebugCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
@@ -172,8 +174,8 @@ public final class RubyDebuggerProxy {
     
     public synchronized void addBreakpoint(final IRubyBreakpoint breakpoint) {
         LOGGER.fine("Adding breakpoint: " + breakpoint);
-        if (isFinished()) {
-            LOGGER.fine("Session and/or debuggee has already finished, skipping addition of breakpoint: " + breakpoint);
+        if (!isReady()) {
+            LOGGER.fine("Session and/or debuggee is not ready, skipping addition of breakpoint: " + breakpoint);
             return;
         }
         assert breakpoint != null : "breakpoint cannot be null";
@@ -226,8 +228,8 @@ public final class RubyDebuggerProxy {
      */
     public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint, boolean silent) {
         LOGGER.fine("Removing breakpoint: " + breakpoint);
-        if (isFinished()) {
-            LOGGER.fine("Session and/or debuggee has already finished, skipping removing of breakpoint: " + breakpoint);
+        if (!isReady()) {
+            LOGGER.fine("Session and/or debuggee is not ready, skipping removing of breakpoint: " + breakpoint);
             return;
         }
         if (breakpoint instanceof IRubyLineBreakpoint) {
@@ -307,9 +309,9 @@ public final class RubyDebuggerProxy {
     
     private void sendCommand(final String s) throws RubyDebuggerException {
         LOGGER.fine("Sending command debugger: " + s);
-        if (isFinished()) {
+        if (!isReady()) {
             throw new RubyDebuggerException("Trying to send a command [" + s +
-                    "] to terminated process (debuggee: " + getDebugTarged() + ", output: \n\n" +
+                    "] to non-started or finished proxy (debuggee: " + getDebugTarged() + ", output: \n\n" +
                     dumpProcess(debugTarged.getProcess()));
         }
         getCommandWriter().println(s);
@@ -358,7 +360,7 @@ public final class RubyDebuggerProxy {
             sendCommand(commandFactory.createReadFrames(thread));
             infos = getReadersSupport().readFrames();
         } catch (RubyDebuggerException e) {
-            if (isFinished()) {
+            if (!isReady()) {
                 throw e;
             }
             infos = new RubyFrameInfo[0];

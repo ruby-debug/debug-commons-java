@@ -15,6 +15,13 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
     public RubyDebuggerProxyTest(String testName) {
         super(testName);
     }
+
+    public void testIsFinished() throws Exception {
+        final RubyDebuggerProxy proxy = prepareProxy("sleep 0.01");
+        assertFalse("proxy not ready yet", proxy.isReady());
+        startDebugging(proxy, new IRubyLineBreakpoint[]{}, 0);
+        assertTrue("proxy not ready yet", proxy.isReady());
+    }
     
     public void testBreakpointsRemoving1() throws Exception {
         final RubyDebuggerProxy proxy = prepareProxy(
