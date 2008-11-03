@@ -360,9 +360,10 @@ public final class RubyDebuggerProxy {
             sendCommand(commandFactory.createReadFrames(thread));
             infos = getReadersSupport().readFrames();
         } catch (RubyDebuggerException e) {
-            if (!isReady()) {
+            if (isReady()) {
                 throw e;
             }
+            LOGGER.fine("Session and/or debuggee is not ready, returning empty thread list.");
             infos = new RubyFrameInfo[0];
         }
         RubyFrame[] frames = new RubyFrame[infos.length];
@@ -443,7 +444,7 @@ public final class RubyDebuggerProxy {
             try {
                 sendCommand("exit");
             } catch (RubyDebuggerException ex) {
-                LOGGER.fine("'exit' command failed. Process died? " + debugTarged.isRunning());
+                LOGGER.fine("'exit' command failed. Process died? -> " + debugTarged.isRunning());
             }
         }
     }
@@ -498,7 +499,7 @@ public final class RubyDebuggerProxy {
         final StringBuilder info = new StringBuilder();
         boolean running = Util.isRunning(process);
         if (running) {
-            info.append("But server process is running. You might try to increase the timeout. Killing...\n\n");
+            info.append("Dumping process, when the debuggee process is running. You might try to increase the timeout. Killing...\n\n");
         }
         info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
         info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
@@ -592,7 +593,12 @@ public final class RubyDebuggerProxy {
 
                 SuspensionReaderLoop.this.suspensionOccurred(sp);
             }
-            finish(getReadersSupport().isUnexpectedFail());
+            boolean unexpectedFail = getReadersSupport().isUnexpectedFail();
+            if (unexpectedFail) {
+                LOGGER.warning("Unexpected fail. Debuggee: " + getDebugTarged() +
+                        ", output: \n\n" + dumpProcess(debugTarged.getProcess()));
+            }
+            finish(unexpectedFail);
             LOGGER.finest("Socket reader loop finished.");
         }
     }
