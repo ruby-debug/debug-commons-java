@@ -26,7 +26,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
             new TestBreakpoint("test.rb", 3),
             new TestBreakpoint("test.rb", 7)
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         
         // spawned thread suspended
         RubyThreadInfo[] ti = proxy.readThreadInfo();
@@ -96,7 +96,7 @@ public final class RubyDebugCommunicationTest extends CommonCommunicationTestBas
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 7)
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         RubyFrame[] frames = suspendedThread.getFrames();
         assertEquals("one frames", 1, frames.length);
         RubyFrame frame = frames[0];

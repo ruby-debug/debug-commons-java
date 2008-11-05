@@ -16,7 +16,7 @@ public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         
         assertNotNull(suspendedThread);
         RubyVariable[] variables = proxy.readGlobalVariables();
@@ -49,7 +49,7 @@ public abstract class CommonCommunicationTestBase extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 9),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         assertNotNull(suspendedThread);
         RubyFrame[] frames = suspendedThread.getFrames();
         assertEquals("one frames", 1, frames.length);

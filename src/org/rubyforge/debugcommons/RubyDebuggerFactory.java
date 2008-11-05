@@ -71,7 +71,7 @@ public final class RubyDebuggerFactory {
         appendIOSynchronizer(args, descriptor);
         args.add("-r");
         args.add(descriptor.isVerbose() ? CLASSIC_VERBOSE_DEBUG_NAME : CLASSIC_DEBUG_NAME);
-        args.add(descriptor.getScriptPath());
+        args.add(descriptor.getDebuggeePath());
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
@@ -130,7 +130,7 @@ public final class RubyDebuggerFactory {
             args.add("--xml-debug");
         }
         args.add("--");
-        args.add(descriptor.getScriptPath());
+        args.add(descriptor.getDebuggeePath());
         if (descriptor.getScriptArguments() != null) {
             args.addAll(Arrays.asList(descriptor.getScriptArguments()));
         }
@@ -189,7 +189,7 @@ public final class RubyDebuggerFactory {
 
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args, final int timeout)
             throws IOException, RubyDebuggerException {
-        LOGGER.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + getProcessAsString(args) + "\"");
+        LOGGER.fine("Running [basedir: " + desc.getBaseDirectory() + "]: \"" + Util.getProcessAsString(args) + "\"");
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(desc.getBaseDirectory());
         if (desc.getEnvironment() != null) {
@@ -204,8 +204,11 @@ public final class RubyDebuggerFactory {
         boolean supportsCondition = desc.getType() == RUBY_DEBUG && suitableVersion;
         proxy.setConditionSupport(supportsCondition);
         
-        RubyDebugTarget target = new RubyDebugTarget(proxy, pb.start(),
-                desc.getPort(), desc.getScriptPath(), desc.getBaseDirectory());
+        // do NOT use InetAddress.getLocalHost() instead of "localhost".
+        // Does not work on Windows for some reason:
+        // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
+        RubyDebugTarget target = new RubyDebugTarget(proxy, "localhost", desc.getPort(),
+                pb.start(), desc.getDebuggeePath(), desc.getBaseDirectory());
         proxy.setDebugTarget(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
         return proxy;
@@ -247,10 +250,10 @@ public final class RubyDebuggerFactory {
         private DebuggerType type;
         private boolean verbose;
         private boolean useDefaultPort;
-        private String scriptPath;
+        private String debuggeePath;
         private File baseDir;
         private String[] scriptArguments;
-        private Map<String, String> environment;
+        private Map<? extends String, ? extends String> environment;
         private boolean synchronizedOutput;
         private Collection<? extends String> additionalOptions;
         private boolean jruby;
@@ -280,15 +283,15 @@ public final class RubyDebuggerFactory {
             this.useDefaultPort = useDefaultPort;
         }
         
-        public String getScriptPath() {
-            return scriptPath;
+        public String getDebuggeePath() {
+            return debuggeePath;
         }
         
         /**
-         * @param scriptPath script to be debugged
+         * @param scriptPath path to the debuggee (application to be debugged)
          */
-        public void setScriptPath(String scriptPath) {
-            this.scriptPath = scriptPath;
+        public void setDebuggeePath(String debuggeePath) {
+            this.debuggeePath = debuggeePath;
         }
         
         /** @see #getBaseDirectory */
@@ -302,7 +305,7 @@ public final class RubyDebuggerFactory {
          * script's parent directory is used.
          */
         public File getBaseDirectory() {
-            return baseDir != null ? baseDir : new File(getScriptPath()).getParentFile();
+            return baseDir != null ? baseDir : new File(getDebuggeePath()).getParentFile();
         }
         
         public String[] getScriptArguments() {
@@ -316,11 +319,11 @@ public final class RubyDebuggerFactory {
             this.scriptArguments = scriptArguments;
         }
         
-        public Map<String, String> getEnvironment() {
+        public Map<? extends String, ? extends String> getEnvironment() {
             return environment;
         }
 
-        public void setEnvironment(final Map<String, String> environment) {
+        public void setEnvironment(final Map<? extends String, ? extends String> environment) {
             this.environment = environment;
         }
         
@@ -366,15 +369,6 @@ public final class RubyDebuggerFactory {
         }
     }
 
-    /** Just helper method for logging. */
-    private static String getProcessAsString(List<? extends String> process) {
-        StringBuilder sb = new StringBuilder();
-        for (String arg : process) {
-            sb.append(arg).append(' ');
-        }
-        return sb.toString().trim();
-    }
-    
     private static Pattern pattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
     static String substitute(String value, Map<String, String> varMap) {

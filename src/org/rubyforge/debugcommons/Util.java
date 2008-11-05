@@ -1,7 +1,9 @@
 package org.rubyforge.debugcommons;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -98,6 +100,69 @@ public final class Util {
 
         // Just do silly alphabetical comparison
         return version1.compareTo(version2);
+    }
+
+    /** Just helper method for logging. */
+    static String getProcessAsString(List<? extends String> process) {
+        StringBuilder sb = new StringBuilder();
+        for (String arg : process) {
+            sb.append(arg).append(' ');
+        }
+        return sb.toString().trim();
+    }
+
+    public static String dumpAndDestroyProcess(final Process process) {
+        final StringBuilder info = new StringBuilder();
+        boolean running = Util.isRunning(process);
+        if (running) {
+            info.append("Dumping process, when the debuggee process is running. You might try to increase the timeout. Killing...\n\n");
+        }
+        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
+        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
+        if (running) {
+            process.destroy();
+        }
+        return info.toString();
+    }
+
+    private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix, final boolean asynch) {
+        final StringBuilder output = new StringBuilder();
+        if (asynch) {
+            Thread collector = new Thread(new Runnable() {
+
+                public void run() {
+                    collect(stream, output);
+                }
+            });
+            collector.start();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            }
+            collector.interrupt();
+        } else {
+            collect(stream, output);
+        }
+        if (output.length() > 0) {
+            LOGGER.log(level, msgPrefix);
+            String outputS = output.toString();
+            LOGGER.log(level, outputS);
+            return msgPrefix + '\n' + outputS;
+        } else {
+            return "";
+        }
+    }
+
+    private static void collect(final InputStream stream, final StringBuilder output) {
+        try {
+            int c;
+            while ((c = stream.read()) != -1) {
+                output.append((char) c);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+        }
     }
 
     public static void logEvent(final XmlPullParser xpp) {

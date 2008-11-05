@@ -15,7 +15,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         try {
             proxy.getReadersSupport().readFrames();
             fail("RubyDebuggerException expected");
@@ -32,7 +32,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
             new TestBreakpoint("test.rb", 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         try {
             proxy.getReadersSupport().readAddedBreakpointNo();
             fail("RubyDebuggerException expected");

@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -144,7 +146,7 @@ public abstract class DebuggerTestBase extends TestBase {
         Descriptor descriptor = new Descriptor();
         descriptor.useDefaultPort(false);
         descriptor.setVerbose(true);
-        descriptor.setScriptPath(testFilePath);
+        descriptor.setDebuggeePath(testFilePath);
         descriptor.setBaseDirectory(baseDir);
         descriptor.setScriptArguments(scriptArguments);
         return startDebugger(descriptor);
@@ -160,19 +162,7 @@ public abstract class DebuggerTestBase extends TestBase {
             case RUBY_DEBUG:
                 File rdebug = new File(PATH_TO_RDEBUG_IDE);
                 assertTrue("rdebug-ide file exists", rdebug.isFile());
-                Map<String, String> env = descriptor.getEnvironment();
-                if (env == null) {
-                    env = new HashMap<String, String>();
-                } else {
-                    env = new HashMap<String, String>(env);
-                }
-                if (GEM_HOME != null) {
-                    env.put("GEM_HOME", GEM_HOME);
-                }
-                if (GEM_PATH != null) {
-                    env.put("GEM_PATH", GEM_PATH);
-                }
-                descriptor.setEnvironment(env);
+                descriptor.setEnvironment(tweakTestProcessEnvironment(descriptor.getEnvironment()));
                 proxy = RubyDebuggerFactory.startRubyDebug(descriptor, rdebug.getAbsolutePath(), "ruby", timeout);
                 break;
             default:
@@ -185,15 +175,29 @@ public abstract class DebuggerTestBase extends TestBase {
         rubyStdoutRedirectorThread.start();
         return proxy;
     }
-    
-    protected void startDebugging(
+
+    /** Start debuggee process without attaching to it. */
+    protected Process startDebuggerProcess(
+            final File toTest,
+            final int port) throws IOException {
+        List<String> args = Arrays.asList(PATH_TO_RDEBUG_IDE, "-p", "" + port,
+                "--xml-debug", "--", toTest.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(toTest.getParentFile());
+        pb.environment().putAll(tweakTestProcessEnvironment(pb.environment()));
+        LOGGER.fine("Running [basedir: " + toTest.getParentFile().getPath() +
+                "]: \"" + Util.getProcessAsString(args) + "\"");
+        return pb.start();
+    }
+
+    protected void attach(
             final RubyDebuggerProxy proxy,
             final IRubyBreakpoint[] breakpoints,
             final int nOfEvents) throws InterruptedException {
         waitForEvents(proxy, nOfEvents, new Runnable() {
             public void run() {
                 try {
-                    proxy.startDebugging(breakpoints);
+                    proxy.attach(breakpoints);
                     assertTrue("proxy alive", proxy.isReady());
                 } catch (RubyDebuggerException e) {
                     fail("Cannot start debugger: " + e);
@@ -246,6 +250,23 @@ public abstract class DebuggerTestBase extends TestBase {
         block.run();
         events.await();
         proxy.removeRubyDebugEventListener(listener);
+    }
+
+    private Map<? extends String, ? extends String> tweakTestProcessEnvironment(
+            final Map<? extends String, ? extends String> origEnv) {
+        Map<String, String> env;
+        if (origEnv == null) {
+            env = new HashMap<String, String>();
+        } else {
+            env = new HashMap<String, String>(origEnv);
+        }
+        if (GEM_HOME != null) {
+            env.put("GEM_HOME", GEM_HOME);
+        }
+        if (GEM_PATH != null) {
+            env.put("GEM_PATH", GEM_PATH);
+        }
+        return env;
     }
     
     protected static final class TestExceptionBreakpoint implements IRubyExceptionBreakpoint {

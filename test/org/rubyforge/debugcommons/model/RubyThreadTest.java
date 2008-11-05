@@ -19,7 +19,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint("test.rb", 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
 
         waitForEvents(proxy, 1, new Runnable() {
 
@@ -52,7 +52,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             bp2,
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
         assertSuspensionLine(2);
 
@@ -83,7 +83,7 @@ public final class RubyThreadTest extends DebuggerTestBase {
 //        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
 //            bp2, bp6
 //        };
-//        startDebugging(proxy, breakpoints, 2);
+//        attach(proxy, breakpoints, 2);
 //        RubyThread t2 = proxy.getDebugTarged().getThreadById(2);
 //        RubyThread t3 = proxy.getDebugTarged().getThreadById(3);
 //        assertNotNull("thread 2 is not null", t2);

@@ -1,7 +1,6 @@
 package org.rubyforge.debugcommons;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -45,7 +44,6 @@ public final class RubyDebuggerProxy {
     private final DebuggerType debuggerType;
     private RubyDebugTarget debugTarged;
     private Socket commandSocket;
-    private boolean started;
     private boolean finished;
     
     private PrintWriter commandWriter;
@@ -94,14 +92,14 @@ public final class RubyDebuggerProxy {
      * @param initialBreakpoints initial set of breakpoints to be set before
      *        triggering the debugging
      */
-    public void startDebugging(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
+    public void attach(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             switch(debuggerType) {
             case CLASSIC_DEBUGGER:
-                startClassicDebugger(initialBreakpoints);
+                attachToClassicDebugger(initialBreakpoints);
                 break;
             case RUBY_DEBUG:
-                startRubyDebug(initialBreakpoints);
+                attachToRubyDebug(initialBreakpoints);
                 break;
             default:
                 throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
@@ -123,7 +121,7 @@ public final class RubyDebuggerProxy {
         return !finished && commandWriter != null && getDebugTarged().isRunning();
     }
 
-    private synchronized void startClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
+    private synchronized void attachToClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new ClassicDebuggerCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
@@ -135,7 +133,7 @@ public final class RubyDebuggerProxy {
         }
     }
 
-    private synchronized void startRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
+    private synchronized void attachToRubyDebug(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
         try {
             commandFactory = new RubyDebugCommandFactory();
             readersSupport.startCommandLoop(getCommandSocket().getInputStream());
@@ -312,7 +310,7 @@ public final class RubyDebuggerProxy {
         if (!isReady()) {
             throw new RubyDebuggerException("Trying to send a command [" + s +
                     "] to non-started or finished proxy (debuggee: " + getDebugTarged() + ", output: \n\n" +
-                    dumpProcess(debugTarged.getProcess()));
+                    Util.dumpAndDestroyProcess(debugTarged.getProcess()));
         }
         getCommandWriter().println(s);
     }
@@ -432,8 +430,12 @@ public final class RubyDebuggerProxy {
                 } catch (InterruptedException e) {
                     LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
                 }
-                LOGGER.fine("Destroying process: " + getDebugTarged());
-                getDebugTarged().getProcess().destroy();
+                RubyDebugTarget target = getDebugTarged();
+                LOGGER.fine("Destroying process: " + target);
+                Process process = target.getProcess();
+                if (process != null) {
+                    process.destroy();
+                }
             }
         }
         fireDebugEvent(RubyDebugEvent.createTerminateEvent());
@@ -455,14 +457,12 @@ public final class RubyDebuggerProxy {
      */
     private Socket attach() throws RubyDebuggerException {
         int port = debugTarged.getPort();
+        String host = debugTarged.getHost();
         Socket socket = null;
         for (int tryCount = (timeout*2), i = 0; i < tryCount && socket == null; i++) {
             try {
-                // do NOT use InetAddress.getLocalHost() instead of "localhost".
-                // Does not work on Windows for some reason:
-                // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
-                socket = new Socket("localhost", port);
-                LOGGER.finest("Successfully attached to localhost:" + port);
+                socket = new Socket(host, port);
+                LOGGER.finest("Successfully attached to " + host + ':' + port);
             } catch (ConnectException e) {
                 synchronized (this) {
                     if (finished) { // terminated by frontend before process started
@@ -474,7 +474,7 @@ public final class RubyDebuggerProxy {
                 }
                 try {
                     if (debugTarged.isRunning()) {
-                        LOGGER.finest("Cannot connect to localhost:" + port + ". Trying again...(" + (tryCount - i - 1) + ')');
+                        LOGGER.finest("Cannot connect to " + host + ':' + port + ". Trying again...(" + (tryCount - i - 1) + ')');
                         Thread.sleep(500);
                     } else {
                         failWithInfo(e);
@@ -491,61 +491,9 @@ public final class RubyDebuggerProxy {
     }
 
     private void failWithInfo(ConnectException e) throws RubyDebuggerException {
-        String info = dumpProcess(debugTarged.getProcess());
+        Process process = debugTarged.getProcess();
+        String info = process == null ? "[Remote Process]" : Util.dumpAndDestroyProcess(process);
         throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
-    }
-
-    private static String dumpProcess(final Process process) {
-        final StringBuilder info = new StringBuilder();
-        boolean running = Util.isRunning(process);
-        if (running) {
-            info.append("Dumping process, when the debuggee process is running. You might try to increase the timeout. Killing...\n\n");
-        }
-        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
-        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
-        if (running) {
-            process.destroy();
-        }
-        return info.toString();
-    }
-
-    private static String dumpStream(final InputStream stream, final Level level, final String msgPrefix, final boolean asynch) {
-        final StringBuilder output = new StringBuilder();
-        if (asynch) {
-            Thread collector = new Thread(new Runnable() {
-                public void run() {
-                    collect(stream, output);
-                }
-            });
-            collector.start();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-            }
-            collector.interrupt();
-        } else {
-            collect(stream, output);
-        }
-        if (output.length() > 0) {
-            LOGGER.log(level, msgPrefix);
-            String outputS = output.toString();
-            LOGGER.log(level, outputS);
-            return msgPrefix + '\n' + outputS;
-        } else {
-            return "";
-        }
-    }
-    
-    private static void collect(final InputStream stream, final StringBuilder output) {
-        try {
-            int c;
-            while ((c = stream.read()) != -1) {
-                output.append((char) c);
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-        }
     }
 
     /**
@@ -596,7 +544,7 @@ public final class RubyDebuggerProxy {
             boolean unexpectedFail = getReadersSupport().isUnexpectedFail();
             if (unexpectedFail) {
                 LOGGER.warning("Unexpected fail. Debuggee: " + getDebugTarged() +
-                        ", output: \n\n" + dumpProcess(debugTarged.getProcess()));
+                        ", output: \n\n" + Util.dumpAndDestroyProcess(debugTarged.getProcess()));
             }
             finish(unexpectedFail);
             LOGGER.finest("Socket reader loop finished.");

@@ -22,7 +22,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint(testFilePath, 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
     }
 
@@ -34,7 +34,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint("test.rb", 2),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
     }
 
@@ -47,7 +47,7 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint("test.rb", 2),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
     }
 
@@ -62,12 +62,12 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         descriptor.setVerbose(true);
         descriptor.setAdditionalOptions(Collections.singleton("-I" + includeDir.getAbsolutePath()));
         descriptor.setBaseDirectory(baseDir);
-        descriptor.setScriptPath(testFile.getAbsolutePath());
+        descriptor.setDebuggeePath(testFile.getAbsolutePath());
         final RubyDebuggerProxy proxy = startDebugger(descriptor);
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint("test.rb", 1),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
     }
 
@@ -77,12 +77,12 @@ public class RubyDebuggerFactoryTest extends DebuggerTestBase {
         descriptor.setVerbose(true);
         descriptor.setEnvironment(Collections.singletonMap("MY_ENV_123_X", "test_123"));
         testFile = writeFile("test.rb", "exit 1 if ENV['MY_ENV_123_X'] != 'test_123'", "puts 'OK'");
-        descriptor.setScriptPath(testFile.getAbsolutePath());
+        descriptor.setDebuggeePath(testFile.getAbsolutePath());
         final RubyDebuggerProxy proxy = startDebugger(descriptor);
         final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
             new TestBreakpoint("test.rb", 2),
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         resumeSuspendedThread(proxy);
     }
 

@@ -27,7 +27,7 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
             new TestBreakpoint("test.rb", 3),
             new TestBreakpoint("test.rb", 7)
         };
-        startDebugging(proxy, breakpoints, 1);
+        attach(proxy, breakpoints, 1);
         
         // spawned thread suspended
         RubyThreadInfo[] ti = proxy.readThreadInfo();
@@ -112,7 +112,7 @@ public final class ClassicDebuggerCommunicationTest extends CommonCommunicationT
 //        final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[] {
 //            new TestBreakpoint("test.rb", 10),
 //        };
-//        startDebugging(proxy, breakpoints, 200);
+//        attach(proxy, breakpoints, 200);
 //        System.out.println("MK> OK");
 //        proxy.finish(true);
 //    }

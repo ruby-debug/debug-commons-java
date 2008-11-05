@@ -11,16 +11,22 @@ public final class RubyDebugTarget extends RubyEntity {
     private static final Logger LOGGER = Logger.getLogger(RubyDebugTarget.class.getName());
 
     private final Process process;
+    private final String host;
     private final int port;
     private final String debuggedFile;
     private final File baseDir;
     
     private RubyThread[] threads;
     
-    public RubyDebugTarget(RubyDebuggerProxy proxy, Process process, int port,
+    public RubyDebugTarget(RubyDebuggerProxy proxy, String host, int port) {
+        this(proxy, host, port, null, null, null);
+    }
+
+    public RubyDebugTarget(RubyDebuggerProxy proxy, String host, int port, Process process,
             String debuggedFile, File baseDir) {
         super(proxy);
         this.process = process;
+        this.host = host;
         this.port = port;
         this.debuggedFile = debuggedFile;
         this.baseDir = baseDir;
@@ -30,7 +36,11 @@ public final class RubyDebugTarget extends RubyEntity {
     public Process getProcess() {
         return process;
     }
-    
+
+    public String getHost() {
+        return host;
+    }
+
     public int getPort() {
         return port;
     }
@@ -101,9 +111,13 @@ public final class RubyDebugTarget extends RubyEntity {
         }
         return null;
     }
-    
+
+    private boolean isRemote() {
+        return process == null;
+    }
+
     public boolean isRunning() {
-        return Util.isRunning(process);
+        return isRemote() || Util.isRunning(process);
     }
 
     @Override
