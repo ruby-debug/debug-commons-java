@@ -22,7 +22,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         } catch (RubyDebuggerException e) {
             // OK - expected
         }
-        proxy.getDebugTarged().getThreadById(1).resume();
+        proxy.getDebugTarget().getThreadById(1).resume();
     }
     
     public void testNPENotThrownWhenReadingAddedBreakpoints() throws Exception {
@@ -39,7 +39,7 @@ public class ReadersSupportTest extends DebuggerTestBase {
         } catch (RubyDebuggerException e) {
             // OK - expected
         }
-        proxy.getDebugTarged().getThreadById(1).resume();
+        proxy.getDebugTarget().getThreadById(1).resume();
     }
     
 }

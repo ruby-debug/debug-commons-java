@@ -84,8 +84,8 @@ public final class RubyThreadTest extends DebuggerTestBase {
 //            bp2, bp6
 //        };
 //        attach(proxy, breakpoints, 2);
-//        RubyThread t2 = proxy.getDebugTarged().getThreadById(2);
-//        RubyThread t3 = proxy.getDebugTarged().getThreadById(3);
+//        RubyThread t2 = proxy.getDebugTarget().getThreadById(2);
+//        RubyThread t3 = proxy.getDebugTarget().getThreadById(3);
 //        assertNotNull("thread 2 is not null", t2);
 //        assertNotNull("thread 3 is not null", t3);
 //        assertTrue(t2.canStepOver());

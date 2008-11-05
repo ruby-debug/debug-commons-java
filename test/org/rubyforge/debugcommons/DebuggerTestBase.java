@@ -168,7 +168,7 @@ public abstract class DebuggerTestBase extends TestBase {
             default:
                 throw new IllegalStateException("Unhandled debugger type: " + debuggerType);
         }
-        debugTarget = proxy.getDebugTarged();
+        debugTarget = proxy.getDebugTarget();
         rubyStderrRedirectorThread = new OutputRedirectorThread(debugTarget.getProcess().getErrorStream());
         rubyStderrRedirectorThread.start();
         rubyStdoutRedirectorThread = new OutputRedirectorThread(debugTarget.getProcess().getInputStream());
