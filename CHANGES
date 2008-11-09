@@ -1,5 +1,17 @@
 0.9.1 - 0.10.0
 --------------
+  * uncompatible API changes
+  * basic support for remote debugging
+  * base verbosity on "org.rubyforge.debugcommons" logger level rather than on
+    "org.rubyforge.debugcommons.verbose" property. So just one of them is
+    needed.
+  * Robustness, strictness, logging:
+    * let <message>s to come asynchronously
+    * strict debug-commons protocol checking
+    * better logging infrastructure
+    * more info during failures
+  * Utilizing --xml-debug introduced in ruby-debug-ide 0.4.0
+    * do not mess up debugger debug output with the debuggee output
   * Some progress. Code cleanup, API changes (increasing middle version of
     trunk).
     * RubyDebuggerProxy
@@ -8,16 +20,6 @@
       * relaxing addBreakpoint, to emit warning instead of exception (debuggee
         could die)
     * ReadersSupport does not throw redundant RubyDebuggerException anymore
-  * Utilizing --xml-debug introduced in ruby-debug-ide 0.4.0
-    * do not mess up debugger debug output with the debuggee output
-  * Robustness, strictness, logging:
-    * let <message>s to come asynchronously
-    * strict debug-commons protocol checking
-    * better logging infrastructure
-    * more info during failures
-  * base verbosity on "org.rubyforge.debugcommons" logger level rather than on
-    "org.rubyforge.debugcommons.verbose" property. So just one of them is
-    needed.
 
 0.9.0 - 0.9.1
 -------------

@@ -1,3 +1,132 @@
+2008-11-09 00:15  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java:
+	  Preventing possible NPEs. RubyDebugTarget#isAvailable
+
+2008-11-06 16:00  Martin Krauskopf
+
+	* MIT-LICENSE,
+	  src/org/rubyforge/debugcommons/ClassicDebuggerCommandFactory.java,
+	  src/org/rubyforge/debugcommons/ICommandFactory.java,
+	  src/org/rubyforge/debugcommons/ReadersSupport.java,
+	  src/org/rubyforge/debugcommons/RubyDebugCommandFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebugEvent.java,
+	  src/org/rubyforge/debugcommons/RubyDebugEventListener.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerException.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/BreakpointSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/ExceptionSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/IRubyBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/IRubyExceptionBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/IRubyLineBreakpoint.java,
+	  src/org/rubyforge/debugcommons/model/Message.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  src/org/rubyforge/debugcommons/model/RubyEntity.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrame.java,
+	  src/org/rubyforge/debugcommons/model/RubyFrameInfo.java,
+	  src/org/rubyforge/debugcommons/model/RubyThread.java,
+	  src/org/rubyforge/debugcommons/model/RubyThreadInfo.java,
+	  src/org/rubyforge/debugcommons/model/RubyValue.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariable.java,
+	  src/org/rubyforge/debugcommons/model/RubyVariableInfo.java,
+	  src/org/rubyforge/debugcommons/model/StepSuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/model/SuspensionPoint.java,
+	  src/org/rubyforge/debugcommons/reader/BreakpointAddedReader.java,
+	  src/org/rubyforge/debugcommons/reader/BreakpointDeletedReader.java,
+	  src/org/rubyforge/debugcommons/reader/CatchpointSetReader.java,
+	  src/org/rubyforge/debugcommons/reader/ConditionSetReader.java,
+	  src/org/rubyforge/debugcommons/reader/ErrorReader.java,
+	  src/org/rubyforge/debugcommons/reader/FramesReader.java,
+	  src/org/rubyforge/debugcommons/reader/SuspensionReader.java,
+	  src/org/rubyforge/debugcommons/reader/ThreadInfoReader.java,
+	  src/org/rubyforge/debugcommons/reader/VariablesReader.java,
+	  src/org/rubyforge/debugcommons/reader/XmlStreamReader.java,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/OutputRedirectorThread.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java,
+	  test/org/rubyforge/debugcommons/TestBase.java,
+	  test/org/rubyforge/debugcommons/model/RubyDebugTargetTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyFrameInfoTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyVariableTest.java: MIT
+	  License
+
+2008-11-05 20:58  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java: Typo:
+	  s/targed/target
+
+2008-11-05 20:36  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerFactory.java,
+	  src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/Util.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/ClassicDebuggerCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/CommonCommunicationTestBase.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/ReadersSupportTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebugCommunicationTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerFactoryTest.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyDebugTargetTest.java,
+	  test/org/rubyforge/debugcommons/model/RubyThreadTest.java:
+	  Initial support for remote debugging. Tweaking/changing some API
+	  as needed.
+
+2008-11-03 18:06  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/RubyDebuggerProxy.java: Tweaks:
+	  - log output of the process after unexpected fail
+	  - tweaking logging message
+	  - fixing #readFrames(): throw exception when the proxy is ready
+	  but in error state.
+
+2008-10-31 12:53  Martin Krauskopf
+
+	* CHANGES, src/org/rubyforge/debugcommons/RubyDebuggerFactory.java:
+	  Base verbosity on "org.rubyforge.debugcommons" logger level
+	  rather than on "org.rubyforge.debugcommons.verbose" property. So
+	  just one of them is needed.
+
+2008-10-31 12:25  Martin Krauskopf
+
+	* CHANGES, src/org/rubyforge/debugcommons/RubyDebuggerProxy.java,
+	  src/org/rubyforge/debugcommons/model/RubyDebugTarget.java,
+	  test/org/rubyforge/debugcommons/DebuggerTestBase.java,
+	  test/org/rubyforge/debugcommons/RubyDebuggerProxyTest.java: Need
+	  for a check whether the proxy is usable, i.e. whether it is
+	  started and not finished. Introucing #isReady + sanity test.
+
+2008-10-31 08:59  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/reader/FramesReader.java,
+	  src/org/rubyforge/debugcommons/reader/ThreadInfoReader.java:
+	  Flush possible message during threads and frames reading.
+
+2008-10-31 08:51  Martin Krauskopf
+
+	* src/org/rubyforge/debugcommons/reader/XmlStreamReader.java:
+	  trivial: unused logger
+
+2008-10-31 08:17  Martin Krauskopf
+
+	* CHANGES, ChangeLog: CHANGES update
+
 2008-10-31 08:12  Martin Krauskopf
 
 	* src/org/rubyforge/debugcommons/ReadersSupport.java,
