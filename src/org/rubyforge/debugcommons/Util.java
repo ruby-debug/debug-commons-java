@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.rubyforge.debugcommons.model.Message;
+import org.rubyforge.debugcommons.model.RubyDebugTarget;
 import org.rubyforge.debugcommons.reader.VariablesReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -133,16 +134,22 @@ public final class Util {
         return sb.toString().trim();
     }
 
-    public static String dumpAndDestroyProcess(final Process process) {
+    public static String dumpAndDestroyProcess(final RubyDebugTarget target) {
         final StringBuilder info = new StringBuilder();
-        boolean running = Util.isRunning(process);
-        if (running) {
-            info.append("Dumping process, when the debuggee process is running. You might try to increase the timeout. Killing...\n\n");
-        }
-        info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
-        info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
-        if (running) {
-            process.destroy();
+        if (target.isRemote()) {
+            info.append("Remote process");
+        } else {
+            boolean running = target.isRunning();
+            if (running) {
+                info.append("Dumping and destroying process, when the debuggee process is running." +
+                        " You might try to increase the timeout. Killing...\n\n");
+            }
+            Process process = target.getProcess();
+            info.append(dumpStream(process.getInputStream(), Level.INFO, "Standard Output: ", running));
+            info.append(dumpStream(process.getErrorStream(), Level.SEVERE, "Error Output: ", running));
+            if (running) {
+                process.destroy();
+            }
         }
         return info.toString();
     }

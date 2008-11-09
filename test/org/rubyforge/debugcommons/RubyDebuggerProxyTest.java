@@ -49,10 +49,11 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
         File testF = testFile = writeFile("test.rb", testContent);
         int port = 12345;
         Process process = startDebuggerProcess(testF, port);
+        RubyDebugTarget debugTarget = null;
         boolean success = false;
         try {
             RubyDebuggerProxy proxy = new RubyDebuggerProxy(RubyDebuggerProxy.RUBY_DEBUG, 6);
-            RubyDebugTarget debugTarget = new RubyDebugTarget(proxy, "localhost", port);
+            debugTarget = new RubyDebugTarget(proxy, "localhost", port);
             proxy.setDebugTarget(debugTarget);
             final IRubyLineBreakpoint[] breakpoints = new IRubyLineBreakpoint[]{
                 new TestBreakpoint("test.rb", 2),
@@ -64,8 +65,8 @@ public final class RubyDebuggerProxyTest extends DebuggerTestBase {
             assertFalse(Util.isRunning(process));
             success = true;
         } finally {
-            if (!success) {
-                Util.dumpAndDestroyProcess(process);
+            if (!success && debugTarget != null) {
+                Util.dumpAndDestroyProcess(debugTarget);
             }
         }
     }

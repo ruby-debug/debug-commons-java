@@ -140,7 +140,7 @@ public final class RubyDebuggerProxy {
      * proxy did not start yet, false is returned.
      */
     public synchronized boolean isReady() {
-        return !finished && commandWriter != null && getDebugTarget().isRunning();
+        return !finished && commandWriter != null && debugTarget.isAvailable();
     }
 
     private synchronized void attachToClassicDebugger(final IRubyBreakpoint[] initialBreakpoints) throws RubyDebuggerException {
@@ -332,7 +332,7 @@ public final class RubyDebuggerProxy {
         if (!isReady()) {
             throw new RubyDebuggerException("Trying to send a command [" + s +
                     "] to non-started or finished proxy (debuggee: " + getDebugTarget() + ", output: \n\n" +
-                    Util.dumpAndDestroyProcess(debugTarget.getProcess()));
+                    Util.dumpAndDestroyProcess(debugTarget));
         }
         getCommandWriter().println(s);
     }
@@ -453,10 +453,9 @@ public final class RubyDebuggerProxy {
                     LOGGER.log(Level.INFO, "Interrupted during IO readers waiting", e);
                 }
                 RubyDebugTarget target = getDebugTarget();
-                LOGGER.fine("Destroying process: " + target);
-                Process process = target.getProcess();
-                if (process != null) {
-                    process.destroy();
+                if (!target.isRemote()) {
+                    LOGGER.fine("Destroying process: " + target);
+                    target.getProcess().destroy();
                 }
             }
         }
@@ -464,11 +463,14 @@ public final class RubyDebuggerProxy {
     }
     
     private synchronized void sendExit() {
-        if (commandSocket != null && debugTarget.isRunning()) {
+        if (commandSocket != null && debugTarget.isAvailable()) {
             try {
                 sendCommand("exit");
             } catch (RubyDebuggerException ex) {
-                LOGGER.fine("'exit' command failed. Process died? -> " + debugTarget.isRunning());
+                LOGGER.fine("'exit' command failed. Remote process? -> " + debugTarget.isRemote());
+                if (!debugTarget.isRemote()) {
+                    LOGGER.fine("'exit' command failed. Process running? -> " + debugTarget.isRunning());
+                }
             }
         }
     }
@@ -495,7 +497,7 @@ public final class RubyDebuggerProxy {
                     }
                 }
                 try {
-                    if (debugTarget.isRunning()) {
+                    if (debugTarget.isAvailable()) {
                         LOGGER.finest("Cannot connect to " + host + ':' + port + ". Trying again...(" + (tryCount - i - 1) + ')');
                         Thread.sleep(500);
                     } else {
@@ -513,10 +515,9 @@ public final class RubyDebuggerProxy {
     }
 
     private void failWithInfo(ConnectException e) throws RubyDebuggerException {
-        Process process = debugTarget.getProcess();
-        String info = process == null
+        String info = debugTarget.isRemote()
                 ? "[Remote Process at " + debugTarget.getHost() + ':' + debugTarget.getPort() + "]"
-                : Util.dumpAndDestroyProcess(process);
+                : Util.dumpAndDestroyProcess(debugTarget);
         throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
     }
 
@@ -568,7 +569,7 @@ public final class RubyDebuggerProxy {
             boolean unexpectedFail = getReadersSupport().isUnexpectedFail();
             if (unexpectedFail) {
                 LOGGER.warning("Unexpected fail. Debuggee: " + getDebugTarget() +
-                        ", output: \n\n" + Util.dumpAndDestroyProcess(debugTarget.getProcess()));
+                        ", output: \n\n" + Util.dumpAndDestroyProcess(debugTarget));
             }
             finish(unexpectedFail);
             LOGGER.finest("Socket reader loop finished.");

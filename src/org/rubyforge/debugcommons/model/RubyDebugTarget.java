@@ -37,24 +37,30 @@ public final class RubyDebugTarget extends RubyEntity {
     private final int port;
     private final String debuggedFile;
     private final File baseDir;
+    private final boolean remote;
     
     private RubyThread[] threads;
     
     public RubyDebugTarget(RubyDebuggerProxy proxy, String host, int port) {
-        this(proxy, host, port, null, null, null);
+        this(proxy, host, port, null, null, null, true);
     }
 
     public RubyDebugTarget(RubyDebuggerProxy proxy, String host, int port, Process process,
-            String debuggedFile, File baseDir) {
+            String debuggee, File baseDir) {
+        this(proxy, host, port, process, debuggee, baseDir, false);
+    }
+
+    private RubyDebugTarget(RubyDebuggerProxy proxy, String host, int port, Process process,
+            String debugeee, File baseDir, boolean remote) {
         super(proxy);
         this.process = process;
         this.host = host;
         this.port = port;
-        this.debuggedFile = debuggedFile;
+        this.debuggedFile = debugeee;
         this.baseDir = baseDir;
         this.threads = new RubyThread[0];
+        this.remote = remote;
     }
-    
     public Process getProcess() {
         return process;
     }
@@ -74,7 +80,7 @@ public final class RubyDebugTarget extends RubyEntity {
     public File getBaseDir() {
         return baseDir;
     }
-    
+
     private void updateThreads() throws RubyDebuggerException {
         // preconditions:
         // 1) both threadInfos and updatedThreads are sorted by their id attribute
@@ -134,12 +140,26 @@ public final class RubyDebugTarget extends RubyEntity {
         return null;
     }
 
-    private boolean isRemote() {
-        return process == null;
+    /**
+     * Returns true if the underlying process is running or if this a remote
+     * target.
+     */
+    public boolean isAvailable() {
+        return isRemote() || isRunning();
     }
 
+    /** Return whether this represent a remote target. */
+    public boolean isRemote() {
+        return remote;
+    }
+
+    /**
+     * Return the underlying process is running. Usable only for non-remote
+     * processes.
+     */
     public boolean isRunning() {
-        return isRemote() || Util.isRunning(process);
+        assert !isRemote() : "cannot ask remote process whether it is running";
+        return Util.isRunning(process);
     }
 
     @Override

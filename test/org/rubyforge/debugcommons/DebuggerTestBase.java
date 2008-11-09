@@ -112,7 +112,7 @@ public abstract class DebuggerTestBase extends TestBase {
         String name = this.getName();
         System.out.println("Waiting for the server process to finish...");
         if (debugTarget != null) {
-            for (int i = 0; i < 8 && debugTarget.isRunning(); i++) {
+            for (int i = 0; i < 8 && debugTarget.isAvailable(); i++) {
                 Thread.sleep(250);
                 System.out.println(i + " (" + name + ")");
             }
