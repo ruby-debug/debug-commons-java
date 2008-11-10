@@ -441,6 +441,10 @@ public final class RubyDebuggerProxy {
                 LOGGER.fine("Trying to finish the same proxy more than once: " + this);
                 return;
             }
+            if (getDebugTarget().isRemote()) {
+                // TBD rather detach
+                sendExit();
+            }
             finished = true;
             PROXIES.remove(RubyDebuggerProxy.this);
             if (forced) {
