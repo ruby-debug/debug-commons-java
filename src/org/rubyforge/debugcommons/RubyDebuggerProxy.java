@@ -230,7 +230,9 @@ public final class RubyDebuggerProxy {
                     throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
                 }
             } catch (final RubyDebuggerException ex) {
-                LOGGER.log(Level.WARNING, "Cannot add breakpoint: " + ex.getLocalizedMessage(), ex);
+                if (isReady()) {
+                    LOGGER.log(Level.WARNING, "Cannot add breakpoint to: " + getDebugTarget(), ex);
+                }
             }
         }
     }
