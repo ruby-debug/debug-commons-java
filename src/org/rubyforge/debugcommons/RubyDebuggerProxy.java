@@ -569,8 +569,11 @@ public final class RubyDebuggerProxy {
                         }
                     }
                 }
-
-                SuspensionReaderLoop.this.suspensionOccurred(sp);
+                if (!RubyDebuggerProxy.this.isReady()) { // flush events after proxy is finished
+                    LOGGER.info("Session and/or debuggee is not ready, ignoring backend event - suspension point: " + sp);
+                } else {
+                    SuspensionReaderLoop.this.suspensionOccurred(sp);
+                }
             }
             boolean unexpectedFail = getReadersSupport().isUnexpectedFail();
             if (unexpectedFail) {
