@@ -227,7 +227,8 @@ final class ReadersSupport {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new RubyDebuggerException("Interruped during reading " + toRead, ex);
+            throw new RubyDebuggerException("Interruped during reading " +
+                    toRead + " (timeout: " + timeout + ')', ex);
         }
     }
 
