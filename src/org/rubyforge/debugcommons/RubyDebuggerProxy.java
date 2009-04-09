@@ -447,7 +447,6 @@ public final class RubyDebuggerProxy {
                 // TBD rather detach
                 sendExit();
             }
-            finished = true;
             PROXIES.remove(RubyDebuggerProxy.this);
             if (forced) {
                 sendExit();
@@ -464,6 +463,7 @@ public final class RubyDebuggerProxy {
                     target.getProcess().destroy();
                 }
             }
+            finished = true;
         }
         fireDebugEvent(RubyDebugEvent.createTerminateEvent());
     }
