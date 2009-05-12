@@ -207,6 +207,7 @@ public final class RubyDebuggerFactory {
     private static void adjustForJRuby(List<String> args) {
         args.add("-J-Djruby.reflection=true");
         args.add("-J-Djruby.compile.mode=OFF");
+        args.add("-J-Djruby.debug.fullTrace=true");
     }
 
     private static RubyDebuggerProxy startDebugger(final Descriptor desc, final List<String> args, final int timeout)
