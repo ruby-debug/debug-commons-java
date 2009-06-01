@@ -25,6 +25,7 @@ package org.rubyforge.debugcommons.reader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyFrameInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -42,6 +43,15 @@ public final class FramesReader extends XmlStreamReader {
         assert xpp.getName().equals("frames");
         while (!(nextEvent() == XmlPullParser.END_TAG && "frames".equals(xpp.getName()))) {
             ErrorReader.flushPossibleMessage(xpp);
+            /*
+             * Check for empty <frames>, e.g.:
+             * <frames>
+             * <message>
+             * </frames>
+             */
+            if (Util.isEndTag(xpp, "frames")) {
+                break;
+            }
             assert xpp.getName().equals("frame") : xpp.getName() + " encountered";
             String file = getAttributeValue("file");
             int line = getAttributeIntValue("line");

@@ -25,6 +25,7 @@ package org.rubyforge.debugcommons.reader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.rubyforge.debugcommons.Util;
 import org.rubyforge.debugcommons.model.RubyThreadInfo;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -42,6 +43,15 @@ public final class ThreadInfoReader extends XmlStreamReader {
         assert xpp.getName().equals("threads");
         while (!(nextEvent() == XmlPullParser.END_TAG && "threads".equals(xpp.getName()))) {
             ErrorReader.flushPossibleMessage(xpp);
+            /*
+             * Check for empty <threads>, e.g.:
+             * <threads>
+             * <message>
+             * </threads>
+             */
+            if (Util.isEndTag(xpp, "threads")) {
+                break;
+            }
             assert xpp.getName().equals("thread") : xpp.getName() + " encountered";
             int id = getAttributeIntValue("id");
             String status = getAttributeValue("status");

@@ -266,4 +266,19 @@ public final class Util {
             return "<Unable to find a type>";
         }
     }
+
+    /**
+     * Checks whether the current state of the given <code>xpp</code> represents
+     * an end tag for the given <code>name</code>.
+     * 
+     * @param xpp
+     * @param name
+     * @return
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    public static boolean isEndTag(XmlPullParser xpp, String name) throws XmlPullParserException, IOException {
+        return XmlPullParser.END_TAG == xpp.getEventType() && name.equals(xpp.getName());
+    }
+
 }

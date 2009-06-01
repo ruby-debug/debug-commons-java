@@ -64,6 +64,15 @@ public final class VariablesReader extends XmlStreamReader {
                         "and file a bug against Ruby or debug-commons tracker.");
             }
             ErrorReader.flushPossibleMessage(xpp);
+            /*
+             * Check for empty <variables>, e.g.:
+             * <variables>
+             * <message>
+             * </variables>
+             */
+            if (Util.isEndTag(xpp, "variables")) {
+                break;
+            }
             assert xpp.getName().equals("variable") : xpp.getName() + "(type: " + Util.getType(xpp) + ") encountered";
             String name = getAttributeValue("name");
             String value = getAttributeValue("value");
