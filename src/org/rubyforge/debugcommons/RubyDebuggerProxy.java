@@ -524,7 +524,8 @@ public final class RubyDebuggerProxy {
         String info = debugTarget.isRemote()
                 ? "[Remote Process at " + debugTarget.getHost() + ':' + debugTarget.getPort() + "]"
                 : Util.dumpAndDestroyProcess(debugTarget);
-        throw new RubyDebuggerException("Cannot connect to the debugged process in " + timeout + "s:\n\n" + info, e);
+        throw new RubyDebuggerException("Cannot connect to the debugged process at port "
+                + debugTarget.getPort() + " in " + timeout + "s:\n\n" + info, e);
     }
 
     /**
