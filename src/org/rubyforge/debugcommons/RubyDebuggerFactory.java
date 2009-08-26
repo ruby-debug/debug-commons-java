@@ -227,10 +227,10 @@ public final class RubyDebuggerFactory {
         boolean supportsCondition = desc.getType() == RUBY_DEBUG && suitableVersion;
         proxy.setConditionSupport(supportsCondition);
         
-        // do NOT use InetAddress.getLocalHost() instead of "localhost".
-        // Does not work on Windows for some reason:
-        // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273
-        RubyDebugTarget target = new RubyDebugTarget(proxy, "localhost", desc.getPort(),
+        // 127.0.0.1 seemingly works with all systems and with IPv6 as well.
+        // "localhost" and InetAddress.getLocalHost() have problems on some systems.
+        // cf. http://www.netbeans.org/issues/show_bug.cgi?id=143273 for one case
+        RubyDebugTarget target = new RubyDebugTarget(proxy, "127.0.0.1", desc.getPort(),
                 pb.start(), desc.getDebuggeePath(), desc.getBaseDirectory());
         proxy.setDebugTarget(target);
         RubyDebuggerProxy.PROXIES.add(proxy);
