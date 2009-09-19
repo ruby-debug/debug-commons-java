@@ -534,6 +534,28 @@ public final class RubyDebuggerProxy {
             }
         }
     }
+
+    public synchronized void jump(final int line) {
+        try {
+            sendCommand("jump " + line);
+        }
+        catch (final RubyDebuggerException ex) {
+            if (isReady()) {
+                LOGGER.log(Level.WARNING, "Cannot jump", ex);
+            }
+        }
+    }
+
+    public synchronized void thread_pause(final int id) {
+        try {
+            sendCommand("th " + id);
+        }
+        catch (final RubyDebuggerException ex) {
+            if (isReady()) {
+                LOGGER.log(Level.WARNING, "Cannot pause", ex);
+            }
+        }
+    }
     
     /**
      * Tries to attach to the <code>target</code>'s process and gives up in

@@ -156,7 +156,11 @@ public final class RubyThread extends RubyEntity {
         getProxy().addBreakpoint(temporaryBreakpoint);
         resume();
     }
-    
+
+    public void jump(final int line) {
+        getProxy().jump(line);
+    }
+
     private void updateName() {
         this.updateName(null);
     }
