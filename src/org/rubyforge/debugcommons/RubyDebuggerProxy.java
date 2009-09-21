@@ -546,13 +546,24 @@ public final class RubyDebuggerProxy {
         }
     }
 
-    public synchronized void thread_pause(final int id) {
+    public synchronized void threadPause(final int id) {
         try {
             sendCommand("pause " + id);
         }
         catch (final RubyDebuggerException ex) {
             if (isReady()) {
                 LOGGER.log(Level.WARNING, "Cannot pause", ex);
+            }
+        }
+    }
+
+    public synchronized void setType(final RubyVariable var, final String new_type) {
+        try {
+            sendCommand("set_type " + var.getName() + " " + new_type);
+        }
+        catch (final RubyDebuggerException ex) {
+            if (isReady()) {
+                LOGGER.log(Level.WARNING, "Cannot set_type", ex);
             }
         }
     }
