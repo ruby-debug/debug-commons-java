@@ -548,7 +548,7 @@ public final class RubyDebuggerProxy {
 
     public synchronized void thread_pause(final int id) {
         try {
-            sendCommand("th " + id);
+            sendCommand("pause " + id);
         }
         catch (final RubyDebuggerException ex) {
             if (isReady()) {
