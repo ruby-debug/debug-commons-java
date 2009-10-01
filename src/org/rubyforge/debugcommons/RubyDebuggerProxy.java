@@ -510,7 +510,7 @@ public final class RubyDebuggerProxy {
                         failWithInfo(e);
                     }
                 } catch (InterruptedException e1) {
-                    LOGGER.log(Level.SEVERE, "Interrupted during attaching.", e1);
+                    LOGGER.log(Level.INFO, "Interrupted during attaching.", e1);
                     Thread.currentThread().interrupt();
                 }
             } catch (IOException e) {

@@ -167,7 +167,7 @@ public final class Util {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             }
             collector.interrupt();
         } else {
