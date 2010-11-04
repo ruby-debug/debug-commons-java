@@ -50,6 +50,8 @@ final class ReadersSupport {
     private static final String EXCEPTION_ELEMENT = "exception";
     private static final String BREAKPOINT_ADDED_ELEMENT = "breakpointAdded";
     private static final String BREAKPOINT_DELETED_ELEMENT = "breakpointDeleted";
+    private static final String BREAKPOINT_ENABLED_ELEMENT = "breakpointEnabled";
+    private static final String BREAKPOINT_DISABLED_ELEMENT = "breakpointDisabled";
     private static final String CONDITION_SET_ELEMENT = "conditionSet";
     private static final String CATCHPOINT_SET_ELEMENT = "catchpointSet";
     
@@ -77,6 +79,8 @@ final class ReadersSupport {
     private final BlockingQueue<SuspensionPoint> suspensions;
     private final BlockingQueue<Integer> addedBreakpoints;
     private final BlockingQueue<Integer> removedBreakpoints;
+    private final BlockingQueue<Integer> enabledBreakpoints;
+    private final BlockingQueue<Integer> disabledBreakpoints;
     private final BlockingQueue<Integer> conditionSets;
     private final BlockingQueue<String> catchpointSets;
     
@@ -95,6 +99,8 @@ final class ReadersSupport {
         this.suspensions = new LinkedBlockingQueue<SuspensionPoint>();
         this.addedBreakpoints = new LinkedBlockingQueue<Integer>();
         this.removedBreakpoints = new LinkedBlockingQueue<Integer>();
+        this.enabledBreakpoints = new LinkedBlockingQueue<Integer>();
+        this.disabledBreakpoints = new LinkedBlockingQueue<Integer>();
         this.conditionSets = new LinkedBlockingQueue<Integer>();
         this.catchpointSets = new LinkedBlockingQueue<String>();
     }
@@ -141,6 +147,10 @@ final class ReadersSupport {
             addedBreakpoints.add(BreakpointAddedReader.readBreakpointNo(xpp));
         } else if (BREAKPOINT_DELETED_ELEMENT.equals(element)) {
             removedBreakpoints.add(BreakpointDeletedReader.readBreakpointNo(xpp));
+        } else if (BREAKPOINT_ENABLED_ELEMENT.equals(element)) {
+            enabledBreakpoints.add(BreakpointEnabledReader.readBreakpointNo(xpp));
+        } else if (BREAKPOINT_DISABLED_ELEMENT.equals(element)) {
+            disabledBreakpoints.add(BreakpointDisabledReader.readBreakpointNo(xpp));
         } else if (BREAKPOINT_ELEMENT.equals(element) || SUSPENDED_ELEMENT.equals(element) || EXCEPTION_ELEMENT.equals(element)) {
             SuspensionPoint sp = SuspensionReader.readSuspension(xpp);
             suspensions.add(sp);
@@ -198,6 +208,24 @@ final class ReadersSupport {
     
     int readAddedBreakpointNo() throws RubyDebuggerException {
         return poll(addedBreakpoints, "added breakpoint number");
+    }
+
+    int readEnabledBreakpointNo(int breakpointID) throws RubyDebuggerException {
+        int enabledID = poll(enabledBreakpoints, "breakpoint number of the enabled breakpoint (" + breakpointID + ")");
+        if (enabledID != breakpointID) {
+            throw new RubyDebuggerException("Unexpected breakpoint removed. " +
+                    "Received id: " + enabledID + ", expected: " + breakpointID);
+        }
+        return enabledID;
+    }
+
+    int readDisabledBreakpointNo(int breakpointID) throws RubyDebuggerException {
+        int disabledID = poll(disabledBreakpoints, "breakpoint number of the disabled breakpoint (" + breakpointID + ")");
+        if (disabledID != breakpointID) {
+            throw new RubyDebuggerException("Unexpected breakpoint removed. " +
+                    "Received id: " + disabledID + ", expected: " + breakpointID);
+        }
+        return disabledID;
     }
     
     int readConditionSet() throws RubyDebuggerException {

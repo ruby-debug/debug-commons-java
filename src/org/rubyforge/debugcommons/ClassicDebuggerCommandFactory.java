@@ -82,7 +82,15 @@ public final class ClassicDebuggerCommandFactory implements ICommandFactory {
     public String createLoad(String filename) {
         return "load " + filename;
     }
-    
+
+    public String createEnableBreakpoint(int index) {
+        return null;
+    }
+
+    public String createDisableBreakpoint(int index) {
+        return null;
+    }
+
     public String createInspect(RubyFrame frame, String expression) {
         return "th " + frame.getThread().getId() + "; v inspect " + frame.getIndex() + " " + expression;
     }

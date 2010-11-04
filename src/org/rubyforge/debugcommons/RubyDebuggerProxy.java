@@ -28,7 +28,6 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -199,44 +198,95 @@ public final class RubyDebuggerProxy {
             return;
         }
         assert breakpoint != null : "breakpoint cannot be null";
-        if (breakpoint.isEnabled()) {
-            try {
-                if (breakpoint instanceof IRubyLineBreakpoint) {
-                    IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
-                    String command = commandFactory.createAddBreakpoint(
-                            lineBreakpoint.getFilePath(), lineBreakpoint.getLineNumber());
-                    sendCommand(command);
-                    Integer id = getReadersSupport().readAddedBreakpointNo();
-                    String condition = lineBreakpoint.getCondition();
-                    if (condition != null && supportsCondition) {
-                        command = commandFactory.createSetCondition(id, condition);
-                        if (command != null) {
-                            sendCommand(command);
-                            getReadersSupport().readConditionSet(); // read response
-                        } else {
-                            LOGGER.info("conditional breakpoints are not supported by backend");
-                        }
-                    }
-                    breakpointsIDs.put(id, lineBreakpoint);
-                } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
-                    IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
-                    // just 're-enable' if contained in removedCatchpoints
-                    if (!removedCatchpoints.remove(excBreakpoint.getException())) {
-                        String command = commandFactory.createCatchOn(excBreakpoint);
+        try {
+            if (breakpoint instanceof IRubyLineBreakpoint) {
+                IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+                String command = commandFactory.createAddBreakpoint(
+                        lineBreakpoint.getFilePath(), lineBreakpoint.getLineNumber());
+                sendCommand(command);
+                Integer id = getReadersSupport().readAddedBreakpointNo();
+                String condition = lineBreakpoint.getCondition();
+                if (condition != null && supportsCondition) {
+                    command = commandFactory.createSetCondition(id, condition);
+                    if (command != null) {
                         sendCommand(command);
-                        getReadersSupport().readCatchpointSet(); // read response
+                        getReadersSupport().readConditionSet(); // read response
+                    } else {
+                        LOGGER.info("conditional breakpoints are not supported by backend");
                     }
-                } else {
-                    throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
                 }
-            } catch (final RubyDebuggerException ex) {
-                if (isReady()) {
-                    LOGGER.log(Level.WARNING, "Cannot add breakpoint to: " + getDebugTarget(), ex);
+                if (!breakpoint.isEnabled()) {
+                    disableBreakpoint(breakpoint);
                 }
+                breakpointsIDs.put(id, lineBreakpoint);
+            } else if (breakpoint instanceof IRubyExceptionBreakpoint) {
+                IRubyExceptionBreakpoint excBreakpoint = (IRubyExceptionBreakpoint) breakpoint;
+                // just 're-enable' if contained in removedCatchpoints
+                if (!removedCatchpoints.remove(excBreakpoint.getException())) {
+                    String command = commandFactory.createCatchOn(excBreakpoint);
+                    sendCommand(command);
+                    getReadersSupport().readCatchpointSet(); // read response
+                }
+            } else {
+                throw new IllegalArgumentException("Unknown breakpoint type: " + breakpoint);
+            }
+        } catch (final RubyDebuggerException ex) {
+            if (isReady()) {
+                LOGGER.log(Level.WARNING, "Cannot add breakpoint to: " + getDebugTarget(), ex);
             }
         }
     }
-    
+
+    private void disableBreakpoint(final IRubyBreakpoint breakpoint) {
+        LOGGER.fine("Disabling breakpoint: " + breakpoint);
+        if (!isReady()) {
+            LOGGER.fine("Session and/or debuggee is not ready, skipping addition of breakpoint: " + breakpoint);
+            return;
+        }
+        try {
+            if (breakpoint instanceof IRubyLineBreakpoint) {
+                IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+                Integer id = findBreakpointId(lineBreakpoint);
+                String command = commandFactory.createDisableBreakpoint(id);
+                if (command != null) {
+                    sendCommand(command);
+                    getReadersSupport().readDisabledBreakpointNo(id);
+                } else {
+                    LOGGER.info("disabling breakpoints is nor supported by backend");
+                }
+            } else {
+                removeBreakpoint(breakpoint);
+            }
+        } catch (RubyDebuggerException e) {
+          LOGGER.log(Level.SEVERE, "Exception during disabling breakpoint.", e);
+        }
+    }
+
+    private void enableBreakpoint(final IRubyBreakpoint breakpoint) {
+        LOGGER.fine("Enabling breakpoint: " + breakpoint);
+        if (!isReady()) {
+            LOGGER.fine("Session and/or debuggee is not ready, skipping addition of breakpoint: " + breakpoint);
+            return;
+        }
+        try {
+            if (breakpoint instanceof IRubyLineBreakpoint) {
+                IRubyLineBreakpoint lineBreakpoint = (IRubyLineBreakpoint) breakpoint;
+                Integer id = findBreakpointId(lineBreakpoint);
+                String command = commandFactory.createEnableBreakpoint(id);
+                if (command != null) {
+                    sendCommand(command);
+                    getReadersSupport().readEnabledBreakpointNo(id);
+                } else {
+                    LOGGER.info("disabling breakpoints is nor supported by backend");
+                }
+            } else {
+                addBreakpoint(breakpoint);
+            }
+        } catch (RubyDebuggerException e) {
+          LOGGER.log(Level.SEVERE, "Exception during enabling breakpoint.", e);
+        }
+    }
+
     public synchronized void removeBreakpoint(final IRubyBreakpoint breakpoint) {
         removeBreakpoint(breakpoint, false);
     }
@@ -285,21 +335,25 @@ public final class RubyDebuggerProxy {
     /**
      * Update the given breakpoint. Use when <em>enabled</em> property has
      * changed.
+     * @param breakpoint breakpoint to be updated
      */
-    public void updateBreakpoint(IRubyBreakpoint breakpoint) throws RubyDebuggerException {
-        removeBreakpoint(breakpoint, true);
-        addBreakpoint(breakpoint);
+    public void updateBreakpoint(IRubyBreakpoint breakpoint) {
+        if (breakpoint.isEnabled()) {
+            enableBreakpoint(breakpoint);
+        } else {
+            disableBreakpoint(breakpoint);
+        }
     }
     
     /**
      * Find ID under which the given breakpoint is known in the current
      * debugging session.
      *
+     * @param wantedBP breakpoint to search for
      * @return found ID; might be <tt>null</tt> if none is found
      */
     private synchronized Integer findBreakpointId(final IRubyLineBreakpoint wantedBP) {
-        for (Iterator<Map.Entry<Integer, IRubyLineBreakpoint>> it = breakpointsIDs.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Integer, IRubyLineBreakpoint> breakpointID = it.next();
+        for (Map.Entry<Integer, IRubyLineBreakpoint> breakpointID : breakpointsIDs.entrySet()) {
             IRubyLineBreakpoint bp = breakpointID.getValue();
             int id = breakpointID.getKey();
             if (wantedBP.getFilePath().equals(bp.getFilePath()) &&

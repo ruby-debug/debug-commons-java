@@ -64,5 +64,8 @@ public interface ICommandFactory {
     String createCatchOff();
     
     String createLoad(String filename);
-    
+
+    String createEnableBreakpoint(int index);
+
+    String createDisableBreakpoint(int index);
 }

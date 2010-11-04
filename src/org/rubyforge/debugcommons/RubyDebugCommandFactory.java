@@ -93,6 +93,14 @@ public class RubyDebugCommandFactory implements ICommandFactory {
         setBreakPointCommand.append(line);
         return setBreakPointCommand.toString();
     }
+
+    public String createEnableBreakpoint(int index) {
+      return "enable " + index;
+    }
+
+    public String createDisableBreakpoint(int index) {
+      return "disable " + index;
+    }
     
     public String createRemoveBreakpoint(int index) {
         return "delete " + index;
