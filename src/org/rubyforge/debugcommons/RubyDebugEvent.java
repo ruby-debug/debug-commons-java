@@ -60,6 +60,10 @@ public final class RubyDebugEvent {
     public RubyThread getRubyThread() {
         return rubyThread;
     }
+
+    public SuspensionPoint getSuspensionPoint() {
+        return sp;
+    }
     
     public String getFilePath() {
         return sp.getFile();
