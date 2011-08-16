@@ -72,6 +72,7 @@ public final class RubyDebuggerProxy {
     private ReadersSupport readersSupport;
     
     private boolean supportsCondition;
+    private Object variablesLock = new Object();
     
     // catchpoint removing is not supported by backend yet, handle it in the
     // debug-commons-java until the support is added
@@ -383,7 +384,7 @@ public final class RubyDebuggerProxy {
         }
     }
     
-    private void sendCommand(final String s) throws RubyDebuggerException {
+    private synchronized void sendCommand(final String s) throws RubyDebuggerException {
         LOGGER.fine("Sending command debugger: " + s);
         if (!isReady()) {
             throw new RubyDebuggerException("Trying to send a command [" + s +
@@ -451,8 +452,11 @@ public final class RubyDebuggerProxy {
     }
     
     public RubyVariable[] readVariables(RubyFrame frame) throws RubyDebuggerException {
-        sendCommand(commandFactory.createReadLocalVariables(frame));
-        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariableInfo[] infos;
+        synchronized (variablesLock) {
+            sendCommand(commandFactory.createReadLocalVariables(frame));
+            infos = getReadersSupport().readVariables();
+        }
         RubyVariable[] variables= new RubyVariable[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyVariableInfo info = infos[i];
@@ -462,8 +466,11 @@ public final class RubyDebuggerProxy {
     }
     
     public RubyVariable[] readInstanceVariables(final RubyVariable variable) throws RubyDebuggerException {
-        sendCommand(commandFactory.createReadInstanceVariable(variable));
-        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariableInfo[] infos;
+        synchronized (variablesLock) {
+            sendCommand(commandFactory.createReadInstanceVariable(variable));
+            infos = getReadersSupport().readVariables();
+        }
         RubyVariable[] variables= new RubyVariable[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyVariableInfo info = infos[i];
@@ -473,8 +480,11 @@ public final class RubyDebuggerProxy {
     }
     
     public RubyVariable[] readGlobalVariables() throws RubyDebuggerException {
-        sendCommand(commandFactory.createReadGlobalVariables());
-        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariableInfo[] infos;
+        synchronized (variablesLock) {
+            sendCommand(commandFactory.createReadGlobalVariables());
+            infos = getReadersSupport().readVariables();
+        }
         RubyVariable[] variables= new RubyVariable[infos.length];
         for (int i = 0; i < infos.length; i++) {
             RubyVariableInfo info = infos[i];
@@ -485,8 +495,11 @@ public final class RubyDebuggerProxy {
     
     public RubyVariable inspectExpression(RubyFrame frame, String expression) throws RubyDebuggerException {
         expression = expression.replaceAll("\n", "\\\\n");
-        sendCommand(commandFactory.createInspect(frame, expression));
-        RubyVariableInfo[] infos = getReadersSupport().readVariables();
+        RubyVariableInfo[] infos;
+        synchronized (variablesLock) {
+            sendCommand(commandFactory.createInspect(frame, expression));
+            infos = getReadersSupport().readVariables();
+        }
         return infos.length == 0 ? null : new RubyVariable(infos[0], frame);
     }
     
