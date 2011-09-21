@@ -59,6 +59,10 @@ public final class RubyFrame extends RubyEntity {
         }
         return variables;
     }
+
+    public void clearCachedVariables() {
+        variables = null;
+    }
     
     public RubyVariable inspectExpression(final String expression) throws RubyDebuggerException {
         return getProxy().inspectExpression(this, expression);
