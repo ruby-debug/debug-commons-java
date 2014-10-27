@@ -34,15 +34,23 @@ public abstract class XmlStreamReader {
     public XmlStreamReader(XmlPullParser xpp) {
         this.xpp = xpp;
     }
-    
+
     protected void ensureEndTag(final String name) throws XmlPullParserException, IOException {
-        int nextTag = xpp.next();
-        if (nextTag != XmlPullParser.END_TAG && !name.equals(xpp.getName())) {
+        ensureEndTag(xpp, name);
+    }
+
+    public static void ensureEndTag(XmlPullParser xpp, final String name) throws XmlPullParserException, IOException {
+        xpp.next();
+        ensureAtEndTag(xpp, name);
+    }
+
+    protected static void ensureAtEndTag(XmlPullParser xpp, final String name) throws XmlPullParserException, IOException {
+        if (xpp.getEventType() != XmlPullParser.END_TAG && !name.equals(xpp.getName())) {
             throw new IllegalStateException(
                     "Unexpected event. Expecting " + name + " end tag." + xpp.getName());
         }
     }
-    
+
     /**
      * Works like {@link XmlPullParser#next} but skips all {@link
      * XmlPullParser#TEXT} events.
