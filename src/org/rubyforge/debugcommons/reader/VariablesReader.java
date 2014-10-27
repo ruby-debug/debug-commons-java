@@ -73,27 +73,53 @@ public final class VariablesReader extends XmlStreamReader {
             if (Util.isEndTag(xpp, "variables")) {
                 break;
             }
-            assert xpp.getName().equals("variable") : xpp.getName() + "(type: " + Util.getType(xpp) + ") encountered";
-            String name = getAttributeValue("name");
-            String value = getAttributeValue("value");
-            String kind = getAttributeValue("kind");
-            RubyVariableInfo newVariable;
-            if (value == null) {
-                newVariable = new RubyVariableInfo(name, kind);
-            } else {
-                String type = getAttributeValue("type");
-                boolean hasChildren = getAttributeBoolValue("hasChildren");
-                String objectId = getAttributeValue("objectId");
-                newVariable = new RubyVariableInfo(name, kind, value, type, hasChildren, objectId);
-            }
-            _variables.add(newVariable);
-            ensureEndTag("variable");
+            _variables.add(parseVariable());
         }
         this.variables = _variables.toArray(new RubyVariableInfo[_variables.size()]);
     }
 
+    private RubyVariableInfo parseVariable() throws XmlPullParserException, IOException {
+        assert xpp.getName().equals("variable") : xpp.getName() + "(type: " + Util.getType(xpp) + ") encountered";
+        final String name = getAttributeValue("name");
+        String value = getAttributeValue("value");
+        final String kind = getAttributeValue("kind");
+
+        if (value == null) {
+            ensureEndTag("variable");
+            return new RubyVariableInfo(name, kind);
+        }
+
+        final String type = getAttributeValue("type");
+        final boolean hasChildren = getAttributeBoolValue("hasChildren");
+        final String objectId = getAttributeValue("objectId");
+        value = readValueFromElement(value);
+        ensureAtEndTag(xpp, "variable");
+
+        return new RubyVariableInfo(name, kind, value, type, hasChildren, objectId);
+    }
+
+    /**
+     * Tries to read value from {@code value} sub-element, if there is no sub-element default value will be returned.
+     * Note: xpp moved to the next event after sub-element.
+     */
+    private String readValueFromElement(final String defaultValue) throws IOException, XmlPullParserException {
+        String value = defaultValue;
+        final int nextTag = xpp.next();
+        if (nextTag == XmlPullParser.START_TAG && "value".equals(xpp.getName())) {
+            xpp.next();
+            if (xpp.getEventType() == XmlPullParser.TEXT) {
+                value = xpp.getText();
+                xpp.next();
+            }
+            ensureAtEndTag(xpp, "value");
+            xpp.next();
+        }
+
+        return value;
+    }
+
     private void parseProcessingException() throws XmlPullParserException, IOException {
-        LOGGER.severe("Processing exception occured." +
+        LOGGER.severe("Processing exception occurred." +
                 " exceptionMessage: " + getAttributeValue("message") +
                 ", exceptionType: " + getAttributeValue("type"));
         ensureEndTag("processingException");
